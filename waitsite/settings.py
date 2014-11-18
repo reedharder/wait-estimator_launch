@@ -71,6 +71,9 @@ DATABASES = {
 
 DATABASES['default'] =  dj_database_url.config()
 
+#emails
+ADMINS=(('Reed', 'reedharder@gmail.com'),)
+MANAGERS=(('Reed', 'reedharder@gmail.com'),)
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/
