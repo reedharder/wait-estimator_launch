@@ -72,6 +72,12 @@ DATABASES = {
 DATABASES['default'] =  dj_database_url.config()
 
 #emails
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'reedharder@gmail.com'
+EMAIL_HOST_PASSWORD = 'rearbagg1['
+DEFAULT_FROM_EMAIL = 'reedharder@gmail.com'
 ADMINS=(('Reed', 'reedharder@gmail.com'),)
 MANAGERS=(('Reed', 'reedharder@gmail.com'),)
 
