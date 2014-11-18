@@ -1,0 +1,588 @@
+{% extends 'waitestapp/base_site.html' %}
+{% load static %}
+{% block content %}
+<div >
+	<div style="padding-right:104px; padding-bottom:20px;">
+		<ul class="nav nav-tabs pull-right">		  
+		  <li id="scenarioTab"><a class="submitCatch" href="/waitapp/scenario/1">Scenario</a></li>		 
+		  <li class="active" ><a href="#">Current Input</a></li>
+		</ul>
+		<br>
+	</div>
+ <div class="container">
+		
+      <!-- Main component for a primary marketing message or call to action -->
+      <div class="jumbotron">
+		<ul class="pager pull-right">
+			<li><a class="submitPrev" href="/waitapp/6/">Previous</a></li>
+			<li><a class="submitCatch" href="/waitapp/scenario/1/">Begin Scenario</a></li>
+		</ul>
+		<div style="display:none;">
+			<a id="prevPage" href="/waitapp/6/"  style="display:none;"> PREV</a>
+			<a id="nextPage" href="/waitapp/scenario/1/"  style="display:none;"> NEXT</a>
+		</div>
+        <h3>Current Simulation Results</h3>        
+		<br>
+		<div style="padding-left:25px;">
+			<form>
+				<label>Results for:</label>
+				<select class="pageSelect">
+					<option>Overall</option>
+					{% for phys in phys_list %}
+					<option>{{phys}}</option>
+					{% endfor %}
+				</select>		
+			</form>
+			<br>
+			<div style="padding-left:25px;">
+				<label> Overall estimated wait time: <span id="overallTime">N/A</span>&nbsp; days. Change from current:<span id="overallDif">N/A</span>  </label>
+				<br><br>
+				<div id="border1" style="border:1px solid black;  padding:30px;">
+					<span><strong> For patient with </strong>
+						<select class = "tableSelect">
+									<option>0</option>
+									<option>1</option>
+									<option>2</option>
+									<option>3+</option>
+						</select> 
+						<strong>chronic conditions: </strong>
+					</span><br>
+					<br>
+					<div id="resultsTable">		
+						<table><!--
+							<thead>
+								<tr>
+									<th data-field="gender" ></th>
+									<th data-field="age"></th>
+									<th data-field="visit"></th>   
+									<th data-field="estwait"></th>
+									<th data-field="percwait"></th>
+								</tr> 
+							</thead>-->
+							<tbody>
+							<tr>
+								<td></td>
+								<td>Gender</td>
+								<td>Age Group</td>
+								<td>Visit Type</td>   
+								<td>Est. Wait Time (days)</td>
+								<td>Change from current</td>
+								<td>
+									<select class="colSelect">
+										<option title="100">100% of Patients wait less than:</option>
+										<option title="99">99% of Patients wait less than:</option>
+										<option title="95">95% of Patients wait less than:</option>
+									</select>
+								</td>
+								<td>Change from current</td>
+							</tr>
+							 <tr class="row" title="rowSelect age1">
+								<td>
+									<select class="rowSelect age1">
+										<option>M</option>
+										<option>F</option>
+									</select>
+								</td>
+								<td>0-14</td>
+								<td>
+									<select class="rowSelect age1">
+										<option>Preventative</option>
+										<option>Acute</option>
+										<option>Chronic</option>
+									</select>
+								</td>
+								<td><div id="wait1" style="text-align:center;">N/A</div></td>
+								<td><div id="waitdif1" style="text-align:center;">N/A</div></td>
+								<td><div id="percentile1" style="text-align:center;">N/A</div></td>
+								<td><div id="percentiledif1" style="text-align:center;">N/A</div></td>
+							</tr>
+							<tr class="row" title="rowSelect age2">
+								<td>
+									<select class="rowSelect age2">
+										<option>M</option>
+										<option>F</option>
+									</select>
+								</td>
+								<td>15-24</td>
+								<td>
+									<select class="rowSelect age2" >
+										<option>Preventative</option>
+										<option>Acute</option>
+										<option>Chronic</option>
+									</select>
+								</td>
+								<td><div id="wait2" style="text-align:center;">N/A</div></td>
+								<td><div id="waitdif2" style="text-align:center;">N/A</div></td>
+								<td><div id="percentile2" style="text-align:center;">N/A</div></td>
+								<td><div id="percentiledif2" style="text-align:center;">N/A</div></td>
+							</tr>
+							<tr class="row" title="rowSelect age3">
+								<td>
+									<select class="rowSelect age3">
+										<option>M</option>
+										<option>F</option>
+									</select>
+								</td>
+								<td>25-44</td>
+								<td>
+									<select class="rowSelect age3">
+										<option>Preventative</option>
+										<option>Acute</option>
+										<option>Chronic</option>
+									</select>
+								</td>
+								<td><div id="wait3" style="text-align:center;">N/A</div></td>
+								<td><div id="waitdif3" style="text-align:center;">N/A</div></td>
+								<td><div id="percentile3" style="text-align:center;">N/A</div></td>
+								<td><div id="percentiledif3" style="text-align:center;">N/A</div></td>
+							</tr>
+							<tr class="row" title="rowSelect age4">
+								<td>
+									<select class="rowSelect age4">
+										<option>M</option>
+										<option>F</option>
+									</select>
+								</td>
+								<td>45-64</td>
+								<td>
+									<select class="rowSelect age4">
+										<option>Preventative</option>
+										<option>Acute</option>
+										<option>Chronic</option>
+									</select>
+								</td>
+								<td><div id="wait4" style="text-align:center;">N/A</div></td>
+								<td><div id="waitdif4" style="text-align:center;">N/A</div></td>
+								<td><div id="percentile4" style="text-align:center;">N/A</div></td>
+								<td><div id="percentiledif4" style="text-align:center;">N/A</div></td>
+							</tr>
+							<tr class="row" title="rowSelect age5">
+								<td>
+									<select class="rowSelect age5">
+										<option>M</option>
+										<option>F</option>
+									</select>
+								</td>
+								<td>65-74</td>
+								<td>
+									<select class="rowSelect age5">
+										<option>Preventative</option>
+										<option>Acute</option>
+										<option>Chronic</option>
+									</select>
+								</td>
+								<td><div id="wait5" style="text-align:center;">N/A</div></td>
+								<td><div id="waitdif5" style="text-align:center;">N/A</div></td>
+								<td><div id="percentile5" style="text-align:center;">N/A</div></td>
+								<td><div id="percentiledif5" style="text-align:center;">N/A</div></td>
+							</tr>	
+							<tr class="row" title="rowSelect age6">
+								<td>
+									<select class="rowSelect age6">
+										<option>M</option>
+										<option>F</option>
+									</select>
+								</td>
+								<td>75+</td>
+								<td>
+									<select class="rowSelect age6">
+										<option>Preventative</option>
+										<option>Acute</option>
+										<option>Chronic</option>
+									</select>
+								</td>
+								<td><div id="wait6" style="text-align:center;">N/A</div></td>
+								<td><div id="waitdif6" style="text-align:center;">N/A</div></td>
+								<td><div id="percentile6" style="text-align:center;">N/A</div></td>
+								<td><div id="percentiledif6" style="text-align:center;">N/A</div></td>
+							</tr>	
+							</tbody>
+						</table>
+					</div>
+				</div>
+			<br>
+			<div id="border2" style="border:1px solid black; padding:30px;">
+				<label>Make results query:</label>
+				<table id="queryGrid">
+				 <tr>
+					<td>Gender</td>
+					<td>Age Range</td> 
+					<td>Conditions</td>
+					<td>Visit Type</td>
+					<td></td>
+					<td>Est. Wait Time (days)</td>
+					<td>
+						<select class="queryColSelect">
+							<option title="100">100% of Patients wait less than:</option>
+							<option title="99">99% of Patients wait less than:</option>
+							<option title="95">95% of Patients wait less than:</option>
+						</select>
+					</td>
+				 </tr>
+				  <tr>
+					<td>
+						<select class="queryOption">
+							<option>M</option>
+							<option>F</option>
+						</select>
+					</td>
+					<td>
+						<select class="queryOption" id = "#ageselect">
+							<option title="1">0-14</option>
+							<option title="2">15-24</option>
+							<option title="3">24-44</option>
+							<option title="4">45-64</option>
+							<option title="5">65-74</option>
+							<option title="6">75+</option>
+						</select>
+					</td>				
+					<td>
+						<select class="queryOption">
+							<option>0</option>
+							<option>1</option>
+							<option>2</option>
+							<option>3+</option>
+						</select>
+					</td>
+					<td>
+						<select class="queryOption">
+							<option>Preventative</option>
+							<option>Acute</option>
+							<option>Chronic</option>
+						</select>
+					</td>
+					<td>
+					<button id="query" style="height:30px; line-height:25px;">Submit Query</button>
+					</td>
+					<td><div id="queryEst">N/A</div></td>
+					<td><div id="queryPerc">N/A</div></td>
+				  </tr>
+				 </table>
+			</div>
+			 <br>
+			 <br>
+			<!-- <div align="right" style="padding-right:40px;">
+				<form action="/waitapp/scenario/1">
+					<input type="submit" value="Begin Modified Scenario">
+				</form>
+			</div>		 -->
+		
+		
+		
+			</div>
+		</div>
+		
+		
+	</div>
+</div>
+</div>
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="{% static 'js/jquery-1.11.1.min.js' %}"></script>
+<script src="{% static 'js/bootstrap.min.js' %}"></script>
+<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+<script src="{% static 'js/ie10-viewport-bug-workaround.js' %}"></script>
+<!-- script for file upload functionality -->    
+
+<!-- bootstrap table script -->
+<script src="{% static 'js/bootstrap-table.min.js' %}"></script>
+
+<!--table functionality and toggle show/hide table script -->
+<script language="javascript">
+//csrf config for ajax
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+var csrftoken = getCookie('csrftoken');
+
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+function sameOrigin(url) {
+    // test that a given url is a same-origin URL
+    // url could be relative or scheme relative or absolute
+    var host = document.location.host; // host + port
+    var protocol = document.location.protocol;
+    var sr_origin = '//' + host;
+    var origin = protocol + sr_origin;
+    // Allow absolute or scheme relative URLs to same origin
+    return (url == origin || url.slice(0, origin.length + 1) == origin + '/') ||
+        (url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') ||
+        // or any other URL that isn't scheme relative or absolute i.e relative.
+        !(/^(\/\/|http:|https:).*/.test(url));
+}
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
+            // Send the token to same-origin, relative URLs only.
+            // Send the token only if the method warrants CSRF protection
+            // Using the CSRFToken value acquired earlier
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    }
+});
+
+//set up page
+$( document ).ready(function() {
+	var doc = $('.pageSelect').val();
+	var chron_cond = $('.tableSelect').val();
+	var perc = $('.colSelect option:selected').attr('title')
+	//get overall
+	$.ajax({      
+	  url: "?",
+	  type: "POST",
+      data : {'type': 'overall', 'doc': doc},       
+      success: function(data) {	   
+       $('#overallTime').text(data.exp);  
+		$('#overallDif').text(data.expd);
+      }
+    });
+	
+	//loopthrough rows of table, query information
+	$('.row').each( function() {
+		//get row class stored in tr title
+		var rowclass = $(this).attr('title');	
+		//filter out age class 
+		rowclass = "." + rowclass.split(" ")[1]	
+		//get row/agegroup
+		row = rowclass.slice(-1);	
+		//get array of gender and visit type
+		var params= $(rowclass).map(function() {
+			return $(this).val();
+		}).get();
+		var gender = params.toString().split(",")[0]
+		var visit = params.toString().split(",")[1]
+		var waitid = "#wait" + row
+		var percid = "#percentile" + row
+		var waitiddif = "#waitdif" + row
+		var perciddif = "#percentiledif" + row
+		$.ajax({      		
+		  url: "?",
+		  type: "POST",
+		  data : {'type': 'rowselect', 'doc': doc, 'age': row, 'chron': chron_cond, 'gender':gender, 'visit':visit, 'perc':perc},       
+		  success: function(data) {	
+			//alert(data.exp);
+		   $(waitid).text(data.exp);  
+		   $(percid).text(data.p);
+		   $(waitiddif).text(data.expd);  
+		   $(perciddif).text(data.pd);
+		  }
+		});	
+	});
+});
+//row change ajax call
+$('.rowSelect').on('change', function() {
+	//get class of row
+	var rowclass = $(this).attr('class');
+	
+	//filter out age class 
+	rowclass = "." + rowclass.split(" ")[1]
+	
+	//get row/agegroup
+	row = rowclass.slice(-1);	
+	//get array of gender and visit type
+	var params= $(rowclass).map(function() {
+		return $(this).val();
+	}).get();	
+	chron_cond = $('.tableSelect').val()
+	doc = $('.pageSelect').val()
+	var perc = $('.colSelect option:selected').attr('title')
+	var gender = params.toString().split(",")[0]
+	var visit = params.toString().split(",")[1]
+	var waitid = "#wait" + row
+	var percid = "#percentile" + row
+	var waitiddif = "#waitdif" + row
+	var perciddif = "#percentiledif" + row
+	$.ajax({      		
+	  url: "?",
+	  type: "POST",
+	  data : {'type': 'rowselect', 'doc': doc, 'age': row, 'chron': chron_cond, 'gender':gender, 'visit':visit, 'perc':perc},       
+	  success: function(data) {	   
+	   $(waitid).text(data.exp);  
+	   $(percid).text(data.p);
+	   $(waitiddif).text(data.expd);  
+	   $(perciddif).text(data.pd);
+	  }
+	});	
+});
+
+
+
+$('.tableSelect').on('change', function() {
+	var chron_cond = $('.tableSelect').val()
+	var doc = $('.pageSelect').val()
+	var perc = $('.colSelect option:selected').attr('title')
+	//loopthrough rows of table, query information
+	$('.row').each( function() {
+		//get row class stored in tr title
+		var rowclass = $(this).attr('title');	
+		//filter out age class 
+		rowclass = "." + rowclass.split(" ")[1]	
+		//get row/agegroup
+		row = rowclass.slice(-1);	
+		//get array of gender and visit type
+		var params= $(rowclass).map(function() {
+			return $(this).val();
+		}).get();
+		var gender = params.toString().split(",")[0]
+		var visit = params.toString().split(",")[1]
+		var waitid = "#wait" + row
+		var percid = "#percentile" + row
+		var waitiddif = "#waitdif" + row
+		var perciddif = "#percentiledif" + row
+		$.ajax({      		
+		  url: "?",
+		  type: "POST",
+		  data : {'type': 'rowselect', 'doc': doc, 'age': row, 'chron': chron_cond, 'gender':gender, 'visit':visit, 'perc':perc},       
+		  success: function(data) {	   
+		   $(waitid).text(data.exp);  
+		   $(percid).text(data.p);
+		   $(waitiddif).text(data.expd);  
+		   $(perciddif).text(data.pd);
+		  }
+		});	
+	});
+});
+
+
+$('.pageSelect').on('change', function() {
+	var doc = $('.pageSelect').val();
+	var chron_cond = $('.tableSelect').val();
+	var perc = $('.colSelect option:selected').attr('title')
+	//get overall
+	$.ajax({      
+	  url: "?",
+	  type: "POST",
+      data : {'type': 'overall', 'doc': doc},       
+      success: function(data) {	   
+       $('#overallTime').text(data.exp); 
+		$('#overallDif').text(data.expd);
+      }
+    });
+	
+	//loopthrough rows of table, query information
+	$('.row').each( function() {
+		//get row class stored in tr title
+		var rowclass = $(this).attr('title');	
+		//filter out age class 
+		rowclass = "." + rowclass.split(" ")[1]	
+		//get row/agegroup
+		row = rowclass.slice(-1);	
+		//get array of gender and visit type
+		var params= $(rowclass).map(function() {
+			return $(this).val();
+		}).get();
+		var gender = params.toString().split(",")[0]
+		var visit = params.toString().split(",")[1]
+		var waitid = "#wait" + row
+		var percid = "#percentile" + row
+		var waitiddif = "#waitdif" + row
+		var perciddif = "#percentiledif" + row
+		$.ajax({      		
+		  url: "?",
+		  type: "POST",
+		  data : {'type': 'rowselect', 'doc': doc, 'age': row, 'chron': chron_cond, 'gender':gender, 'visit':visit, 'perc':perc},       
+		  success: function(data) {	   
+		   $(waitid).text(data.exp);  
+		   $(percid).text(data.p);
+		   $(waitiddif).text(data.expd);  
+		   $(perciddif).text(data.pd);
+		  }
+		});	
+	});
+});
+//change percentile
+$('.colSelect').on('change', function() {
+	
+	var chron_cond = $('.tableSelect').val()
+	var doc = $('.pageSelect').val()
+	var perc = $('.colSelect option:selected').attr('title')
+	//loopthrough rows of table, query information
+	$('.row').each( function() {
+		//get row class stored in tr title
+		var rowclass = $(this).attr('title');	
+		//filter out age class 
+		rowclass = "." + rowclass.split(" ")[1]	
+		//get row/agegroup
+		row = rowclass.slice(-1);	
+		//get array of gender and visit type
+		var params= $(rowclass).map(function() {
+			return $(this).val();
+		}).get();
+		var gender = params.toString().split(",")[0]
+		var visit = params.toString().split(",")[1]
+		var waitid = "#wait" + row
+		var percid = "#percentile" + row
+		var waitiddif = "#waitdif" + row
+		var perciddif = "#percentiledif" + row
+		$.ajax({      		
+		  url: "?",
+		  type: "POST",
+		  data : {'type': 'rowselect', 'doc': doc, 'age': row, 'chron': chron_cond, 'gender':gender, 'visit':visit, 'perc':perc},       
+		  success: function(data) {	   
+		   $(waitid).text(data.exp);  
+		   $(percid).text(data.p);
+		   $(waitiddif).text(data.expd);  
+		   $(perciddif).text(data.pd);
+		  }
+		});	
+	});
+});
+
+//button to submit qery action
+$('#query').click( function() {
+	var doc = $('.pageSelect').val()
+	var age = $('#ageselect option:selected').attr('title')
+	var perc = $('.queryColSelect option:selected').attr('title')
+	var qParams= $('.queryOption').map(function() {
+				return $(this).val();}).get();	
+	var gender = qParams.toString().split(",")[0]	
+	var chron_cond = qParams.toString().split(",")[2]
+	var visit = params.toString().split(",")[3]
+	$.ajax({      		
+		  url: "?",
+		  type: "POST",
+		  data : {'type': 'rowselect', 'doc': doc, 'age': row, 'chron': chron_cond, 'gender':gender, 'visit':visit, 'perc':perc},       
+		  success: function(data) {	   
+		   $('#queryEst').text(data.exp);  
+		   $('#queryPerc').text(data.p);
+		  }
+		});		
+});
+//query change perc, resubmit query
+$('.queryColSelect').on('change', function() {
+	var doc = $('.pageSelect').val()
+	var age = $('#ageselect option:selected').attr('title')
+	var perc = $('.queryColSelect option:selected').attr('title')
+	var qParams= $('.queryOption').map(function() {
+				return $(this).val();}).get();	
+	var gender = qParams.toString().split(",")[0]	
+	var chron_cond = qParams.toString().split(",")[2]
+	var visit = params.toString().split(",")[3]
+	$.ajax({      		
+		  url: "?",
+		  type: "POST",
+		  data : {'type': 'rowselect', 'doc': doc, 'age': row, 'chron': chron_cond, 'gender':gender, 'visit':visit, 'perc':perc},       
+		  success: function(data) {	   
+			   $('#queryEst').text(data.exp);  
+			   $('#queryPerc').text(data.p);
+		  }
+		});		
+});
+</script>
+
+{% endblock %} 

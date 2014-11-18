@@ -1,0 +1,366 @@
+{% extends 'waitestapp/base_site.html' %}
+{% load static %}
+{% block content %}
+<div >
+	<div style="padding-right:104px; padding-bottom:20px;">
+		<ul class="nav nav-tabs pull-right">		  
+		  <li class="active"><a href="/waitapp/scenario/4" data-toggle="tab">Scenario</a></li>		 
+		  <li ><a href="/waitapp/results" >Current Input</a></li>
+		</ul>
+		<br>
+	</div>
+		<div class="container">
+
+		  <!-- Main component for a primary marketing message or call to action -->
+		  <div class="jumbotron">
+			<ul class="pager pull-right">
+				<li><a class="submitPrev" href="/waitapp/scenario/3/" >Previous</a></li>
+				<li><a class="submitCatch" href="/waitapp/scenario/5/">Next</a></li>
+			</ul>
+			<div style="display:none;">
+				<a id="prevPage" href="/waitapp/scenario/3/"  style="display:none;"> PREV</a>
+				<a id="nextPage" href="/waitapp/scenario/5/"  style="display:none;"> NEXT</a>
+			</div>
+			
+			<h3>Scenario: Physician Continuity Rules</h3>
+			<p>Enter rules for patient-physician continuity:</p>
+			<br>
+			<!-- Rule Form -->
+			
+			<!-- Rule Form -->
+			
+			<form>
+				<label>Default continuity strategy:</label>
+				<select id="defCont">					
+					<option value="noshare">Do Not Share</option>
+					<option value="share">Share</option>
+				</select>		
+			</form>
+			<br>		
+			    <div id="errors"></div>
+				<form class="contRuleBox">
+				<div  style="padding-bottom:10px;">
+					<input class="Check" type="checkbox" name="gender" value="Gender"> &nbsp;Gender:					
+					<select class="rule-form" name="gender-rule">					    
+						<option>M</option>
+						<option>F</option>
+					</select>					
+				</div>
+				<div style="padding-bottom:10px;">
+					<input class="Check"  type="checkbox" name="agerange" value="Age"> &nbsp;Age Range: &nbsp;					
+					<input class="rule-form"  type="text"  name="agerange-rule" id="agerange-rule" placeholder="0-100" style="max-width:45px;">					
+				</div>
+				<div class="contRule" style="padding-bottom:10px;">
+					<input class="Check"  type="checkbox" name="condrange" value="Chronic"> &nbsp; # Conditions:					
+					<input class="rule-form"  type="text" name="condrange-rule" id="condrange-rule" placeholder="0-100" style="max-width:45px;">					
+				</div>
+				<div class="contRule" style="padding-bottom:10px;">
+					<input class="Check" type="checkbox" name="visit" value="Visit"> &nbsp; Visit Type:					
+					<select class="rule-form"  name="visit-rule" style="width:100px;">
+						<option>Acute</option>
+						<option>Preventative</option>
+						<option>Chronic</option>
+					</select>					
+				</div>
+				<div class="contRule" style="padding-bottom:10px;">
+					<input class="Check"  type="checkbox" name="affiliation" value="Provider"> &nbsp; Affiliation:					
+					<select class="rule-form"  name="affiliation-rule" id="affiliation-rule" style="width:100px;">
+					    {% for phys in phys_list %}
+						<option>{{phys}}</option>
+						{% endfor %}
+					</select>			
+				</div>
+				<div  style="padding-bottom:10px;">					
+					Rule: 
+					<select class="rule" name="continuity-rule" style="width:100px;">
+						<option>Share</option>
+						<option>Do Not Share</option>
+					</select>					
+				</div>								
+			</form>					
+			<div >							
+				<button id="addContRule" class="btn btn-primary" style="margin-top:20px;" >Add Rule</button>						
+			</div>
+		
+		
+		
+		<br>    
+		
+		<!-- File input widget -->
+		<div>
+			<div id="file_input">
+				<label>Or, upload text file:</label>		
+				<div class="input-group">
+					<span class="input-group-btn">
+						<span class="btn btn-primary btn-file">
+							Browse&hellip; <input type="file">
+						</span>
+					</span>
+					<div>
+					<input type="text" class="form-control" style="width:300px">
+					&nbsp;&nbsp;
+					<button type="button" class="btn btn-primary" style="display:inline; ">Load File</button>
+					</div>
+				</div>			
+			</div>    
+		</div>
+		
+
+	<br>
+	<button id="toggleTable" type="button" class="btn btn-primary">Show Table</button>
+	<br>
+	<div id="tableDiv">
+	<table id="contRuleTable">
+		<thead>
+			<tr>
+				<th data-field="state" data-checkbox="true"></th>
+				<th data-field="rule">Rule</th>
+				<th data-field="continuity">Continuity</th>			
+			</tr>
+		</thead>
+		<tbody>
+			{% for row in table_data %}
+			<tr>
+				<td></td>
+				<td>{{row.Rule}}</td>
+				<td>{{row.Continuity}}</td>   	
+			</tr>    
+			{% endfor %}
+		</tbody>
+	</table>
+	<button class="btn btn-default" id="remove-data" data-method="remove">
+			Clear Selected Rows
+	</button>
+	</div>
+	</div>
+	</div>
+</div>
+ <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="{% static 'js/jquery-1.11.1.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="{% static 'js/ie10-viewport-bug-workaround.js' %}"></script>
+<!-- script for file upload functionality -->    
+<script language="javascript">
+$(document).on('change', '.btn-file :file', function() {
+  var input = $(this),
+	  numFiles = input.get(0).files ? input.get(0).files.length : 1,
+	  label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+  input.trigger('fileselect', [numFiles, label]);
+});
+
+$(document).ready( function() {
+	$('.btn-file :file').on('fileselect', function(event, numFiles, label) {
+		
+		var input = $(this).parents('.input-group').find(':text'),
+			log = numFiles > 1 ? numFiles + ' files selected' : label;
+		
+		if( input.length ) {
+			input.val(log);
+		} else {
+			if( log ) alert(log);
+		}
+		
+	});
+});
+</script>
+
+<!-- bootstrap table script -->
+<script src="{% static 'js/bootstrap-table.min.js' %}"></script>
+<script src="{% static 'js/jquery.tabletojson.min.js' %}"></script>
+<!--table functionality and toggle show/hide table script -->
+<script language="javascript">
+//set table properties
+$('#contRuleTable').bootstrapTable({
+    cache: false,	
+	//height: 200,
+	striped: true,
+	pagination: true,
+	pageSize: 50,
+	pageList: [10, 25, 50, 100, 200],	
+	clickToSelect: true,
+});
+
+//csrf config for ajax
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+var csrftoken = getCookie('csrftoken');
+
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+function sameOrigin(url) {
+    // test that a given url is a same-origin URL
+    // url could be relative or scheme relative or absolute
+    var host = document.location.host; // host + port
+    var protocol = document.location.protocol;
+    var sr_origin = '//' + host;
+    var origin = protocol + sr_origin;
+    // Allow absolute or scheme relative URLs to same origin
+    return (url == origin || url.slice(0, origin.length + 1) == origin + '/') ||
+        (url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') ||
+        // or any other URL that isn't scheme relative or absolute i.e relative.
+        !(/^(\/\/|http:|https:).*/.test(url));
+}
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
+            // Send the token to same-origin, relative URLs only.
+            // Send the token only if the method warrants CSRF protection
+            // Using the CSRFToken value acquired earlier
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    }
+});
+
+
+//catch page change, convert table data to json, submit to hidden form, then change page
+$('.submitPrev').click(function(e) {
+	e.preventDefault(); //don't follow link yet
+	var table = $('#contRuleTable').tableToJSON({ ignoreColumns: [0], ignoreHiddenRows: false });
+	table  = JSON.stringify(table);
+	//alert(table);
+	var defCont = $('#defCont').val();	
+	//stick stringified JSON of table into hidden form and submit	
+	$.ajax({      
+	  url: "?",
+	  type: "POST",
+      data : {'id_table': table, 'defCont': defCont},       
+      success: function() {
+	   //alert("data recieved!");
+       $( "#prevPage" )[0].click();   
+      }
+    });
+});
+
+//catch page change click, submit data, then return to previous page
+//catch page change, convert table data to json, submit to hidden form, then change page
+$('.submitCatch').click(function(e) {
+	e.preventDefault(); //don't follow link yet
+	var table = $('#contRuleTable').tableToJSON({ ignoreColumns: [0], ignoreHiddenRows: false });
+	table  = JSON.stringify(table);
+	//alert(table);
+	var defCont = $('#defCont').val();
+	//alert(defCont);
+	//stick stringified JSON of table into hidden form and submit	
+	$.ajax({      
+	  url: "?",
+	  type: "POST",
+      data : {'id_table': table, 'defCont': defCont},       
+      success: function() {
+	   //alert("data recieved!");
+       $( "#nextPage" )[0].click();   
+      }
+    });
+});
+
+
+$('#addContRule').click(function () {
+	$('#errors').html(''); //clear errors
+	var no_errors = true
+	//get form values in array
+	var cond_fields = $( ".rule-form" ).serializeArray();
+	var check_fields = $( ".Check" ).serializeArray();
+	var rule = $( ".rule" ).val();
+	//convert checkfields to hash
+	var check_hash = {};
+	$.each(check_fields, function(i, check) {		
+		check_hash[check.name] = (check.value);
+		});
+	
+	//alert(rule);
+	//alert(cond_fields);
+	var row = "<tr><td></td><td>"
+	var count = 0
+    $.each(cond_fields, function( i, field ) {
+	// if field is one of the checked boxes
+		var check_key = field.name.slice(0,-5)
+		if (check_key in check_hash) {
+		    //check if fields in correct format
+			if (check_key == "condrange" || check_key == "agerange") {
+				function isNum(element, index, array) {  
+					return /^\d+$/.test(element);
+					}	
+                var input = cond_fields[i].value					
+				var arr = input.split("-");
+				var passed = arr.every(isNum);
+				if (!(passed && arr.length == 2)) {
+				 $('#errors').html("<h5 style='color:red;'>Enter range as numbers seperated by dashes</h5>");
+				 no_errors = false }
+			}
+			//insert AND if not the first field
+			if (count==0) {var bool = ""}
+			else {var bool = " AND"}
+			// append field to row
+			row = (row + bool + " " + check_hash[check_key] + ":" + cond_fields[i].value);
+			count = (count + 1);
+			}	
+    });
+	if (no_errors && check_fields.length > 0) {
+		row =  row + "</td><td>" + rule +("</td></tr>")
+		
+		//alert(row);
+		
+		$('#contRuleTable').bootstrapTable('destroy')
+		$('#contRuleTable').append(row);
+		$('#contRuleTable').bootstrapTable({
+			cache: false,
+			//height: 200,
+			striped: true,
+			pagination: true,
+			pageSize: 50,
+			pageList: [10, 25, 50, 100, 200],		
+			clickToSelect: true,
+		});
+		$('#agerange-rule').val('');
+		$('#condrange-rule').val('');
+		
+	}
+});
+
+//delete selected rows button
+$('#remove-data').click(function () {
+	var selects = $('#contRuleTable').bootstrapTable('getSelections');
+		states = $.map(selects, function (row) {
+			return row.state;
+		});
+
+	$('#contRuleTable').bootstrapTable('remove', {
+		field: 'state',
+		values: states
+	});
+});
+
+$(document).ready(function(){
+ 
+  $("#tableDiv").hide();
+  $("#toggleTable").click(function(){
+    var button_name = $("#toggleTable").text();
+    if (button_name == "Show Table") {
+        $("#toggleTable").text("Hide Table") 
+    }
+    else {
+        $("#toggleTable").text("Show Table")
+    }        
+    $("#tableDiv").toggle();
+  });
+});
+</script>
+
+{% endblock %} 

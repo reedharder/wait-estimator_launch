@@ -1,0 +1,44 @@
+{% extends 'waitestapp/base_site.html' %}
+{% block content %}
+ <div class="container">
+
+      <!-- Main component for a primary marketing message or call to action -->
+      <div class="jumbotron">
+        <h3>Practice Capacity</h3>
+        <p>Enter information about each staff member below, or upload as file</p>
+            <div class="bs-example">
+            <form class="form-inline" role="form">
+                <div class="form-group" style="max-width:200px;">
+                    <label for="pname" >Provider Name</label>
+                    <input  name="pname" class="form-control" placeholder="Provider Name">
+                </div>
+                <div class="form-group"  style="max-width:120px;">
+                    <label >Hours Per Day</label>
+                    <input  class="form-control" placeholder="Hours" style="max-width:115px;">
+                </div>
+                <div class="form-group"  style="max-width:120px;" >
+                    <label >Weeks Per Year</label>
+                    <input  class="form-control" style="max-width:115px;" placeholder="Weeks">
+                </div>
+                <div class="form-group" style="max-width:150px;">
+                    <label>Position</label>
+                    <select class="form-control" style="max-width:145px;">               
+                        <option>Physician</option>
+                        <option>Nurse Practitioner</option>
+                        <option>Physician Assistant</option>
+                    </select>
+                </div>
+                <div class="form-group" style="max-width:110px;">
+                    <label>&nbsp;</label>
+                    <button type="submit" class="btn btn-primary">Add Provider</button>
+                </div>
+            </form>
+            
+        </div>        
+            <p>
+              <a class="btn btn-lg btn-primary" href="/waitapp-1/" role="button">Launch Wait Estimator &raquo;</a>
+            </p>
+          </div>
+
+        </div>
+{% endblock %} 

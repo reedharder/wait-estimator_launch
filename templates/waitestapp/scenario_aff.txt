@@ -1,0 +1,230 @@
+{% extends 'waitestapp/base_site.html' %}
+{% load static %}
+{% block content %}
+<div >
+	<div style="padding-right:104px; padding-bottom:20px;">
+		<ul class="nav nav-tabs pull-right">		  
+		  <!-- <li class="scenarioTab"><a href="/waitapp/scenario/1" data-toggle="tab">Scenario</a></li> -->		 
+		  <li class="active" ><a href="/waitapp/2/" data-toggle="tab">Current Input</a></li>
+		</ul>
+		<br>
+	</div>
+ <div class="container">
+
+      <!-- Main component for a primary marketing message or call to action -->
+      <div class="jumbotron">
+		<ul class="pager pull-right">
+			<li><a href="/waitapp/1/">Previous</a></li>
+			<li><a href="/waitapp/3/">Next</a></li>
+		</ul>
+        <h3>Patient Affiliations</h3>
+        <p>Enter affiliation of each patient, or load affiliations as file:</p>
+		
+		<!-- Provider Addition Widget -->
+		
+		<div style="display:table;">
+		  <div style="display: table-row;">
+            <div class="bs-example" style="display: table-cell;">
+				<form id="addForm" class="form-inline" action="#" method="get" role="form">
+					<div class="form-group" style="max-width:200px;">
+						<label for="patname" >Patient Name</label>
+						<input  id="patname" name="patname" class="form-control" placeholder="Patient Name">
+					</div>
+					<div class="form-group" style="max-width:150px;">
+						<label>Primary Provider</label>
+						<select name="position" class="form-control" style="max-width:145px;">               
+							<option>Doctor 1</option>
+							<option>Doctor 2</option>
+							<option>Doctor 3</option>
+						</select>
+					</div>				
+					
+				</form>
+			</div>
+			<div style="display: table-cell;">							
+				<button id="addAff" class="btn btn-primary" style="margin-top:20px;" >Add Affilation</button>						
+			</div>
+		</div>
+		</div>
+    
+	 
+	 <br>  
+	
+	<!-- File input widget -->
+    <div>
+		<div id="file_input">
+			<label>Or, upload text file:</label>		
+			<div class="input-group">
+				<span class="input-group-btn">
+					<span class="btn btn-primary btn-file">
+						Browse&hellip; <input type="file">
+					</span>
+				</span>
+				<div>
+				<input type="text" class="form-control" style="width:300px">
+				&nbsp;&nbsp;
+				<button type="button" class="btn btn-primary" style="display:inline; ">Load File</button>
+				</div>
+			</div>			
+		</div>    
+	</div>  
+	
+
+<br>
+<button id="toggleTable" type="button" class="btn btn-primary">Show Table</button>
+<br>
+<div id="tableDiv">
+<table id="affTable">
+    <thead>
+        <tr>
+		    <th data-field="state" data-checkbox="true"></th>
+            <th data-field="patname">Patient</th>
+            <th data-field="provname">Provider</th>            
+        </tr>
+    </thead>
+	<tbody>
+    <tr>
+		<td></td>
+        <td>Patient A</td>
+        <td>Doctor 1</td>        
+    </tr>
+    <tr>
+		<td></td>
+        <td>Patient B</td>
+        <td>Doctor 1</td>       
+    </tr>
+    <tr>
+		<td></td>
+        <td>Patient C</td>
+        <td>Doctor 2</td>
+        
+    </tr>
+    <tr>
+		<td></td>
+        <td>Patient D</td>
+        <td>Doctor 2</td>
+    </tr>
+    <tr>
+		<td></td>        
+        <td>Patient E</td>
+        <td>Doctor 3</td>
+    </tr>
+	<tr>
+		<td></td>        
+        <td>Patient F</td>
+        <td>Doctor 3</td>
+    </tr>
+    </tbody>
+</table>
+<button class="btn btn-default" id="remove-data" data-method="remove">
+        Clear Selected Rows
+</button>
+</div>
+</div>
+</div>
+</div>
+ <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="{% static 'js/jquery-1.11.1.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="{% static 'js/ie10-viewport-bug-workaround.js' %}"></script>
+<!-- script for file upload functionality -->    
+<script language="javascript">
+$(document).on('change', '.btn-file :file', function() {
+  var input = $(this),
+	  numFiles = input.get(0).files ? input.get(0).files.length : 1,
+	  label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+  input.trigger('fileselect', [numFiles, label]);
+});
+
+$(document).ready( function() {
+	$('.btn-file :file').on('fileselect', function(event, numFiles, label) {
+		
+		var input = $(this).parents('.input-group').find(':text'),
+			log = numFiles > 1 ? numFiles + ' files selected' : label;
+		
+		if( input.length ) {
+			input.val(log);
+		} else {
+			if( log ) alert(log);
+		}
+		
+	});
+});
+</script>
+
+<!-- bootstrap table script -->
+<script src="{% static 'js/bootstrap-table.min.js' %}"></script>
+
+<!--table functionality and toggle show/hide table script -->
+<script language="javascript">
+//set table properties
+$('#affTable').bootstrapTable({
+    cache: false,
+	height: 400,
+	striped: true,
+	pagination: true,
+	pageSize: 50,
+	pageList: [10, 25, 50, 100, 200],		
+	clickToSelect: true,
+});
+
+
+//add to table with addAff button
+$('#addAff').click(function () {
+	//get form values in array
+	var fields = $( ".form-group > :input" ).serializeArray();
+	var row = "<tr><td></td>"
+    jQuery.each( fields, function( i, field ) {
+      row = row + ( "<td>" + field.value + "</td>" );
+    });
+	row =  row + ("</tr>")
+	
+	$('#affTable').bootstrapTable('destroy')
+	$('#affTable').append(row);
+	$('#affTable').bootstrapTable({
+		cache: false,
+		height: 400,
+		striped: true,
+		pagination: true,
+		pageSize: 50,
+		pageList: [10, 25, 50, 100, 200],		
+		clickToSelect: true,
+	});
+	$('#patname').val($('#pname').attr('placeholder'))	
+});
+	
+
+//delete selected rows button
+$('#remove-data').click(function () {
+	var selects = $('#affTable').bootstrapTable('getSelections');
+		states = $.map(selects, function (row) {
+			return row.state;
+		});
+
+	$('#affTable').bootstrapTable('remove', {
+		field: 'state',
+		values: states
+	});
+});
+
+$(document).ready(function(){
+ //var $table = $("#provTable");
+   
+  $("#tableDiv").hide();
+  $("#toggleTable").click(function(){
+    var button_name = $("#toggleTable").text();
+    if (button_name == "Show Table") {
+        $("#toggleTable").text("Hide Table") 
+    }
+    else {
+        $("#toggleTable").text("Show Table")
+    }        
+    $("#tableDiv").toggle();
+  });
+});
+</script>
+
+{% endblock %} 

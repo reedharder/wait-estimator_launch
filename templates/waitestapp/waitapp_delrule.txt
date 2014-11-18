@@ -1,0 +1,188 @@
+{% extends 'waitestapp/base_site.html' %}
+{% load static %}
+{% block content %}
+ <div class="container">
+
+      <!-- Main component for a primary marketing message or call to action -->
+      <div class="jumbotron">
+		<ul class="pager pull-right">
+			<li><a href="/waitapp/3/">Previous</a></li>
+			<li><a href="/waitapp/5/">Next</a></li>
+		</ul>
+        <h3>Physician Continuity Rules</h3>
+        <p>Enter rules for patient-physician continuity:</p>
+		<br>
+		<!-- Rule Form -->
+		<form>
+			<div style="padding-bottom:10px;">
+				<input type="checkbox" name="gender" value="Gender"> &nbsp;Gender:
+				<select>
+					<option>M</option>
+					<option>F</option>
+				</select>
+			</div>
+			<div style="padding-bottom:10px;">
+				<input type="checkbox" name="agerange" value="Age Range"> &nbsp;Age Range: &nbsp;
+				<input type="text" value="0-100" style="max-width:45px;">
+			</div>
+			<div style="padding-bottom:10px;">
+				<input type="checkbox" name="condrange" value="# Chronic Conditions"> &nbsp; # Conditions:
+				<input type="text" value="0-100" style="max-width:45px;">
+			</div>
+			<div style="padding-bottom:10px;">
+				<input type="checkbox" name="visit" value="Visit Type"> &nbsp; Visit Type:
+				<select style="max-width:80px;">
+					<option>Acute</option>
+					<option>Preventative</option>
+					<option>Chronic</option>
+				</select>
+			</div>
+			<div style="padding-bottom:10px;">
+				<input type="checkbox" name="continuity" value="Continuity"> &nbsp; Continuity:
+				<select "max-width:80px;">
+					<option>Share</option>
+					<option>Do Not Share</option>
+				</select>
+			</div>
+			<input type="submit" value="Add Rule">
+		</form>
+    <br>    
+	
+	<!-- File input widget -->
+    <div class="col-lg-6 col-sm-6 col-12" id="file_input">
+        <label>Or, upload text file:</label>
+		<div class="input-group">
+			<span class="input-group-btn">
+				<span class="btn btn-primary btn-file">
+					Browse&hellip; <input type="file">
+				</span>
+			</span>
+			<input type="text" class="form-control">
+		</div>
+    </div>    
+	
+
+<br>
+<br>
+<button type="button" class="btn btn-primary">Load File</button>
+<button id="toggleTable" type="button" class="btn btn-primary">Show Table</button>
+<br>
+<div id="tableDiv">
+<table id="patTable">
+    <thead>
+        <tr>
+		    <th data-field="state" data-checkbox="true"></th>
+            <th data-field="patname">Rule</th>
+            <th data-field="gender">Continuity</th>			
+        </tr>
+    </thead>
+	<tbody>
+    <tr>
+		<td></td>
+        <td>Gender:M AND Age:0-9 AND Visit:Acute</td>
+        <td>Share</td>   	
+    </tr>    
+    </tbody>
+</table>
+<button class="btn btn-default" id="remove-data" data-method="remove">
+        Clear Selected Rows
+</button>
+</div>
+</div>
+</div>
+ <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="{% static 'js/jquery-1.11.1.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="{% static 'js/ie10-viewport-bug-workaround.js' %}"></script>
+<!-- script for file upload functionality -->    
+<script language="javascript">
+$(document).on('change', '.btn-file :file', function() {
+  var input = $(this),
+	  numFiles = input.get(0).files ? input.get(0).files.length : 1,
+	  label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+  input.trigger('fileselect', [numFiles, label]);
+});
+
+$(document).ready( function() {
+	$('.btn-file :file').on('fileselect', function(event, numFiles, label) {
+		
+		var input = $(this).parents('.input-group').find(':text'),
+			log = numFiles > 1 ? numFiles + ' files selected' : label;
+		
+		if( input.length ) {
+			input.val(log);
+		} else {
+			if( log ) alert(log);
+		}
+		
+	});
+});
+</script>
+
+<!-- bootstrap table script -->
+<script src="{% static 'js/bootstrap-table.min.js' %}"></script>
+
+<!--table functionality and toggle show/hide table script -->
+<script language="javascript">
+//set table properties
+$('#patTable').bootstrapTable({
+    cache: false,	
+	height: 400,
+	striped: true,
+	pagination: true,
+	pageSize: 50,
+	pageList: [10, 25, 50, 100, 200],
+	search: true,	
+	clickToSelect: true,
+});
+
+//add to table with addProv button CURRENTLY NON FUNCTIONAL
+$('#addProv').click(function () {
+	//get form values in array
+	var values = {};
+	$.each($('#addForm').serializeArray(), function(i, field) {
+		values[field.name] = field.value;		
+	});
+	values['state']=""
+	
+	$('#patTable').bootstrapTable('append-data', {
+		data: values
+	});
+	
+});
+	
+
+//delete selected rows button
+$('#remove-data').click(function () {
+	var selects = $('#patTable').bootstrapTable('getSelections');
+		states = $.map(selects, function (row) {
+			return row.state;
+		});
+
+	$('#patTable').bootstrapTable('remove', {
+		field: 'state',
+		values: states
+	});
+});
+
+$(document).ready(function(){
+ //var $table = $("#provTable");
+   
+  $("#tableDiv").hide();
+  $("#toggleTable").click(function(){
+    var button_name = $("#toggleTable").text();
+    if (button_name == "Show Table") {
+        $("#toggleTable").text("Hide Table") 
+    }
+    else {
+        $("#toggleTable").text("Show Table")
+    }        
+    $("#tableDiv").toggle();
+  });
+});
+</script>
+
+{% endblock %} 

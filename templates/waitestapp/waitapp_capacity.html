@@ -1,0 +1,307 @@
+{% extends 'waitestapp/base_site.html' %}
+{% load static %}
+{% block content %}
+<div >
+	<div style="padding-right:104px; padding-bottom:20px;">
+		<ul class="nav nav-tabs pull-right">		  
+		  <!-- <li class="scenarioTab"><a href="/waitapp/scenario/1/" data-toggle="tab">Scenario</a></li> -->		 
+		  <li class="active" ><a href="/waitapp/1/" data-toggle="tab">Current Input</a></li>
+		</ul>
+		<br>
+	</div>
+	<div id="aff" class="container">
+
+      <!-- Main component -->
+		<div class="jumbotron">
+			<ul class="pager pull-right">
+				<li><a href="/">Home</a></li>
+				<li><a class="submitCatch" id="nextWiz" href="/waitapp/2/">Next</a></li>
+			</ul>
+			<a id="nextPage" href="/waitapp/2/"  style="display:none;"> NEXT</a>
+			
+			
+			<h3>Practice Capacity</h3>
+			<p>Enter information about each staff member below, or upload as file:</p>
+			
+			<!-- Provider Addition Widget -->
+			<div style="display:table;">
+				<div style="display: table-row;">
+					<div class="bs-example" style="display: table-cell;">
+						<form id="addForm" class="form-inline"  role="form">
+							<div class="form-group" style="max-width:200px;">
+								<label for="pname" >Provider Name</label>
+								<input id="pname" name="pname" class="form-control" placeholder="Provider Name">
+							</div>
+							<div class="form-group"  style="max-width:120px;">
+								<label >Hours Per Day</label>
+								<input id="hours" name="hours" class="form-control" placeholder="Hours" style="max-width:115px;">
+							</div>
+							<div class="form-group"  style="max-width:120px;" >
+								<label >Days Per Year</label>
+								<input  id="days" name="days" class="form-control" style="max-width:115px;" placeholder="Days">
+							</div>					
+							<div class="form-group" style="max-width:150px;">
+								<label>Position</label>
+								<select name="position" class="form-control" style="max-width:145px;">               
+									<option>Physician</option>
+									<option>Nurse Practitioner</option>
+									<option>Physician Assistant</option>
+								</select>
+							</div>
+							<div class="form-group" style="max-width:120px;">
+								<label>Team</label>
+								<select name="team" class="form-control" style="max-width:115px;">               
+									<option>No Team</option>
+									<option>Team A</option>
+									<option>Team B</option>
+									<option>Team C</option>
+									<option>Team D</option>
+								</select>
+							</div>
+							<div class="form-group" style="max-width:110px;">
+								<label>&nbsp;</label>
+								
+							</div>
+						</form>
+					</div>
+					<div style="display: table-cell;">							
+						<button id="addProv" class="btn btn-primary" style="margin-top:20px;" >Add Provider</button>						
+					</div>
+				</div>
+			</div>
+				<br>    
+	
+				<!-- File input widget -->
+				<div>
+					<div id="file_input">
+						<label>Or, upload text file:</label>		
+						<div class="input-group">
+							<span class="input-group-btn">
+								<span class="btn btn-primary btn-file">
+									Browse&hellip; <input type="file">
+								</span>
+							</span>
+							<div>
+							<input type="text" class="form-control" style="width:300px">
+							&nbsp;&nbsp;
+							<button type="button" class="btn btn-primary" style="display:inline; ">Load File</button>
+							</div>
+						</div>			
+					</div>    
+				</div>  
+	
+
+				<br>
+				<button id="toggleTable" type="button" class="btn btn-primary">Show Table</button>
+				<br>
+			<div id="tableDiv">
+				<table id="provTable">
+					<thead>
+						<tr>
+							<th data-field="state" data-checkbox="true"></th>
+							<th data-field="name">Provider Name</th>
+							<th data-field="hours">Hours Per Day</th>
+							<th data-field="weeks">Days Per Year</th>
+							<th data-field="position">Position</th>
+							<th data-field="team">Team</th>
+						</tr>
+					</thead>
+					<tbody>
+					{% for row in table_data %}
+					<tr>
+						<td></td>
+						<td>{{row.Provider_Name}}</td>
+						<td>{{row.Hours_Per_Day}}</td>
+						<td>{{row.Days_Per_Year}}</td>
+						<td>{{row.Position}}</td>
+						<td>{{row.Team}}</td>
+					</tr>
+					{% endfor %}
+					</tbody>
+				</table>
+				<button class="btn btn-default" id="remove-data" data-method="remove">
+						Clear Selected Rows
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+ <!-- Bootstrap core JavaScript
+    ================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="{% static 'js/jquery-1.11.1.min.js' %}"></script>
+<script src="{% static 'js/bootstrap.min.js' %}"></script>
+<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+<script src="{% static 'js/ie10-viewport-bug-workaround.js' %}"></script>
+
+<!-- script for file upload functionality -->    
+<script language="javascript">
+$(document).on('change', '.btn-file :file', function() {
+  var input = $(this),
+	  numFiles = input.get(0).files ? input.get(0).files.length : 1,
+	  label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+  input.trigger('fileselect', [numFiles, label]);
+});
+
+$(document).ready( function() {
+	$('.btn-file :file').on('fileselect', function(event, numFiles, label) {
+		
+		var input = $(this).parents('.input-group').find(':text'),
+			log = numFiles > 1 ? numFiles + ' files selected' : label;
+		
+		if( input.length ) {
+			input.val(log);
+		} else {
+			if( log ) alert(log);
+		}
+		
+	});
+});
+</script>
+
+<!-- bootstrap table script -->
+<script src="{% static 'js/bootstrap-table.min.js' %}"></script>
+<script src="{% static 'js/jquery.tabletojson.min.js' %}"></script>
+<!--table functionality and toggle show/hide table script -->
+<script language="javascript">
+//set table properties
+$('#provTable').bootstrapTable({
+    cache: false,
+	height: 400,
+	striped: true,
+	pagination: true,
+	pageSize: 50,
+	pageList: [10, 25, 50, 100, 200],
+		
+	clickToSelect: true,
+});
+
+
+//csrf config for ajax
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+var csrftoken = getCookie('csrftoken');
+
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+function sameOrigin(url) {
+    // test that a given url is a same-origin URL
+    // url could be relative or scheme relative or absolute
+    var host = document.location.host; // host + port
+    var protocol = document.location.protocol;
+    var sr_origin = '//' + host;
+    var origin = protocol + sr_origin;
+    // Allow absolute or scheme relative URLs to same origin
+    return (url == origin || url.slice(0, origin.length + 1) == origin + '/') ||
+        (url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') ||
+        // or any other URL that isn't scheme relative or absolute i.e relative.
+        !(/^(\/\/|http:|https:).*/.test(url));
+}
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
+            // Send the token to same-origin, relative URLs only.
+            // Send the token only if the method warrants CSRF protection
+            // Using the CSRFToken value acquired earlier
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    }
+});
+
+
+//catch page change, convert table data to json, submit to hidden form, then change page
+$('.submitCatch').click(function(e) {
+	e.preventDefault(); //don't follow link yet
+	var table = $('#provTable').tableToJSON({ ignoreColumns: [0], ignoreHiddenRows: false });
+	table  = JSON.stringify(table);
+	//alert(table);
+	//stick stringified JSON of table into hidden form and submit	
+	$.ajax({      
+	  url: "?",
+	  type: "POST",
+      data : {'id_table': table},       
+      success: function() {
+	   //alert("data recieved!");
+       $( "#nextPage" )[0].click();   
+      }
+    });
+});
+
+//add to table with addProv button
+$('#addProv').click(function () {
+	//get form values in array
+	var fields = $( ".form-group > :input" ).serializeArray();
+	var row = "<tr><td></td>"
+    jQuery.each( fields, function( i, field ) {
+      row = row + ( "<td>" + field.value + "</td>" );
+    });
+	row =  row + ("</tr>")
+	
+	$('#provTable').bootstrapTable('destroy')
+	$('#provTable').append(row);
+	$('#provTable').bootstrapTable({
+		cache: false,
+		height: 400,
+		striped: true,
+		pagination: true,
+		pageSize: 50,
+		pageList: [10, 25, 50, 100, 200],		
+		clickToSelect: true,
+	});
+	$('#pname').val('')
+	$('#hours').val('')
+	$('#weeks').val('')
+	//$('#provTable').bootstrapTable('append-data', {
+		//data: values
+	//});
+	
+});
+	
+
+//delete selected rows button
+$('#remove-data').click(function () {
+	var selects = $('#provTable').bootstrapTable('getSelections');
+		states = $.map(selects, function (row) {
+			return row.state;
+		});
+
+	$('#provTable').bootstrapTable('remove', {
+		field: 'state',
+		values: states
+	});
+});
+
+// show/hide table
+$(document).ready(function(){
+ //var $table = $("#provTable");
+   
+  $("#tableDiv").hide();
+  $("#toggleTable").click(function(){
+    var button_name = $("#toggleTable").text();
+    if (button_name == "Show Table") {
+        $("#toggleTable").text("Hide Table") 
+    }
+    else {
+        $("#toggleTable").text("Show Table")
+    }        
+    $("#tableDiv").toggle();
+  });
+});
+</script>
+
+{% endblock %} 

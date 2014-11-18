@@ -1,0 +1,297 @@
+{% extends 'waitestapp/base_site.html' %}
+{% load static %}
+{% block content %}
+<div >
+	<div style="padding-right:104px; padding-bottom:20px;">
+		<ul class="nav nav-tabs pull-right">		  
+		  <!-- <li class="scenarioTab"><a href="/waitapp/scenario/1" data-toggle="tab">Scenario</a></li> -->		 
+		  <li class="active" ><a href="/waitapp/2/" data-toggle="tab">Current Input</a></li>
+		</ul>
+		<br>
+	</div>
+ <div class="container">
+
+      <!-- Main component for a primary marketing message or call to action -->
+      <div class="jumbotron">
+		<ul class="pager pull-right">
+			<li><a class="submitPrev" href="waitapp/1/">Previous</a></li>
+			<li><a class="submitCatch" href="waitapp/3/">Next</a></li>
+		</ul>
+		<div style="display:none;">
+			<a id="prevPage" href="/waitapp/1/"  style="display:none;"> PREV</a>
+			<a id="nextPage" href="/waitapp/3/"  style="display:none;"> NEXT</a>
+		</div>
+		
+        <h3>Patient Affiliations</h3>
+        <p>Enter affiliation of each patient, or load affiliations as file:</p>
+		
+		<!-- Provider Addition Widget -->
+		
+		<div style="display:table;">
+		  <div style="display: table-row;">
+            <div class="bs-example" style="display: table-cell;">
+				<form id="addForm" class="form-inline" action="#" method="get" role="form">
+					<div class="form-group" style="max-width:200px;">
+						<label for="patname" >Patient Name</label>
+						<input  id="patname" name="patname" class="form-control" placeholder="Patient Name">
+					</div>
+					<div class="form-group" style="max-width:150px;">
+						<label>Primary Provider</label>
+						<select name="position" class="form-control" style="max-width:145px;">
+							{% if phys_list %}
+							{% for phys in phys_list %}
+							<option>{{ phys }}</option>
+							{% endfor %}
+							{% endif %}							
+						</select>
+					</div>				
+					
+				</form>
+			</div>
+			<div style="display: table-cell;">							
+				<button id="addAff" class="btn btn-primary" style="margin-top:20px;" >Add Affilation</button>						
+			</div>
+		</div>
+		</div>
+    
+	 
+	 <br>  
+	
+	<!-- File input widget -->
+    <div>
+		<div id="file_input">
+			<label>Or, upload text file:</label>		
+			<div class="input-group">
+				<span class="input-group-btn">
+					<span class="btn btn-primary btn-file">
+						Browse&hellip; <input type="file">
+					</span>
+				</span>
+				<div>
+				<input type="text" class="form-control" style="width:300px">
+				&nbsp;&nbsp;
+				<button type="button" class="btn btn-primary" style="display:inline; ">Load File</button>
+				</div>
+			</div>			
+		</div>    
+	</div>  
+	
+
+<br>
+<button id="toggleTable" type="button" class="btn btn-primary">Show Table</button>
+<br>
+<div id="tableDiv">
+<table id="affTable">
+    <thead>
+        <tr>
+		    <th data-field="state" data-checkbox="true"></th>
+            <th data-field="patname">Patient</th>
+            <th data-field="provname">Provider</th>            
+        </tr>
+    </thead>
+	<tbody>
+	{% for row in table_data %}
+    <tr>	
+		<td></td>
+        <td>{{row.Patient}}</td>
+        <td>{{row.Provider}}</td>        
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<button class="btn btn-default" id="remove-data" data-method="remove">
+        Clear Selected Rows
+</button>
+</div>
+</div>
+</div>
+</div>
+ <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="{% static 'js/jquery-1.11.1.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="{% static 'js/ie10-viewport-bug-workaround.js' %}"></script>
+<!-- script for file upload functionality -->    
+<script language="javascript">
+$(document).on('change', '.btn-file :file', function() {
+  var input = $(this),
+	  numFiles = input.get(0).files ? input.get(0).files.length : 1,
+	  label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+  input.trigger('fileselect', [numFiles, label]);
+});
+
+$(document).ready( function() {
+	$('.btn-file :file').on('fileselect', function(event, numFiles, label) {
+		
+		var input = $(this).parents('.input-group').find(':text'),
+			log = numFiles > 1 ? numFiles + ' files selected' : label;
+		
+		if( input.length ) {
+			input.val(log);
+		} else {
+			if( log ) alert(log);
+		}
+		
+	});
+});
+</script>
+
+<!-- bootstrap table script -->
+<script src="{% static 'js/bootstrap-table.min.js' %}"></script>
+<script src="{% static 'js/jquery.tabletojson.min.js' %}"></script>
+<!--table functionality and toggle show/hide table script -->
+<script language="javascript">
+//set table properties
+$('#affTable').bootstrapTable({
+    cache: false,
+	height: 400,
+	striped: true,
+	pagination: true,
+	pageSize: 50,
+	pageList: [10, 25, 50, 100, 200],		
+	clickToSelect: true,
+});
+
+//csrf config for ajax
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+var csrftoken = getCookie('csrftoken');
+
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+function sameOrigin(url) {
+    // test that a given url is a same-origin URL
+    // url could be relative or scheme relative or absolute
+    var host = document.location.host; // host + port
+    var protocol = document.location.protocol;
+    var sr_origin = '//' + host;
+    var origin = protocol + sr_origin;
+    // Allow absolute or scheme relative URLs to same origin
+    return (url == origin || url.slice(0, origin.length + 1) == origin + '/') ||
+        (url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') ||
+        // or any other URL that isn't scheme relative or absolute i.e relative.
+        !(/^(\/\/|http:|https:).*/.test(url));
+}
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
+            // Send the token to same-origin, relative URLs only.
+            // Send the token only if the method warrants CSRF protection
+            // Using the CSRFToken value acquired earlier
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    }
+});
+
+
+//catch page change, convert table data to json, submit to hidden form, then change page
+$('.submitPrev').click(function(e) {
+	e.preventDefault(); //don't follow link yet
+	var table = $('#affTable').tableToJSON({ ignoreColumns: [0], ignoreHiddenRows: false });
+	table  = JSON.stringify(table);
+	//alert(table);
+	//stick stringified JSON of table into hidden form and submit	
+	$.ajax({      
+	  url: "?",
+	  type: "POST",
+      data : {'id_table': table},       
+      success: function() {
+	   //alert("data recieved!");
+       $( "#prevPage" )[0].click();   
+      }
+    });
+});
+
+//catch page change click, submit data, then return to previous page
+//catch page change, convert table data to json, submit to hidden form, then change page
+$('.submitCatch').click(function(e) {
+	e.preventDefault(); //don't follow link yet
+	var table = $('#affTable').tableToJSON({ ignoreColumns: [0], ignoreHiddenRows: false });
+	table  = JSON.stringify(table);
+	//alert(table);
+	//stick stringified JSON of table into hidden form and submit	
+	$.ajax({      
+	  url: "?",
+	  type: "POST",
+      data : {'id_table': table},       
+      success: function() {
+	   //alert("data recieved!");
+       $( "#nextPage" )[0].click();   
+      }
+    });
+});
+
+
+//add to table with addAff button
+$('#addAff').click(function () {
+	//get form values in array
+	var fields = $( ".form-group > :input" ).serializeArray();
+	var row = "<tr><td></td>"
+    jQuery.each( fields, function( i, field ) {
+      row = row + ( "<td>" + field.value + "</td>" );
+    });
+	row =  row + ("</tr>")
+	
+	$('#affTable').bootstrapTable('destroy')
+	$('#affTable').append(row);
+	$('#affTable').bootstrapTable({
+		cache: false,
+		height: 400,
+		striped: true,
+		pagination: true,
+		pageSize: 50,
+		pageList: [10, 25, 50, 100, 200],		
+		clickToSelect: true,
+	});
+	$('#patname').val('')	
+});
+	
+
+//delete selected rows button
+$('#remove-data').click(function () {
+	var selects = $('#affTable').bootstrapTable('getSelections');
+		states = $.map(selects, function (row) {
+			return row.state;
+		});
+
+	$('#affTable').bootstrapTable('remove', {
+		field: 'state',
+		values: states
+	});
+});
+
+$(document).ready(function(){
+ //var $table = $("#provTable");
+   
+  $("#tableDiv").hide();
+  $("#toggleTable").click(function(){
+    var button_name = $("#toggleTable").text();
+    if (button_name == "Show Table") {
+        $("#toggleTable").text("Hide Table") 
+    }
+    else {
+        $("#toggleTable").text("Show Table")
+    }        
+    $("#tableDiv").toggle();
+  });
+});
+</script>
+
+{% endblock %} 

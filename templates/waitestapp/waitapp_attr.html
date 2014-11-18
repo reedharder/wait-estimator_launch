@@ -1,0 +1,387 @@
+{% extends 'waitestapp/base_site.html' %}
+{% load static %}
+{% block content %}
+<div >
+	<div style="padding-right:104px; padding-bottom:20px;">
+		<ul class="nav nav-tabs pull-right">		  
+		  <!-- <li class="scenarioTab"><a href="/waitapp/scenario/1" data-toggle="tab">Scenario</a></li>	-->	 
+		  <li class="active" ><a href="/waitapp/3" data-toggle="tab">Current Input</a></li>
+		</ul>
+		<br>
+	</div>
+	 <div class="container">
+
+		  <!-- Main component -->
+	  <div class="jumbotron">
+		<ul class="pager pull-right">
+			<li><a class="submitPrev" href="/waitapp/2/">Previous</a></li>
+			<li><a class="submitCatch" href="/waitapp/4/">Next</a></li>
+		</ul>
+		<div style="display:none;">
+			<a id="prevPage" href="/waitapp/2/"  style="display:none;"> PREV</a>
+			<a id="nextPage" href="/waitapp/4/"  style="display:none;"> NEXT</a>
+		</div>
+			<h3>Patient Attributes</h3>
+			<p>Enter the composition of each Physician's panel, or load patient attributes as file:</p>
+			<br>
+			<!-- Provider Addition Widget -->
+			<div style="display:table;">
+			  <div style="display: table-row;">
+				<div class="bs-example" style="display: table-cell;">
+					<form id="addForm" class="form-inline" action="#" method="get" role="form">						
+						<div class="form-group" style="max-width:150px;">
+							<label>Primary Provider</label>
+							<select name="position" class="form-control" style="max-width:145px;">
+								{% if phys_list %}
+								{% for phys in phys_list %}
+								<option>{{ phys }}</option>
+								{% endfor %}
+								{% endif %}							
+							</select>
+						</div>				
+						<div class="form-group" style="max-width:200px;">
+							<label for="nummale" >Males on panel:</label>
+							<input  id="nummale" name="nummale" class="form-control" placeholder="# Males">
+						</div>
+						<div class="form-group" style="max-width:200px;">
+							<label for="numfmale" >Females on panel:</label>
+							<input  id="numfmale" name="numfmale" class="form-control" placeholder="# Females">
+						</div>
+					</form>
+				</div>
+				<div style="display: table-cell;">							
+					<button id="addPanel" class="btn btn-primary" style="margin-top:20px;" >Add Panel</button>						
+				</div>
+			  </div>
+			</div>
+			
+			<br>
+			<!-- panel table -->
+			<table id="panelTable">
+				<thead>
+					<tr>
+						<th data-field="state" data-checkbox="true"></th>
+						<th data-field="physician">Physician</th>
+						<th data-field="M">Males</th>	
+						<th data-field="F">Females</th>
+						<th data-field="Panel">Panel Size</th>						
+					</tr>
+				</thead>
+				<tbody>
+				{% for row in table_data %}
+				<tr>
+					<td></td>
+					<td>{{ row.Physician }}</td>
+					<td>{{ row.Males }}</td> 
+					<td>{{ row.Females }}</td> 
+					<td>{{ row.Panel_Size }}</td>
+				</tr>    
+				{% endfor %}
+				</tbody>
+			</table>
+			<button class="btn btn-default" id="remove-panel-data" data-method="remove">Clear Selected Rows</button>
+			<!-- OLD PROVIDER STATS WIDGET
+			<h4>Panels</h4>
+			<label>Physician</label>
+				
+				<div class="panelForm">			    
+					<form>				    
+						<label>Doctor 1:</label>
+						Panel Size: <input type="text" name="panelsize" placeholder="Enter Panel Size" />
+						Ratio M/F: <input type="text" name="malefemale" placeholder="Enter Ratio" />
+						<input type="submit" value="Save Panel"/>					
+					</form>
+				</div>
+				<div class="panelForm">			    
+					<form>				    
+						<label>Doctor 2:</label>
+						Panel Size: <input type="text" name="panelsize" placeholder="Enter Panel Size" />
+						Ratio M/F: <input type="text" name="maefemale" placeholder="Enter Ratio" />
+						<input type="submit" value="Save Panel"/>					
+					</form>
+				</div>
+				<div class="panelForm">			    
+					<form>				    
+						<label>Doctor 3:</label>
+						Panel Size: <input type="text" name="panelsize" placeholder="Enter Panel Size" />
+						Ratio M/F: <input type="text" name="maefemale" placeholder="Enter Ratio" />
+						<input type="submit" value="Save Panel"/>					
+					</form>
+				</div> -->
+		<br>    
+		
+		<!-- File input widget -->
+		<div>
+		<div id="file_input">
+			<label>Or, upload text file:</label>		
+			<div class="input-group">
+				<span class="input-group-btn">
+					<span class="btn btn-primary btn-file">
+						Browse&hellip; <input type="file">
+					</span>
+				</span>
+				<div>
+				<input type="text" class="form-control" style="width:300px">
+				&nbsp;&nbsp;
+				<button type="button" class="btn btn-primary" style="display:inline; ">Load File</button>
+				</div>
+			</div>
+			
+			
+		</div>    
+		</div>
+
+
+	<br>
+
+	<button id="toggleTable" type="button" class="btn btn-primary">Use Patient-By-Patient Data</button>
+	<br>
+	<div id="tableDiv">
+	<table id="patTable">
+		<thead>
+			<tr>
+				<th data-field="state" data-checkbox="true"></th>
+				<th data-field="patname">Patient Name</th>
+				<th data-field="gender">Patient Gender</th>
+				<th data-field="age">Age</th>   
+				<th data-field="chronic">Chronic Conditions</th> 
+			</tr>
+		</thead>
+		<tbody>
+		{% for row in pat_table_data %}
+		<tr>		
+			<td></td>
+			<td>{{row.Patient_Name}}</td>
+			<td>{{row.Patient_Gender}}</td>        
+			<td>{{row.Age}}</td>
+			<td>{{row.Chronic_Conditions}}</td>
+		</tr>
+		{% endfor %}
+		</tbody>
+	</table>
+	<button class="btn btn-default" id="remove-data" data-method="remove">
+			Clear Selected Rows
+	</button>
+	</div>
+	</div>
+	</div>
+</div>
+ <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="{% static 'js/jquery-1.11.1.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="{% static 'js/ie10-viewport-bug-workaround.js' %}"></script>
+<!-- script for file upload functionality -->    
+<script language="javascript">
+$(document).on('change', '.btn-file :file', function() {
+  var input = $(this),
+	  numFiles = input.get(0).files ? input.get(0).files.length : 1,
+	  label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+  input.trigger('fileselect', [numFiles, label]);
+});
+
+$(document).ready( function() {
+	$('.btn-file :file').on('fileselect', function(event, numFiles, label) {
+		
+		var input = $(this).parents('.input-group').find(':text'),
+			log = numFiles > 1 ? numFiles + ' files selected' : label;
+		
+		if( input.length ) {
+			input.val(log);
+		} else {
+			if( log ) alert(log);
+		}
+		
+	});
+});
+</script>
+
+<!-- bootstrap table script -->
+<script src="{% static 'js/bootstrap-table.min.js' %}"></script>
+<script src="{% static 'js/jquery.tabletojson.min.js' %}"></script>
+<!--table functionality and toggle show/hide table script -->
+<script language="javascript">
+//set table properties
+$('#panelTable').bootstrapTable({
+    cache: false,
+	height: 200,
+	striped: true,	
+	clickToSelect: true,
+});
+
+$('#patTable').bootstrapTable({
+    cache: false,
+	height: 400,
+	striped: true,
+	pagination: true,
+	pageSize: 50,
+	pageList: [10, 25, 50, 100, 200],
+	clickToSelect: true,
+});
+
+//csrf config for ajax
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+var csrftoken = getCookie('csrftoken');
+
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+function sameOrigin(url) {
+    // test that a given url is a same-origin URL
+    // url could be relative or scheme relative or absolute
+    var host = document.location.host; // host + port
+    var protocol = document.location.protocol;
+    var sr_origin = '//' + host;
+    var origin = protocol + sr_origin;
+    // Allow absolute or scheme relative URLs to same origin
+    return (url == origin || url.slice(0, origin.length + 1) == origin + '/') ||
+        (url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') ||
+        // or any other URL that isn't scheme relative or absolute i.e relative.
+        !(/^(\/\/|http:|https:).*/.test(url));
+}
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
+            // Send the token to same-origin, relative URLs only.
+            // Send the token only if the method warrants CSRF protection
+            // Using the CSRFToken value acquired earlier
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    }
+});
+
+
+//catch page change, convert table data to json, submit to hidden form, then change page
+$('.submitPrev').click(function(e) {
+	e.preventDefault(); //don't follow link yet
+	var table = $('#panelTable').tableToJSON({ ignoreColumns: [0], ignoreHiddenRows: false });
+	table  = JSON.stringify(table);
+	var patTable =  $('#patTable').tableToJSON({ ignoreColumns: [0], ignoreHiddenRows: true });
+	patTable  = JSON.stringify(patTable);
+	//alert(table);
+	//alert(patTable);
+	//stick stringified JSON of table into hidden form and submit	
+	$.ajax({      
+	  url: "?",
+	  type: "POST",
+      data : {'id_table': table, 'patTable':patTable},       
+      success: function() {
+	   //alert("data recieved!");
+       $( "#prevPage" )[0].click();   
+      }
+    });
+});
+
+//catch page change click, submit data, then return to previous page
+//catch page change, convert table data to json, submit to hidden form, then change page
+$('.submitCatch').click(function(e) {
+	e.preventDefault(); //don't follow link yet
+	var table = $('#panelTable').tableToJSON({ ignoreColumns: [0], ignoreHiddenRows: false });
+	table  = JSON.stringify(table);
+	var patTable =  $('#patTable').tableToJSON({ ignoreColumns: [0], ignoreHiddenRows: true });
+	patTable  = JSON.stringify(patTable);
+	//alert(table);
+	//alert(patTable);
+	//stick stringified JSON of table into hidden form and submit	
+	$.ajax({      
+	  url: "?",
+	  type: "POST",
+      data : {'id_table': table, 'patTable':patTable},       
+      success: function() {
+	   //alert("data recieved!");
+       $( "#nextPage" )[0].click();   
+      }
+    });
+});
+
+//add to table with addPanel button
+$('#addPanel').click(function () {
+	//get form values in array
+	var fields = $( ".form-group > :input" ).serializeArray();
+	var row = "<tr><td></td>"
+    jQuery.each( fields, function( i, field ) {
+      row = row + ( "<td>" + field.value + "</td>" );
+    });
+	//alert(row);
+	// compute full panel size from number of males and females
+	var panelSize = parseInt(fields[1].value, 10) + parseInt(fields[2].value, 10)
+	//alert(parseInt(fields[1].value, 10));
+	//alert(parseInt(fields[2].value, 10));
+	
+	row =  row + ("<td>" + panelSize + "</td>"  +"</tr>")
+	//alert(row);
+	
+	$('#panelTable').bootstrapTable('destroy')
+	$('#panelTable').append(row);
+	$('#panelTable').bootstrapTable({
+		cache: false,
+		height: 200,
+		striped: true,			
+		clickToSelect: true,
+	});
+	$('#nummale').val('')	
+	$('#numfmale').val('')	
+});
+	
+
+//delete selected rows button
+$('#remove-data').click(function () {
+	var selects = $('#patTable').bootstrapTable('getSelections');
+		states = $.map(selects, function (row) {
+			return row.state;
+		});
+
+	$('#patTable').bootstrapTable('remove', {
+		field: 'state',
+		values: states
+	});
+});
+
+//delete selected rows button
+$('#remove-panel-data').click(function () {
+	var selects = $('#patTable').bootstrapTable('getSelections');
+		states = $.map(selects, function (row) {
+			return row.state;
+		});
+
+	$('#panelTable').bootstrapTable('remove', {
+		field: 'state',
+		values: states
+	});
+});
+
+$(document).ready(function(){
+ //var $table = $("#provTable");
+   
+  $("#tableDiv").hide();
+  $("#toggleTable").click(function(){
+    var button_name = $("#toggleTable").text();
+    if (button_name == "Use Patient-By-Patient Data") {
+        $("#toggleTable").text("Use Aggregate Data") 
+    }
+    else {
+        $("#toggleTable").text("Use Patient-By-Patient Data")
+    }        
+    $("#tableDiv").toggle();
+  });
+});
+</script>
+
+{% endblock %} 

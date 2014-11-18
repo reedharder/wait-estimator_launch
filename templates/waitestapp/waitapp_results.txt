@@ -1,0 +1,203 @@
+{% extends 'waitestapp/base_site.html' %}
+{% load static %}
+{% block content %}
+ <div class="container">
+
+      <!-- Main component for a primary marketing message or call to action -->
+      <div class="jumbotron">
+		<ul class="pager pull-right">
+			<li><a href="/waitapp/1/">Previous</a></li>
+			<li><a href="/waitapp/3/">Next</a></li>
+		</ul>
+        <h3>Patient Affiliations</h3>
+        <p>Enter affiliation of each patient, or load affiliations as file:</p>
+		
+		<!-- Provider Addition Widget -->
+		<!-- FIRST NAME, LAST NAME, DROPDOWN -->
+            <div class="bs-example">
+				<form id="addForm" class="form-inline" action="#" method="get" role="form">
+					<div class="form-group" style="max-width:200px;">
+						<label for="patname" >Patient Name</label>
+						<input  name="patname" class="form-control" placeholder="Patient Name">
+					</div>
+					<div class="form-group"  style="max-width:200px;">
+						<label >Primary Provider</label>
+						<input  name="provname" class="form-control" placeholder="Primary Provider" style="max-width:195px;">
+					</div>
+					
+					<div class="form-group" style="max-width:110px;">
+						<label>&nbsp;</label>
+						<button id="addAff" class="btn btn-primary">Add Affilation</button>
+					</div>
+				</form>
+			</div>
+    <br>    
+	
+	<!-- File input widget -->
+    <div>
+		<div id="file_input">
+			<label>Or, upload text file:</label>		
+			<div class="input-group">
+				<span class="input-group-btn">
+					<span class="btn btn-primary btn-file">
+						Browse&hellip; <input type="file">
+					</span>
+				</span>
+				<div>
+				<input type="text" class="form-control" style="width:300px">
+				&nbsp;&nbsp;
+				<button type="button" class="btn btn-primary" style="display:inline; ">Load File</button>
+				</div>
+			</div>			
+		</div>    
+	</div>  
+	
+
+<br>
+<button id="toggleTable" type="button" class="btn btn-primary">Show Table</button>
+<br>
+<div id="tableDiv">
+<table id="affTable">
+    <thead>
+        <tr>
+		    <th data-field="state" data-checkbox="true"></th>
+            <th data-field="patname">Patient</th>
+            <th data-field="provname">Provider</th>            
+        </tr>
+    </thead>
+	<tbody>
+    <tr>
+		<td></td>
+        <td>Patient A</td>
+        <td>Doctor 1</td>        
+    </tr>
+    <tr>
+		<td></td>
+        <td>Patient B</td>
+        <td>Doctor 1</td>       
+    </tr>
+    <tr>
+		<td></td>
+        <td>Patient C</td>
+        <td>Doctor 2</td>
+        
+    </tr>
+    <tr>
+		<td></td>
+        <td>Patient D</td>
+        <td>Doctor 2</td>
+    </tr>
+    <tr>
+		<td></td>        
+        <td>Patient E</td>
+        <td>Doctor 3</td>
+    </tr>
+	<tr>
+		<td></td>        
+        <td>Patient F</td>
+        <td>Doctor 3</td>
+    </tr>
+    </tbody>
+</table>
+<button class="btn btn-default" id="remove-data" data-method="remove">
+        Clear Selected Rows
+</button>
+</div>
+</div>
+</div>
+ <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="{% static 'js/jquery-1.11.1.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="{% static 'js/ie10-viewport-bug-workaround.js' %}"></script>
+<!-- script for file upload functionality -->    
+<script language="javascript">
+$(document).on('change', '.btn-file :file', function() {
+  var input = $(this),
+	  numFiles = input.get(0).files ? input.get(0).files.length : 1,
+	  label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+  input.trigger('fileselect', [numFiles, label]);
+});
+
+$(document).ready( function() {
+	$('.btn-file :file').on('fileselect', function(event, numFiles, label) {
+		
+		var input = $(this).parents('.input-group').find(':text'),
+			log = numFiles > 1 ? numFiles + ' files selected' : label;
+		
+		if( input.length ) {
+			input.val(log);
+		} else {
+			if( log ) alert(log);
+		}
+		
+	});
+});
+</script>
+
+<!-- bootstrap table script -->
+<script src="{% static 'js/bootstrap-table.min.js' %}"></script>
+
+<!--table functionality and toggle show/hide table script -->
+<script language="javascript">
+//set table properties
+$('#affTable').bootstrapTable({
+    cache: false,
+	height: 400,
+	striped: true,
+	pagination: true,
+	pageSize: 50,
+	pageList: [10, 25, 50, 100, 200],
+	search: true,	
+	clickToSelect: true,
+});
+
+//add to table with addProv button CURRENTLY NON FUNCTIONAL
+$('#addProv').click(function () {
+	//get form values in array
+	var values = {};
+	$.each($('#addForm').serializeArray(), function(i, field) {
+		values[field.name] = field.value;		
+	});
+	values['state']=""
+	
+	$('#affTable').bootstrapTable('append-data', {
+		data: values
+	});
+	
+});
+	
+
+//delete selected rows button
+$('#remove-data').click(function () {
+	var selects = $('#affTable').bootstrapTable('getSelections');
+		states = $.map(selects, function (row) {
+			return row.state;
+		});
+
+	$('#affTable').bootstrapTable('remove', {
+		field: 'state',
+		values: states
+	});
+});
+
+$(document).ready(function(){
+ //var $table = $("#provTable");
+   
+  $("#tableDiv").hide();
+  $("#toggleTable").click(function(){
+    var button_name = $("#toggleTable").text();
+    if (button_name == "Show Table") {
+        $("#toggleTable").text("Hide Table") 
+    }
+    else {
+        $("#toggleTable").text("Show Table")
+    }        
+    $("#tableDiv").toggle();
+  });
+});
+</script>
+
+{% endblock %} 

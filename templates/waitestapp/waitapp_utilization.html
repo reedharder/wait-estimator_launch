@@ -1,0 +1,289 @@
+{% extends 'waitestapp/base_site.html' %}
+{% load static %}
+{% block content %}
+<div >
+	<div style="padding-right:104px; padding-bottom:20px;">
+		<ul class="nav nav-tabs pull-right">		  
+		  <!-- <li class="scenarioTab"><a href="/waitapp/scenario/1" data-toggle="tab">Scenario</a></li> -->		 
+		  <li class="active" ><a href="/waitapp/6" data-toggle="tab">Current Input</a></li>
+		</ul>
+		<br>
+	</div>
+	 <div class="container">
+
+		  <!-- Main component for a primary marketing message or call to action -->
+		  <div class="jumbotron">
+			<ul class="pager pull-right">
+				<li><a class="submitPrev" href="/waitapp/5/">Previous</a></li>
+				<li><a class="submitCatch" href="/waitapp/results/">Run Simulation</a></li>
+			</ul>
+			<div style="display:none;">
+				<a id="prevPage" href="/waitapp/5/"  style="display:none;"> PREV</a>
+				<a id="nextPage" href="/waitapp/results/"  style="display:none;"> NEXT</a>
+			</div>
+			<img src="{% static 'img/ajax-loader.gif' %}" style="display: none; position: absolute; right: 50px;" id="imgProgress" />
+			
+			<h3>Patient Utilization</h3>
+			<p>Utilization of services for each physician:</p>
+			<br>
+			<div id="borderTable" style="border:1px solid black; padding:30px;">
+				<table id="utilgrid">
+					<tr>
+						<td><strong>Physician</strong></td> 
+						<td><strong>Panel Size</strong></td> 				
+						<td style="text-align:center;"><strong> Team </strong></td>
+						<td style ="padding-left:30px;"><strong>Capacity &nbsp;&nbsp;</strong><h6>(hrs/year)</h6></td> 
+						<td><strong>Demand &nbsp;&nbsp;&nbsp;&nbsp; </strong><h6>(hrs/year)</h6></td> 
+						<td><strong>Imbalance&nbsp;&nbsp; </strong><h6>(hrs/year)</h6></td>  
+					</tr>
+					{% for phys, values in phys_demand.items %}
+					<tr>
+						<td>{{ phys }}</td> 
+						<td>{{ values.8 }}</td>				
+						<td> 
+							<h6><strong>{{ values.5 }}:</strong></h6> 
+							<ul>
+								
+								{% for staff in values.6 %}
+								<li><h6>{{ staff }}</h6></li>
+								{% endfor %}
+							</ul>
+						</td>
+						<td style ="padding-left:30px;">{{ values.4 | floatformat:"0" }}</td> 
+						<td>{{ values.3 | floatformat:"0" }}</td> 
+						<td>{{ values.7  | floatformat:"0"}}</td> 
+					</tr>
+					{% endfor %}
+				</table>
+			</div>
+			<br>
+			<div id="borderGraph" style="border:1px solid black; padding:30px;">
+				<div>
+					<label>Demand by Visit Type:</label>
+					<select id="graphSelect">
+						<option>Acute</option>
+						<option>Preventative</option>
+						<option>Chronic</option>
+					</select>
+				</div>
+				<div id="demandGraph"></div>
+			</div>
+			<!-- Rule Form -->
+			<!--
+			<div id="utilGrid" style="display: table;">
+				<div id="utilRow1" style="display: table-row;">
+					
+						<div style="display: table-cell;"><label>Acute Visits per Patient per Year:&nbsp;&nbsp;</label></div>
+						<div style="display: table-cell;"><form><input type="number" min="0" step="1" value="1" style="width:50px;" required></form></div>
+						<div style="display: table-cell;"><label style="padding-left:8em;">Acute Visit Duration (min):&nbsp;&nbsp;</label></div>
+						<div style="display: table-cell;"><form><input type="number" min="0" step="1" value="15" style="width:50px;" required></form></div>						
+				</div>
+				<div id="utilRow2" style="display: table-row;">
+					
+						<div style="display: table-cell;"><label>Prevenative Visits per Patient per Year:&nbsp;&nbsp;</label></div>
+						<div style="display: table-cell;"><form><input type="number" min="0" step="1" value="1" style="width:50px;" required></form></div>
+						<div style="display: table-cell;"><label style="padding-left:8em;">Acute Visit Duration (min):&nbsp;&nbsp;</label></div>
+						<div style="display: table-cell;"><form><input type="number" min="0" step="1" value="15" style="width:50px;" required></form></div>										
+				</div>
+				<div id="utilRow3" style="display: table-row;">
+					
+						<div style="display: table-cell;"><label>Chronic Visits per Patient per Year&nbsp;&nbsp;</label></div>
+						<div style="display: table-cell;"><form><input type="number" min="0" step="1" value="1" style="width:50px;" required></form></div>
+						<div style="display: table-cell;"><label style="padding-left:8em;">Acute Visit Duration (min): &nbsp;&nbsp;</label></div>
+						<div style="display: table-cell;"><form><input type="number" min="0" step="1" value="15" style="width:50px;" required></form></div>												
+				</div>
+			</div>
+			-->
+			
+		<br>    
+		
+		
+		
+	<!--
+	<button id="toggleTable" type="button" class="btn btn-primary">Show Service Load Panel</button>
+	<br>
+	<div id="tableDiv">
+		<br>
+		<h4>Expected Service Load</h4>
+		<div style="display: table;">
+			<div style="display: table-row;">			
+				<div style="display: table-cell;">  <form><label>See&nbsp;</label><input type="number" min="0" max="100" step="1" value="100" style="width:50px;" required><label>&nbsp;% of acute visit requests within:&nbsp;</label></form></div><div style="display: table-cell;">
+					<form><input type="number" min="0" step="1" value="0" style="width:50px;" required><label>&nbsp;days</label> </form> </div>
+			</div>
+			<div style="display: table-row;">			
+				<div style="display: table-cell;">  <form><label>See&nbsp;</label><input type="number" min="0" max="100" step="1" value="100" style="width:50px;" required><label>&nbsp;% of preventative visit requests within:&nbsp;</label></form></div><div style="display: table-cell;">
+					<form><input type="number" min="0" step="1" value="0" style="width:50px;" required><label>&nbsp;days</label> </form> </div>
+			</div>
+			<div style="display: table-row;">			
+				<div style="display: table-cell;">  <form><label>See&nbsp;</label><input type="number" min="0" max="100" step="1" value="100" style="width:50px;" required><label>&nbsp;% of chronic visit requests within:&nbsp;</label></form></div><div style="display: table-cell;">
+					<form><input type="number" min="0" step="1" value="0" style="width:50px;" required><label>&nbsp;days</label> </form> </div>
+			</div>
+		</div>
+	</div> -->
+	</div>
+	</div>
+</div>
+ <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="{% static 'js/jquery-1.11.1.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="{% static 'js/ie10-viewport-bug-workaround.js' %}"></script>
+<!-- script for file upload functionality -->    
+<script language="javascript">
+$(document).on('change', '.btn-file :file', function() {
+  var input = $(this),
+	  numFiles = input.get(0).files ? input.get(0).files.length : 1,
+	  label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+  input.trigger('fileselect', [numFiles, label]);
+});
+
+$(document).ready( function() {
+	$('.btn-file :file').on('fileselect', function(event, numFiles, label) {
+		
+		var input = $(this).parents('.input-group').find(':text'),
+			log = numFiles > 1 ? numFiles + ' files selected' : label;
+		
+		if( input.length ) {
+			input.val(log);
+		} else {
+			if( log ) alert(log);
+		}
+		
+	});
+});
+</script>
+
+<!-- bootstrap graph script -->
+<script src="{% static 'js/jqBarGraph.1.1.min.js' %}"></script>
+
+<!--table functionality and toggle show/hide table script -->
+<script language="javascript">
+
+//create graphs
+acuteData = new Array(
+	{% for phys, values in phys_demand.items %}	
+   	[{{values.1 | floatformat:"0"}},'{{phys}}','{% cycle '#c90707' '#fd482f' %}']{% if not forloop.last %},{% endif %}	
+	{% endfor %}   	
+); 
+
+prevData = new Array(
+   {% for phys, values in phys_demand.items %}  
+   	[{{values.2 | floatformat:"0"}},'{{phys}}','{% cycle '#064222' '#11a523' %}'] {% if not forloop.last %},{% endif %}		
+	{% endfor %}   
+); 
+
+chronicData = new Array(
+   	{% for phys, values in phys_demand.items %}	
+   	[{{values.3 | floatformat:"0"}},'{{phys}}','{% cycle '#11187c' '#1f2bd4' %}']{% if not forloop.last %},{% endif %}	
+	{% endfor %}   
+); 
+
+//initial graph
+$('#demandGraph').jqBarGraph({ data: acuteData, }); 
+
+//graph chage mechanism
+$('#graphSelect').on('change', function() {
+	$('#demandGraph').html('');
+	if ($(this).val() == "Acute"){
+		$('#demandGraph').jqBarGraph({ data: acuteData, }); 
+	} 
+	else if ($(this).val() == "Preventative") {
+		$('#demandGraph').jqBarGraph({ data: prevData, });
+	}
+	else if ($(this).val() == "Chronic") {
+		$('#demandGraph').jqBarGraph({ data: chronicData, });
+	}
+});
+
+//csrf config for ajax
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+var csrftoken = getCookie('csrftoken');
+
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+function sameOrigin(url) {
+    // test that a given url is a same-origin URL
+    // url could be relative or scheme relative or absolute
+    var host = document.location.host; // host + port
+    var protocol = document.location.protocol;
+    var sr_origin = '//' + host;
+    var origin = protocol + sr_origin;
+    // Allow absolute or scheme relative URLs to same origin
+    return (url == origin || url.slice(0, origin.length + 1) == origin + '/') ||
+        (url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') ||
+        // or any other URL that isn't scheme relative or absolute i.e relative.
+        !(/^(\/\/|http:|https:).*/.test(url));
+}
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
+            // Send the token to same-origin, relative URLs only.
+            // Send the token only if the method warrants CSRF protection
+            // Using the CSRFToken value acquired earlier
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    }
+});
+
+/*
+//catch page change, convert table data to json, submit to hidden form, then change page
+$('.submitPrev').click(function(e) {
+	e.preventDefault(); //don't follow link yet
+	var table = $('#panelTable').tableToJSON({ ignoreColumns: [0], ignoreHiddenRows: false });
+	table  = JSON.stringify(table);
+	alert(table);
+	//stick stringified JSON of table into hidden form and submit	
+	$.ajax({      
+	  url: "?",
+	  type: "POST",
+      data : {'id_table': table},       
+      success: function() {
+	   alert("data recieved!");
+       $( "#prevPage" )[0].click();   
+      }
+    });
+});
+*/
+//catch page change click, submit data, then return to previous page
+// send signal to start simulation, run loading sign
+$('.submitCatch').click(function(e) {
+	e.preventDefault(); //don't follow link yet	
+	//show image progress
+	$("#imgProgress").show(); 
+	$.ajax({      
+	  url: "?",
+	  type: "POST",
+      data : {'alert':'ok'},     
+      success: function() {
+	   //alert("data recieved!");
+	   $("#imgProgress").hide();
+       $( "#nextPage" )[0].click();   
+      }
+    });
+});
+
+
+
+
+
+</script>
+
+{% endblock %} 

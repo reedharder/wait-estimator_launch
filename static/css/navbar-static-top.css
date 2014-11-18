@@ -1,0 +1,36 @@
+body {
+  min-height: 1000px;
+}
+
+.navbar-static-top {
+  margin-bottom: 20px;
+}
+
+.jumbotron  {
+  padding-top: 20px;
+  padding-bottom: 100px;
+  max-width=70%;
+   
+}
+
+#launch_button {
+	padding-top: 30px;
+	
+}
+
+.nav-tabs > li > a,
+        .nav-tabs > li > a:hover,
+        .nav-tabs > li > a:focus {
+		background-color: #f7f7f7  
+		}
+		
+.nav-tabs > li.active > a,
+        .nav-tabs > li.active > a:hover,
+        .nav-tabs > li.active > a:focus {
+          color: #428bca;
+          cursor: default;
+          background-color: #eeeeee;
+          border: 1px solid #dddddd;
+          border-bottom-color: transparent;
+          } 
+		  
