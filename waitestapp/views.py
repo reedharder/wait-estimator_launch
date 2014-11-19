@@ -2,7 +2,7 @@ from django.shortcuts import render ##render_to_response
 from django.http import HttpResponse
 ##from django.contrib.formtools.wizard.views import SessionWizardView
 from  waitestapp import initial_data
-
+from django.views.decorators.csrf import ensure_csrf_cookie
 
 '''
 
@@ -88,6 +88,7 @@ def current_wizard_view(request):
 def home_view(request):       
     return render(request, 'waitestapp/base_site.html')
 
+@ensure_csrf_cookie
 def waitapp_capacity(request):
     if request.method == 'POST':
         import ast
@@ -110,6 +111,7 @@ def waitapp_capacity(request):
         
     return render(request, 'waitestapp/waitapp_capacity.html', {'table_data':table_data})
     
+@ensure_csrf_cookie
 def waitapp_aff(request):
     if request.method == 'POST':
         import ast
@@ -123,6 +125,7 @@ def waitapp_aff(request):
         table_data = key_clean(table_data)
     return render(request, 'waitestapp/waitapp_aff.html',{'phys_list':request.session['phys_list'], 'table_data':table_data})
 
+@ensure_csrf_cookie
 def waitapp_attr(request):
     if request.method == 'POST':
         import ast
@@ -140,7 +143,8 @@ def waitapp_attr(request):
         table_data = key_clean(table_data)
         pat_table_data = key_clean(pat_table_data)
     return render(request, 'waitestapp/waitapp_attr.html', {'phys_list':request.session['phys_list'],'table_data':table_data, 'pat_table_data':pat_table_data})
-    
+
+@ensure_csrf_cookie    
 def waitapp_contrule(request):
     if request.method == 'POST':
         import ast
@@ -164,6 +168,7 @@ def waitapp_contrule(request):
         table_data = key_clean(table_data)
     return render(request, 'waitestapp/waitapp_contrule.html', {'phys_list':request.session['phys_list'],'table_data':table_data, 'share':Share, 'noshare':NoShare} )
 
+@ensure_csrf_cookie
 def waitapp_delrule(request):
     if request.method == 'POST':
         import ast
@@ -177,6 +182,7 @@ def waitapp_delrule(request):
         table_data = key_clean(table_data)
     return render(request, 'waitestapp/waitapp_delrule.html', {'phys_list':request.session['phys_list'],'nonphys_list':request.session['nonphys_list'],'table_data':table_data})
 
+@ensure_csrf_cookie
 def waitapp_utilization(request):#get doctors in list
     import numpy as np
     import ast
@@ -427,7 +433,8 @@ def waitapp_utilization(request):#get doctors in list
         print('ok')
         print(phys_demand)
         return render(request, 'waitestapp/waitapp_utilization.html', {'phys_demand': phys_demand})
-    
+
+@ensure_csrf_cookie    
 def waitapp_results(request):
     import ast
     import numpy as np
@@ -470,6 +477,7 @@ def waitapp_results(request):
         ##table_query_generator(waited, doc, cond, gender, age, visit, q, category_full_to_ind, phys_to_num)    
         return render(request, 'waitestapp/waitapp_results.html', {'phys_list':request.session['phys_list']})
 
+@ensure_csrf_cookie
 def scenario_capacity(request):
     if request.method == 'POST':
         import ast
@@ -494,7 +502,7 @@ def scenario_capacity(request):
         table_data = key_clean(table_data)
     return render(request, 'waitestapp/scenario_capacity.html', {'table_data':table_data})
     
-    
+@ensure_csrf_cookie    
 def scenario_aff(request):
     if request.method == 'POST':
         import ast
@@ -508,6 +516,7 @@ def scenario_aff(request):
         table_data = key_clean(table_data)
     return render(request, 'waitestapp/scenario_aff.html',{'phys_list':request.session['s_phys_list'], 'table_data':table_data})
 
+@ensure_csrf_cookie
 def scenario_attr(request):
     if request.method == 'POST':
         import ast
@@ -526,7 +535,7 @@ def scenario_attr(request):
         pat_table_data = key_clean(pat_table_data)
     return render(request, 'waitestapp/scenario_attr.html', {'phys_list':request.session['s_phys_list'],'table_data':table_data,'pat_table_data':pat_table_data})
 
-    
+@ensure_csrf_cookie    
 def scenario_contrule(request):
     if request.method == 'POST':
         import ast
@@ -555,6 +564,7 @@ def scenario_contrule(request):
         table_data = key_clean(table_data)
     return render(request, 'waitestapp/scenario_contrule.html', {'phys_list':request.session['s_phys_list'],'table_data':table_data,'share':Share, 'noshare':NoShare} )
 
+@ensure_csrf_cookie
 def scenario_delrule(request):
     if request.method == 'POST':
         import ast
@@ -569,7 +579,7 @@ def scenario_delrule(request):
     return render(request, 'waitestapp/scenario_delrule.html', {'phys_list':request.session['s_phys_list'], 'nonphys_list':request.session['s_nonphys_list'],'table_data':table_data})
 
     
-
+@ensure_csrf_cookie
 def scenario_utilization(request):
     import numpy as np
     import ast
@@ -863,7 +873,8 @@ def scenario_utilization(request):
         print('ok')
         print(phys_demand)
         return render(request, 'waitestapp/scenario_utilization.html', {'phys_demand': phys_demand})
-    
+
+@ensure_csrf_cookie    
 def scenario_results(request):
     import ast
     import numpy as np
