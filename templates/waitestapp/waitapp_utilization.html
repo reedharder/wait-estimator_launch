@@ -14,11 +14,10 @@
 		  <!-- Main component for a primary marketing message or call to action -->
 		  <div class="jumbotron">
 			<ul class="pager pull-right">
-				<li><a class="submitPrev" href="/waitapp/5/">Previous</a></li>
-				<li><a class="submitCatch" href="/waitapp/results/">Run Simulation</a></li>
+				<li><a class="submitPrev" href="/waitapp/3/">Previous</a></li>				
 			</ul>
 			<div style="display:none;">
-				<a id="prevPage" href="/waitapp/5/"  style="display:none;"> PREV</a>
+				<a id="prevPage" href="/waitapp/3/"  style="display:none;"> PREV</a>
 				<a id="nextPage" href="/waitapp/results/"  style="display:none;"> NEXT</a>
 			</div>
 			<img src="{% static 'img/ajax-loader.gif' %}" style="display: none; position: absolute; right: 50px;" id="imgProgress" />
@@ -26,47 +25,59 @@
 			<h3>Patient Utilization</h3>
 			<p>Utilization of services for each physician:</p>
 			<br>
-			<div id="borderTable" style="border:1px solid black; padding:30px;">
-				<table id="utilgrid">
-					<tr>
-						<td><strong>Physician</strong></td> 
-						<td><strong>Panel Size</strong></td> 				
-						<td style="text-align:center;"><strong> Team </strong></td>
-						<td style ="padding-left:30px;"><strong>Capacity &nbsp;&nbsp;</strong><h6>(hrs/year)</h6></td> 
-						<td><strong>Demand &nbsp;&nbsp;&nbsp;&nbsp; </strong><h6>(hrs/year)</h6></td> 
-						<td><strong>Imbalance&nbsp;&nbsp; </strong><h6>(hrs/year)</h6></td>  
-					</tr>
-					{% for phys, values in phys_demand.items %}
-					<tr>
-						<td>{{ phys }}</td> 
-						<td>{{ values.8 }}</td>				
-						<td> 
-							<h6><strong>{{ values.5 }}:</strong></h6> 
-							<ul>
-								
-								{% for staff in values.6 %}
-								<li><h6>{{ staff }}</h6></li>
-								{% endfor %}
-							</ul>
-						</td>
-						<td style ="padding-left:30px;">{{ values.4 | floatformat:"0" }}</td> 
-						<td>{{ values.3 | floatformat:"0" }}</td> 
-						<td>{{ values.7  | floatformat:"0"}}</td> 
-					</tr>
-					{% endfor %}
-				</table>
-			</div>
-			<br>
-			<div id="borderGraph" style="border:1px solid black; padding:30px;">
-				<div>
-					<label>Demand by Visit Type:</label>
-					<select id="graphSelect">
-						<option>Acute</option>
-						<option>Preventative</option>
-						<option>Chronic</option>
-					</select>
+		
+			<ul class="nav nav-pills nav-stacked col-md-2">
+			  <li class="active"><a href="#tab_table" data-toggle="pill">Table</a></li>
+			  <li><a href="#tab_graph" data-toggle="pill">Graph</a></li>
+			  
+			</ul>
+			<div class="tab-content col-md-10">
+				<div class="tab-pane active" id="tab_table">
+					<div id="borderTable" style="border:1px solid black; padding:30px;">
+						<table id="utilgrid">
+							<tr>
+								<td><strong>Physician</strong></td> 
+								<td><strong>Panel Size</strong></td> 				
+								<td style="text-align:center;"><strong> Team </strong></td>
+								<td style ="padding-left:30px;"><strong>Capacity &nbsp;&nbsp;</strong><h6>(hrs/year)</h6></td> 
+								<td><strong>Demand &nbsp;&nbsp;&nbsp;&nbsp; </strong><h6>(hrs/year)</h6></td> 
+								<td><strong>Imbalance&nbsp;&nbsp; </strong><h6>(hrs/year)</h6></td>  
+							</tr>
+							{% for phys, values in phys_demand.items %}
+							<tr>
+								<td>{{ phys }}</td> 
+								<td>{{ values.8 }}</td>				
+								<td> 
+									<h6><strong>{{ values.5 }}:</strong></h6> 
+									<ul>
+										
+										{% for staff in values.6 %}
+										<li><h6>{{ staff }}</h6></li>
+										{% endfor %}
+									</ul>
+								</td>
+								<td style ="padding-left:30px;">{{ values.4 | floatformat:"0" }}</td> 
+								<td>{{ values.3 | floatformat:"0" }}</td> 
+								<td>{{ values.7  | floatformat:"0"}}</td> 
+							</tr>
+							{% endfor %}
+						</table>
+					</div>
 				</div>
-				<div id="demandGraph"></div>
+				
+				<div class="tab-pane active" id="tab_graph">
+					<div id="borderGraph" style="border:1px solid black; padding:30px;">
+						<div>
+							<label>Demand by Visit Type:</label>
+							<select id="graphSelect">
+								<option>Acute</option>
+								<option>Preventative</option>
+								<option>Chronic</option>
+							</select>
+						</div>
+						<div id="demandGraph"></div>
+					</div>
+				</div>
 			</div>
 			<!-- Rule Form -->
 			<!--
@@ -120,6 +131,9 @@
 			</div>
 		</div>
 	</div> -->
+	<ul class="pager pull-right">		
+		<li><a class="submitCatch" href="/waitapp/results/">Calculate Wait Times</a></li>
+	</ul>
 	</div>
 	</div>
 </div>

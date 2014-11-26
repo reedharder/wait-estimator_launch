@@ -21,8 +21,8 @@ aff_json = [{"Provider":"Doctor 1","Patient":"Patient A"},
             {"Provider":"Doctor 3","Patient":"Patient F"}]
             
 attr_json = [{"Physician":"Doctor 1", "Males":"900", "Females":"900", "Panel_Size":"1800"},
-             {"Physician":"Doctor 2", "Males":"900", "Females":"900", "Panel_Size":"1800"},
-             {"Physician":"Doctor 3", "Males":"900", "Females":"900", "Panel_Size":"1800"}]
+             {"Physician":"Doctor 2", "Males":"750", "Females":"750", "Panel_Size":"1500"},
+             {"Physician":"Doctor 3", "Males":"1050", "Females":"1000", "Panel_Size":"2050"}]
 
 
 cont_json = [{"Rule":"Gender:M AND Age:0-24 AND Visit:Acute","Continuity":"Share"}]                 

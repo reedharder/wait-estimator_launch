@@ -186,6 +186,11 @@ def waitapp_delrule(request):
 def waitapp_utilization(request):#get doctors in list
     import numpy as np
     import ast
+    #empty data for cont_rule and del rule screens
+    request.session['cont_table'] = []
+    request.session['defCont'] = "noshare" #default?
+    request.session['del_table'] = []
+    
     if request.method == 'POST':
         #run simulator
         print("importing")
