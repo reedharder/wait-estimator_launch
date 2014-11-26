@@ -588,6 +588,10 @@ def scenario_delrule(request):
 def scenario_utilization(request):
     import numpy as np
     import ast
+    request.session['s_cont_table'] = []
+    request.session['s_defCont'] = "noshare"
+    request.session['s_del_table'] = []
+    
     if request.method == 'POST':
         #run simulator
         print("importing")
