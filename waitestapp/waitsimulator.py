@@ -125,7 +125,10 @@ def mat_sim(cut_off, carve_out, days, freqs, durs,  nums, num_classes, nurse_dic
                 else:
                     #add patient to days waited list 
                     if ind >= cut_off:
-                        waited[wait_time, patient] +=1
+                        try:
+                            waited[wait_time, patient] +=1
+                        except IndexError:
+                            pass
                     #try to add to daily demand list, unless patient is scheduled outside timeframe
                     try:
                         daily_supplys[int(ind)+int(wait_time)] +=1
