@@ -38,7 +38,7 @@
 				<label> Overall estimated wait time: <span id="overallTime"></span>&nbsp; days</label>
 				<br><br>
 				<div id="border1" style="border:1px solid black;  padding:30px;">
-					<span><strong> For patient with </strong>
+					<!--<span><strong> For patient with </strong>
 						<select class = "tableSelect">
 									<option>0</option>
 									<option>1</option>
@@ -46,7 +46,7 @@
 									<option>3+</option>
 						</select> 
 						<strong>chronic conditions: </strong>
-					</span><br>
+					</span><br> -->
 					<br>
 					<div id="resultsTable">		
 						<table><!--
@@ -61,9 +61,7 @@
 							</thead>-->
 							<tbody>
 							<tr>
-								<td></td>
-								<td>Gender</td>
-								<td>Age Group</td>
+								<td></td>								
 								<td>Visit Type</td>   
 								<td>Est. Wait Time (days)</td>
 								<td>
@@ -71,117 +69,26 @@
 										<option title="100">100% of Patients wait less than:</option>
 										<option title="99">99% of Patients wait less than:</option>
 										<option title="95">95% of Patients wait less than:</option>
+										<option title="90">90% of Patients wait less than:</option>
 									</select>
 								</td>
 							</tr>
 							 <tr class="row" title="rowSelect age1">
-								<td>
-									<select class="rowSelect age1">
-										<option>M</option>
-										<option>F</option>
-									</select>
-								</td>
-								<td>0-14</td>
-								<td>
-									<select class="rowSelect age1">
-										<option>Preventative</option>
-										<option>Acute</option>
-										<option>Chronic</option>
-									</select>
-								</td>
+								<td style="font-style: italic;">Preventative</td>								
 								<td><div id="wait1" style="text-align:center;"></div></td>
 								<td><div id="percentile1" style="text-align:center;"></div></td>
 							</tr>
 							<tr class="row" title="rowSelect age2">
-								<td>
-									<select class="rowSelect age2">
-										<option>M</option>
-										<option>F</option>
-									</select>
-								</td>
-								<td>15-24</td>
-								<td>
-									<select class="rowSelect age2" >
-										<option>Preventative</option>
-										<option>Acute</option>
-										<option>Chronic</option>
-									</select>
-								</td>
+								<td style="font-style: italic;">Acute</td>								
 								<td><div id="wait2" style="text-align:center;"></div></td>
 								<td><div id="percentile2" style="text-align:center;"></div></td>
 							</tr>
 							<tr class="row" title="rowSelect age3">
-								<td>
-									<select class="rowSelect age3">
-										<option>M</option>
-										<option>F</option>
-									</select>
-								</td>
-								<td>25-44</td>
-								<td>
-									<select class="rowSelect age3">
-										<option>Preventative</option>
-										<option>Acute</option>
-										<option>Chronic</option>
-									</select>
-								</td>
+								<td style="font-style: italic;">Chronic</td>
 								<td><div id="wait3" style="text-align:center;"></div></td>
 								<td><div id="percentile3" style="text-align:center;"></div></td>
 							</tr>
-							<tr class="row" title="rowSelect age4">
-								<td>
-									<select class="rowSelect age4">
-										<option>M</option>
-										<option>F</option>
-									</select>
-								</td>
-								<td>45-64</td>
-								<td>
-									<select class="rowSelect age4">
-										<option>Preventative</option>
-										<option>Acute</option>
-										<option>Chronic</option>
-									</select>
-								</td>
-								<td><div id="wait4" style="text-align:center;"></div></td>
-								<td><div id="percentile4" style="text-align:center;"></div></td>
-							</tr>
-							<tr class="row" title="rowSelect age5">
-								<td>
-									<select class="rowSelect age5">
-										<option>M</option>
-										<option>F</option>
-									</select>
-								</td>
-								<td>65-74</td>
-								<td>
-									<select class="rowSelect age5">
-										<option>Preventative</option>
-										<option>Acute</option>
-										<option>Chronic</option>
-									</select>
-								</td>
-								<td><div id="wait5" style="text-align:center;"></div></td>
-								<td><div id="percentile5" style="text-align:center;"></div></td>
-							</tr>	
-							<tr class="row" title="rowSelect age6">
-								<td>
-									<select class="rowSelect age6">
-										<option>M</option>
-										<option>F</option>
-									</select>
-								</td>
-								<td>75+</td>
-								<td>
-									<select class="rowSelect age6">
-										<option>Preventative</option>
-										<option>Acute</option>
-										<option>Chronic</option>
-									</select>
-								</td>
-								<td><div id="wait6" style="text-align:center;"></div></td>
-								<td><div id="percentile6" style="text-align:center;"></div></td>
-							</tr>	
+								
 							</tbody>
 						</table>
 					</div>
@@ -202,6 +109,7 @@
 							<option title="100">100% of Patients wait less than:</option>
 							<option title="99">99% of Patients wait less than:</option>
 							<option title="95">95% of Patients wait less than:</option>
+							<option title="90">90% of Patients wait less than:</option>
 						</select>
 					</td>
 				 </tr>
@@ -325,7 +233,7 @@ $.ajaxSetup({
 //set up page
 $( document ).ready(function() {
 	var doc = $('.pageSelect').val();
-	var chron_cond = $('.tableSelect').val();
+	//var chron_cond = $('.tableSelect').val();
 	var perc = $('.colSelect option:selected').attr('title')
 	//get overall
 	$.ajax({      
@@ -356,7 +264,7 @@ $( document ).ready(function() {
 		$.ajax({      		
 		  url: "?",
 		  type: "POST",
-		  data : {'type': 'rowselect', 'doc': doc, 'age': row, 'chron': chron_cond, 'gender':gender, 'visit':visit, 'perc':perc},       
+		  data : {'type': 'rowselect', 'doc': doc, 'visit': row,  'perc':perc},       
 		  success: function(data) {	
 			//alert(data.exp);
 		   $(waitid).text(data.exp);  
@@ -367,21 +275,19 @@ $( document ).ready(function() {
 });
 //row change ajax call
 $('.rowSelect').on('change', function() {
-	//get class of row
-	var rowclass = $(this).attr('class');
+
 	
+	//get row/agegroup
+//get row class stored in tr title
+	var rowclass = $(this).attr('title');	
 	//filter out age class 
-	rowclass = "." + rowclass.split(" ")[1]
-	
+	rowclass = "." + rowclass.split(" ")[1]	
 	//get row/agegroup
 	row = rowclass.slice(-1);	
 	//get array of gender and visit type
 	var params= $(rowclass).map(function() {
 		return $(this).val();
-	}).get();	
-	chron_cond = $('.tableSelect').val()
-	doc = $('.pageSelect').val()
-	var perc = $('.colSelect option:selected').attr('title')
+	}).get();
 	var gender = params.toString().split(",")[0]
 	var visit = params.toString().split(",")[1]
 	var waitid = "#wait" + row
@@ -389,8 +295,9 @@ $('.rowSelect').on('change', function() {
 	$.ajax({      		
 	  url: "?",
 	  type: "POST",
-	  data : {'type': 'rowselect', 'doc': doc, 'age': row, 'chron': chron_cond, 'gender':gender, 'visit':visit, 'perc':perc},       
-	  success: function(data) {	   
+	  data : {'type': 'rowselect', 'doc': doc, 'visit': row,  'perc':perc},       
+	  success: function(data) {	
+		//alert(data.exp);
 	   $(waitid).text(data.exp);  
 	   $(percid).text(data.p);
 	  }
@@ -422,8 +329,9 @@ $('.tableSelect').on('change', function() {
 		$.ajax({      		
 		  url: "?",
 		  type: "POST",
-		  data : {'type': 'rowselect', 'doc': doc, 'age': row, 'chron': chron_cond, 'gender':gender, 'visit':visit, 'perc':perc},       
-		  success: function(data) {	   
+		  data : {'type': 'rowselect', 'doc': doc, 'visit': row,  'perc':perc},       
+		  success: function(data) {	
+			//alert(data.exp);
 		   $(waitid).text(data.exp);  
 		   $(percid).text(data.p);
 		  }
@@ -465,8 +373,9 @@ $('.pageSelect').on('change', function() {
 		$.ajax({      		
 		  url: "?",
 		  type: "POST",
-		  data : {'type': 'rowselect', 'doc': doc, 'age': row, 'chron': chron_cond, 'gender':gender, 'visit':visit, 'perc':perc},       
-		  success: function(data) {	   
+		  data : {'type': 'rowselect', 'doc': doc, 'visit': row,  'perc':perc},       
+		  success: function(data) {	
+			//alert(data.exp);
 		   $(waitid).text(data.exp);  
 		   $(percid).text(data.p);
 		  }
@@ -498,8 +407,9 @@ $('.colSelect').on('change', function() {
 		$.ajax({      		
 		  url: "?",
 		  type: "POST",
-		  data : {'type': 'rowselect', 'doc': doc, 'age': row, 'chron': chron_cond, 'gender':gender, 'visit':visit, 'perc':perc},       
-		  success: function(data) {	   
+		  data : {'type': 'rowselect', 'doc': doc, 'visit': row,  'perc':perc},       
+		  success: function(data) {	
+			//alert(data.exp);
 		   $(waitid).text(data.exp);  
 		   $(percid).text(data.p);
 		  }
@@ -520,7 +430,7 @@ $('#query').click( function() {
 	$.ajax({      		
 		  url: "?",
 		  type: "POST",
-		  data : {'type': 'rowselect', 'doc': doc, 'age': row, 'chron': chron_cond, 'gender':gender, 'visit':visit, 'perc':perc},       
+		  data : {'type': 'rowselect', 'doc': doc, 'age': age, 'chron': chron_cond, 'gender':gender, 'visit':visit, 'perc':perc},       
 		  success: function(data) {	   
 		   $('#queryEst').text(data.exp);  
 		   $('#queryPerc').text(data.p);
@@ -540,7 +450,7 @@ $('.queryColSelect').on('change', function() {
 	$.ajax({      		
 		  url: "?",
 		  type: "POST",
-		  data : {'type': 'rowselect', 'doc': doc, 'age': row, 'chron': chron_cond, 'gender':gender, 'visit':visit, 'perc':perc},       
+		  data : {'type': 'rowselect', 'doc': doc, 'age': age, 'chron': chron_cond, 'gender':gender, 'visit':visit, 'perc':perc},       
 		  success: function(data) {	   
 			   $('#queryEst').text(data.exp);  
 			   $('#queryPerc').text(data.p);
