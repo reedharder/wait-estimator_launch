@@ -361,7 +361,7 @@ $('.submitCatch').click(function(e) {
 	$.ajax({      
 	  url: "?",
 	  type: "POST",
-      data : {'id_table': table, 'defCont': defCont, ,'type':'none'},       
+      data : {'id_table': table, 'defCont': defCont,'type':'none'},       
       success: function() {
 	   //alert("data recieved!");
        $( "#nextPage" )[0].click();   
