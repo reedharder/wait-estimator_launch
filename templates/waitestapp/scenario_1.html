@@ -19,7 +19,7 @@
 			</ul>
 			<div style="display:none;">
 				<a id="prevPage" href="/waitapp/results"  style="display:none;"> PREV</a>
-				<a id="nextPage" href="/waitapp/scenario/1"  style="display:none;"> NEXT</a>
+				<a id="nextPage" href="/waitapp/scenario/2"  style="display:none;"> NEXT</a>
 			</div>
 			
 			<h3>Scenario: Patient Assignment</h3>
@@ -328,19 +328,19 @@ $.ajaxSetup({
     }
 });
 
-
+/*
 //catch page change, convert table data to json, submit to hidden form, then change page
 $('.submitPrev').click(function(e) {
 	e.preventDefault(); //don't follow link yet
-	var table = $('#contRuleTable').tableToJSON({ ignoreColumns: [0], ignoreHiddenRows: false });
-	table  = JSON.stringify(table);
+	//var table = $('#contRuleTable').tableToJSON({ ignoreColumns: [0], ignoreHiddenRows: false });
+	//table  = JSON.stringify(table);
 	//alert(table);
 	var defCont = $('#defCont').val();	
 	//stick stringified JSON of table into hidden form and submit	
 	$.ajax({      
 	  url: "?",
 	  type: "POST",
-      data : {'id_table': table, 'defCont': defCont, 'type':'none' },       
+      data : { 'type':'none' },       
       success: function() {
 	   //alert("data recieved!");
        $( "#prevPage" )[0].click();   
@@ -352,8 +352,8 @@ $('.submitPrev').click(function(e) {
 //catch page change, convert table data to json, submit to hidden form, then change page
 $('.submitCatch').click(function(e) {
 	e.preventDefault(); //don't follow link yet
-	var table = $('#contRuleTable').tableToJSON({ ignoreColumns: [0], ignoreHiddenRows: false });
-	table  = JSON.stringify(table);
+	//var table = $('#contRuleTable').tableToJSON({ ignoreColumns: [0], ignoreHiddenRows: false });
+	//table  = JSON.stringify(table);
 	//alert(table);
 	var defCont = $('#defCont').val();
 	//alert(defCont);
@@ -361,7 +361,7 @@ $('.submitCatch').click(function(e) {
 	$.ajax({      
 	  url: "?",
 	  type: "POST",
-      data : {'id_table': table, 'defCont': defCont,'type':'none'},       
+      data : {'type':'none'},       
       success: function() {
 	   //alert("data recieved!");
        $( "#nextPage" )[0].click();   
@@ -369,7 +369,7 @@ $('.submitCatch').click(function(e) {
     });
 });
 
-
+*/
 $('#addContRule').click(function () {
 	$('#errors').html(''); //clear errors
 	var no_errors = true

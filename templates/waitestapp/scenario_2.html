@@ -285,16 +285,17 @@ $.ajaxSetup({
 
 
 //catch page change, convert table data to json, submit to hidden form, then change page
+/*
 $('.submitPrev').click(function(e) {
 	e.preventDefault(); //don't follow link yet
-	var table = $('#delRuleTable').tableToJSON({ ignoreColumns: [0], ignoreHiddenRows: false });
-	table  = JSON.stringify(table);
+	//var table = $('#delRuleTable').tableToJSON({ ignoreColumns: [0], ignoreHiddenRows: false });
+	//table  = JSON.stringify(table);
 	//alert(table);
 	//stick stringified JSON of table into hidden form and submit	
 	$.ajax({      
 	  url: "?",
 	  type: "POST",
-      data : {'id_table': table,'type':'none'},       
+      data : {'type':'none'},       
       success: function() {
 	   //alert("data recieved!");
        $( "#prevPage" )[0].click();   
@@ -306,20 +307,20 @@ $('.submitPrev').click(function(e) {
 //catch page change, convert table data to json, submit to hidden form, then change page
 $('.submitCatch').click(function(e) {
 	e.preventDefault(); //don't follow link yet
-	var table = $('#delRuleTable').tableToJSON({ ignoreColumns: [0], ignoreHiddenRows: false });
-	table  = JSON.stringify(table);
+	//var table = $('#delRuleTable').tableToJSON({ ignoreColumns: [0], ignoreHiddenRows: false });
+	//table  = JSON.stringify(table);
 	//alert(table);
 	//stick stringified JSON of table into hidden form and submit	
 	$.ajax({      
 	  url: "?",
 	  type: "POST",
-      data : {'id_table': table,'type':'none'},       
+      data : {'type':'none'},       
       success: function() {
 	   //alert("data recieved!");
        $( "#nextPage" )[0].click();   
       }
     });
-});
+});*/
 
 /*
 //catch page change, convert table data to json, submit to hidden form, then change page
