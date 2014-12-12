@@ -139,10 +139,10 @@
 						</select>
 					</td>
 					<td>
-						<select class="queryOption">
-							<option>Preventative</option>
-							<option>Acute</option>
-							<option>Chronic</option>
+						<select id="queryVisit" class="queryOption">
+							<option value="1">Preventative</option>
+							<option value="2">Acute</option>
+							<option value="3">Chronic</option>
 						</select>
 					</td>
 					<td>
@@ -426,7 +426,7 @@ $('#query').click( function() {
 				return $(this).val();}).get();	
 	var gender = qParams.toString().split(",")[0]	
 	var chron_cond = qParams.toString().split(",")[2]
-	var visit = qParams.toString().split(",")[3]
+	var visit = $('#queryVisit').val();//qParams.toString().split(",")[3]
 	$.ajax({      		
 		  url: "?",
 		  type: "POST",
@@ -446,7 +446,7 @@ $('.queryColSelect').on('change', function() {
 				return $(this).val();}).get();	
 	var gender = qParams.toString().split(",")[0]	
 	var chron_cond = qParams.toString().split(",")[2]
-	var visit = qParams.toString().split(",")[3]
+	var visit = $('#queryVisit').val();//qParams.toString().split(",")[3]
 	$.ajax({      		
 		  url: "?",
 		  type: "POST",
