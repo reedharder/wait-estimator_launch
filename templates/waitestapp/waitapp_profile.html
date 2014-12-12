@@ -1,0 +1,320 @@
+{% extends 'waitestapp/base_site.html' %}
+{% load static %}
+{% block content %}
+<style>
+input[type=text]
+{
+    width:50px;
+}
+
+.panel {background-color:#A8A8A8; padding:10px;}
+</style>
+
+<div >
+	<div style="padding-right:104px; padding-bottom:20px;">
+		<ul class="nav nav-tabs pull-right">		  
+		  <!-- <li class="scenarioTab"><a href="/waitapp/scenario/1" data-toggle="tab">Scenario</a></li>	-->	 
+		  <li class="active" ><a href="/waitapp/2" data-toggle="tab">Current Input</a></li>
+		</ul>
+		<br>
+	</div>
+	 <div class="container">
+
+		  <!-- Main component -->
+	  <div class="jumbotron">
+		<ul class="pager pull-right">
+			<li><a class="submitPrev" href="/waitapp/1/">Previous</a></li>
+			<li><a class="submitCatch" href="/waitapp/3/">Next</a></li>
+		</ul>
+		<div style="display:none;">
+			<a id="prevPage" href="/waitapp/1/"  style="display:none;"> PREV</a>
+			<a id="nextPage" href="/waitapp/3/"  style="display:none;"> NEXT</a>
+		</div>
+			<h3>Patient Profiles</h3>
+			<p>Provide a break down of patient profiles in your practice by percentage - our software will populate the data fields based on a national sample in case such data is unavailable at your practice:</p>
+			<br>
+			<!-- Provider Addition Widget -->
+			{% if phys_list %}
+			{% for phys in phys_list %}
+			<div class="panel">
+				<label>{{phys}} &nbsp;&nbsp;&nbsp;&nbsp;</label> Panel Size: <input type="text" class="panelsize" placeholder="Enter Panel Size" value="1800" />
+				<table>
+					<tr>
+						<td></td>
+						<td>M</td>
+						<td>F</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>Gender</td>
+						<td><input type="text" class="gender" value="42"></td>
+						<td><input type="text" class="gender" value="58"></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td><input type="checkbox" class="genbox"  name="" checked>&nbsp;Use National Sample</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td>0-15</td>
+						<td>16-24</td>
+						<td>25-44</td>
+						<td>45-64</td>
+						<td>65-74</td>
+						<td>75+</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>Age Group</td>
+						<td><input type="text" class="age" value="16"></td>
+						<td><input type="text" class="age" value="8"></td>
+						<td><input type="text" class="age" value="20"></td>
+						<td><input type="text" class="age" value="30"></td>
+						<td><input type="text" class="age" value="13"></td>
+						<td><input type="text" class="age" value="13"></td>
+						<td><input type="checkbox" class="agebox" name="{{forloop.counter0}}" checked>&nbsp;Use National Sample</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td>0</td>
+						<td>1</td>
+						<td>2</td>
+						<td>3+</td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>Conditions</td>
+						<td><input type="text" class="chron" value="43"></td>
+						<td><input type="text" class="chron" value="25"></td>
+						<td><input type="text" class="chron" value="15"></td>
+						<td><input type="text" class="chron" value="17"></td>
+						<td></td>
+						<td></td>
+						<td><input type="checkbox" class="chronbox"  name="{{forloop.counter0}}" checked> &nbsp;Use National Sample</td>
+					</tr>
+				</table>
+			</div>
+			{% endfor %}
+			{% endif %}	
+
+		<br>    
+		
+		<!-- File input widget -->
+		<div>
+		<div id="file_input">
+			<label>Or, upload text file:</label>		
+			<div class="input-group">
+				<span class="input-group-btn">
+					<span class="btn btn-primary btn-file">
+						Browse&hellip; <input type="file">
+					</span>
+				</span>
+				<div>
+				<input type="text" class="form-control" style="width:300px">
+				&nbsp;&nbsp;
+				<button type="button" class="btn btn-primary" style="display:inline; ">Load File</button>
+				</div>
+			</div>
+			
+			
+		</div>    
+		</div>
+
+
+	<br>
+
+	</div>
+	</div>
+</div>
+ <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="{% static 'js/jquery-1.11.1.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="{% static 'js/ie10-viewport-bug-workaround.js' %}"></script>
+<!-- script for file upload functionality -->    
+<script language="javascript">
+$(document).on('change', '.btn-file :file', function() {
+  var input = $(this),
+	  numFiles = input.get(0).files ? input.get(0).files.length : 1,
+	  label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+  input.trigger('fileselect', [numFiles, label]);
+});
+
+$(document).ready( function() {
+	$('.btn-file :file').on('fileselect', function(event, numFiles, label) {
+		
+		var input = $(this).parents('.input-group').find(':text'),
+			log = numFiles > 1 ? numFiles + ' files selected' : label;
+		
+		if( input.length ) {
+			input.val(log);
+		} else {
+			if( log ) alert(log);
+		}
+		
+	});
+});
+</script>
+
+<!-- bootstrap table script -->
+<script src="{% static 'js/bootstrap-table.min.js' %}"></script>
+<script src="{% static 'js/jquery.tabletojson.min.js' %}"></script>
+<!--table functionality and toggle show/hide table script -->
+<script language="javascript">
+
+
+
+//csrf config for ajax
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+var csrftoken = getCookie('csrftoken');
+
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+function sameOrigin(url) {
+    // test that a given url is a same-origin URL
+    // url could be relative or scheme relative or absolute
+    var host = document.location.host; // host + port
+    var protocol = document.location.protocol;
+    var sr_origin = '//' + host;
+    var origin = protocol + sr_origin;
+    // Allow absolute or scheme relative URLs to same origin
+    return (url == origin || url.slice(0, origin.length + 1) == origin + '/') ||
+        (url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') ||
+        // or any other URL that isn't scheme relative or absolute i.e relative.
+        !(/^(\/\/|http:|https:).*/.test(url));
+}
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
+            // Send the token to same-origin, relative URLs only.
+            // Send the token only if the method warrants CSRF protection
+            // Using the CSRFToken value acquired earlier
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    }
+});
+
+
+//catch page change, convert table data to json, submit to hidden form, then change page
+$('.submitPrev').click(function(e) {
+	e.preventDefault(); //don't follow link yet
+	var datatable = [];
+	$('.panel').each(function() {
+		
+		var panelsize = $(this).find('.panelsize').val() //get panelsize
+		var gender = []
+		if (!($(this).find(".genbox").is(":checked"))) {
+			$(this).find('.gender').each(function() {
+				gender.push($(this).val()) });
+				}
+		var age = []
+		if (!($(this).find(".agebox").is(":checked"))) {
+			$(this).find('.age').each(function() {
+				age.push($(this).val()) });
+				}
+		var chron = []
+		if (!($(this).find(".chronbox").is(":checked"))) {
+			$(this).find('.chron').each(function() {
+				chron.push($(this).val()) });
+				}
+		
+		var panel = [panelsize, gender, age, chron]
+		datatable.push(panel)
+		});
+	
+	datatable=JSON.stringify(datatable);
+	alert(datatable);
+	
+	//var table = $('#panelTable').tableToJSON({ ignoreColumns: [0], ignoreHiddenRows: false });
+	//table  = JSON.stringify(table);
+	//var patTable =  $('#patTable').tableToJSON({ ignoreColumns: [0], ignoreHiddenRows: true });
+	//patTable  = JSON.stringify(patTable);
+	//alert(table);
+	//alert(patTable);
+	//stick stringified JSON of table into hidden form and submit	
+	$.ajax({      
+	  url: "?",
+	  type: "POST",
+      data : {'datatable':datatable },       
+      success: function() {
+	   //alert("data recieved!");
+       $( "#prevPage" )[0].click();   
+      }
+    });
+});
+
+//catch page change click, submit data, then return to previous page
+//catch page change, convert table data to json, submit to hidden form, then change page
+$('.submitCatch').click(function(e) {
+	e.preventDefault(); //don't follow link yet
+	var datatable = [];
+	$('.panel').each(function() {
+		
+		var panelsize = $(this).find('.panelsize').val() //get panelsize
+		var gender = []
+		if (!($(this).find(".genbox").is(":checked"))) {			
+			$(this).find('.gender').each(function() {				
+				gender.push($(this).val()) });
+				}
+		var age = []
+		if (!($(this).find(".agebox").is(":checked"))) {
+			$(this).find('.age').each(function() {
+				age.push($(this).val()) });
+				}
+		var chron = []
+		if (!($(this).find(".chronbox").is(":checked"))) {
+			$(this).find('.chron').each(function() {
+				chron.push($(this).val()) });
+				}
+		
+		var panel = [panelsize, gender, age, chron]
+		datatable.push(panel)
+		});
+	
+	datatable=JSON.stringify(datatable);
+	alert(datatable);
+	
+	//stick stringified JSON of table into hidden form and submit	
+	$.ajax({      
+	  url: "?",
+	  type: "POST",
+      data : {'datatable':datatable },       
+      success: function() {
+	   //alert("data recieved!");
+       $( "#nextPage" )[0].click();   
+      }
+    });
+});
+
+
+	
+
+
+</script>
+
+{% endblock %} 

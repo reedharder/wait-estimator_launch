@@ -112,6 +112,16 @@ def waitapp_capacity(request):
     return render(request, 'waitestapp/waitapp_capacity.html', {'table_data':table_data})
     
 @ensure_csrf_cookie
+def waitapp_prof(request):
+    if request.method == 'POST':
+        import ast
+        table = ast.literal_eval(request.POST['datatable'])
+        request.session['proftable'] = table
+   
+    return render(request, 'waitestapp/waitapp_profile.html',{'phys_list':request.session['phys_list']})
+    
+    
+@ensure_csrf_cookie
 def waitapp_aff(request):
     if request.method == 'POST':
         import ast
@@ -290,7 +300,9 @@ def waitapp_utilization(request):#get doctors in list
         #estimate panel composition of each based on namcs
         request.session['prov_to_num'] = prov_to_num
         request.session['phys_to_num'] = phys_to_num
-        panelTable = request.session['attr_table']
+        panelTable = request.session['proftable']
+        import ast
+        panelTable = ast.literal_eval(str(panelTable)) #convert string to list of lists
         #generate panels:
         from collections import Counter
         #lookup index for each visit type   
@@ -301,18 +313,20 @@ def waitapp_utilization(request):#get doctors in list
         doc_lookup = []
         ind = 0 # start increment counter
         phys_demand = {} #dictionary of demand per physician
-        for panel in panelTable:
+        for docname, panelData in zip(request.session['phys_list'],panelTable):
+            panel = panelData[0] #panelsize
+            #get distributions if correct
+            genarray = [int(string) for string in panelData[1]] if (all([string.isdigit() for string in panelData[1]]) and sum([int(string) for string in panelData[1]]))  else []      
+            agearray =[int(string) for string in panelData[2]]  if (all([string.isdigit() for string in panelData[2]]) and sum([int(string) for string in panelData[2]]))  else [] 
+            condarray = [int(string) for string in panelData[3]] if (all([string.isdigit() for string in panelData[3]]) and sum([int(string) for string in panelData[3]]))  else [] 
+            
             acute_demand = 0 # start counter of demand
             prev_demand = 0
             chronic_demand = 0
-            doc = phys_to_num[panel['Physician']]
-            num_males = int(panel['Males'])
-            num_females = int(panel['Females'])
-            #generate panel accordin to male female ratio and namcs proportions
-            male_dist = Counter(np.random.choice(initial_data.male_cats, num_males, initial_data.male_p))
-            female_dist = Counter(np.random.choice(initial_data.female_cats, num_females, initial_data.female_p))
+            doc = phys_to_num[docname]
+           
             #get full distribution of patient types on panel
-            panel_dict = male_dist + female_dist
+            panel_dict = Counter(np.random.choice(initial_data.full_cats_str, int(panel),adjust_ratios(full_p = initial_data.full_p, full_cats=initial_data.full_cats, sex=genarray, age=agearray,chronic=condarray)))
             #generate import simulation data
             for patient_category in panel_dict:
                 #ACUTE            
@@ -374,7 +388,7 @@ def waitapp_utilization(request):#get doctors in list
                 doc_lookup.append(int(doc))
                 ind +=1 #increment index
             #add doctor demand to dictionary, list is demands by visit, total demand, placeholders for total capacity, team name,  team members, and capacity-demand, and finally panel size
-            phys_demand[panel['Physician']] = [acute_demand, prev_demand, chronic_demand, sum((acute_demand, prev_demand, chronic_demand)), None, None, None, None , num_males + num_females]
+            phys_demand[docname] = [acute_demand, prev_demand, chronic_demand, sum((acute_demand, prev_demand, chronic_demand)), None, None, None, None , str(panel)]
         
         #convert list of shared categories to indices
         shared_categories = [category_full_to_ind[category] for category in shared_categories if category in category_full_to_ind]
@@ -1077,3 +1091,49 @@ def table_query_generator(waited, doc, cond, gender, age, visit, q, category_ful
             exp, percentile = ('N/A', 'N/A')
         
     return exp, percentile
+
+
+#function to adjust ratios
+def adjust_ratios(full_p = initial_data.full_p, full_cats=initial_data.full_cats, sex=[50,50], age=[15,15,20,20,15,15],chronic=[50,20,15,15]):
+ 
+    if sex:
+     #initialize dictionary of category idenifier and values[current proportion, requested proportion, multiplicative factor]
+        divisions={i+1:[0,perc*.01,0] for i,perc in enumerate(sex)}
+        new_p = adjust_category(0, divisions, full_cats, full_p)
+        if new_p: #if no errors, replace proportions with adjusted proportions
+            full_p=new_p
+    if age:
+        #initialize dictionary of category idenifier and values[current proportion, requested proportion, multiplicative factor]
+        divisions={i+1:[0,perc*.01,0] for i,perc in enumerate(age)}
+        new_p = adjust_category(1, divisions, full_cats, full_p)
+        if new_p: #if no errors, replace proportions with adjusted proportions
+            full_p=new_p
+    
+    if chronic:
+        #initialize dictionary of category idenifier and values[current proportion, requested proportion, multiplicative factor]
+        divisions={i:[0,perc*.01,0] for i,perc in enumerate(chronic)}
+        new_p = adjust_category(2, divisions, full_cats, full_p)
+        if new_p: #if no errors, replace proportions with adjusted proportions
+            full_p=new_p
+        
+    return full_p
+    
+            
+def adjust_category(category, divisions, full_cats, full_p ):
+    #category: specific trait (e.g. integer code for male) divisions: dictionary of proportions for e..g. sex      
+    #add up current  total proportion for each category       
+    for cat, proportion in zip(full_cats, full_p):
+        
+        divisions[cat[category]][0] += proportion
+    for entry in divisions:        
+        try:
+           divisions[entry][2] =  divisions[entry][1]/divisions[entry][0]    
+        except ZeroDivisionError:
+            print("Divide by zero in category adjustment!")
+            return False
+    #multiply proportions of categories by expansion factor from above above, depending on category of divisions
+    new_p = [] #initiialize
+    for cat, proportion in zip(full_cats, full_p):
+        new_p.append(proportion*divisions[cat[category]][2])
+    return new_p
+         

@@ -456,4 +456,196 @@ female_p = [0.13509784244856998,
  0.00067737079779227295,
  0.00035122930255895634]
 
+#proportions of eac catgory (sex,age, num chronic)
+full_p =[0.078005040994292674,
+ 0.073268244633079349,
+ 0.066387577135904041,
+ 0.052814555146739287,
+ 0.050279572384622072,
+ 0.03886490714720283,
+ 0.037720543500304196,
+ 0.036127125764116232,
+ 0.03599675522206449,
+ 0.034171567633340096,
+ 0.033519714923081381,
+ 0.028638062404032796,
+ 0.028348350088362256,
+ 0.02661007619433902,
+ 0.026392791957586117,
+ 0.022380276385549149,
+ 0.020946200422979983,
+ 0.019628009386679027,
+ 0.018599530666048615,
+ 0.018338789581945129,
+ 0.018266361503027493,
+ 0.018251875887243967,
+ 0.018063562882058116,
+ 0.01632528898803488,
+ 0.016079033519714923,
+ 0.015499608888373845,
+ 0.014123475388938784,
+ 0.013297795289277747,
+ 0.013283309673494221,
+ 0.01238520149491555,
+ 0.012341744647564969,
+ 0.01190717617405916,
+ 0.011269809079583974,
+ 0.011240837848016919,
+ 0.010299272822087667,
+ 0.0087203407016832289,
+ 0.0076773763652692876,
+ 0.0075035489758669641,
+ 0.0064460990236694963,
+ 0.0047512819769968424,
+ 0.0018686444360749776,
+ 0.0009850218732798332,
+ 0.00086913694701161752,
+ 0.00057942463134107831,
+ 0.00039111162615522785,
+ 0.00020279862096937742,
+ 0.00018831300518585046,
+ 0.00014485615783526958]
 
+
+full_cats = [(1, 3, 0),
+ (2, 1, 0),
+ (1, 1, 0),
+ (1, 4, 1),
+ (1, 4, 0),
+ (2, 4, 1),
+ (1, 3, 1),
+ (1, 4, 3),
+ (1, 2, 0),
+ (2, 4, 0),
+ (1, 4, 2),
+ (2, 3, 0),
+ (2, 4, 3),
+ (1, 6, 3),
+ (2, 4, 2),
+ (1, 5, 3),
+ (2, 6, 3),
+ (2, 5, 3),
+ (2, 3, 1),
+ (1, 5, 1),
+ (2, 2, 0),
+ (1, 6, 2),
+ (1, 6, 1),
+ (2, 5, 1),
+ (2, 6, 1),
+ (1, 5, 2),
+ (2, 5, 2),
+ (2, 6, 2),
+ (1, 3, 2),
+ (2, 1, 1),
+ (1, 5, 0),
+ (2, 5, 0),
+ (1, 2, 1),
+ (1, 6, 0),
+ (2, 6, 0),
+ (1, 1, 1),
+ (2, 3, 2),
+ (1, 3, 3),
+ (2, 2, 1),
+ (2, 3, 3),
+ (1, 2, 2),
+ (2, 1, 2),
+ (2, 2, 2),
+ (1, 1, 2),
+ (1, 2, 3),
+ (1, 1, 3),
+ (2, 2, 3),
+ (2, 1, 3)]
+ 
+full_cats_str = ['1,3,0',
+ '2,1,0',
+ '1,1,0',
+ '1,4,1',
+ '1,4,0',
+ '2,4,1',
+ '1,3,1',
+ '1,4,3',
+ '1,2,0',
+ '2,4,0',
+ '1,4,2',
+ '2,3,0',
+ '2,4,3',
+ '1,6,3',
+ '2,4,2',
+ '1,5,3',
+ '2,6,3',
+ '2,5,3',
+ '2,3,1',
+ '1,5,1',
+ '2,2,0',
+ '1,6,2',
+ '1,6,1',
+ '2,5,1',
+ '2,6,1',
+ '1,5,2',
+ '2,5,2',
+ '2,6,2',
+ '1,3,2',
+ '2,1,1',
+ '1,5,0',
+ '2,5,0',
+ '1,2,1',
+ '1,6,0',
+ '2,6,0',
+ '1,1,1',
+ '2,3,2',
+ '1,3,3',
+ '2,2,1',
+ '2,3,3',
+ '1,2,2',
+ '2,1,2',
+ '2,2,2',
+ '1,1,2',
+ '1,2,3',
+ '1,1,3',
+ '2,2,3',
+ '2,1,3']
+
+ 
+def adjust_ratios(full_p = full_p, full_cats=full_cats, sex=[50,50], age=[15,15,20,20,15,15],chronic=[50,20,15,15]):
+ 
+    if sex:
+     #initialize dictionary of category idenifier and values[current proportion, requested proportion, multiplicative factor]
+        divisions={i+1:[0,perc*.01,0] for i,perc in enumerate(sex)}
+        new_p = adjust_category(0, divisions, full_cats, full_p)
+        if new_p: #if no errors, replace proportions with adjusted proportions
+            full_p=new_p
+    if age:
+        #initialize dictionary of category idenifier and values[current proportion, requested proportion, multiplicative factor]
+        divisions={i+1:[0,perc*.01,0] for i,perc in enumerate(age)}
+        new_p = adjust_category(1, divisions, full_cats, full_p)
+        if new_p: #if no errors, replace proportions with adjusted proportions
+            full_p=new_p
+    
+    if chronic:
+        #initialize dictionary of category idenifier and values[current proportion, requested proportion, multiplicative factor]
+        divisions={i:[0,perc*.01,0] for i,perc in enumerate(chronic)}
+        new_p = adjust_category(2, divisions, full_cats, full_p)
+        if new_p: #if no errors, replace proportions with adjusted proportions
+            full_p=new_p
+        
+    return full_p
+    
+            
+def adjust_category(category, divisions, full_cats, full_p ):
+    #category: specific trait (e.g. integer code for male) divisions: dictionary of proportions for e..g. sex      
+    #add up current  total proportion for each category       
+    for cat, proportion in zip(full_cats, full_p):
+        
+        divisions[cat[category]][0] += proportion
+    for entry in divisions:        
+        try:
+           divisions[entry][2] =  divisions[entry][1]/divisions[entry][0]    
+        except ZeroDivisionError:
+            print("Divide by zero in category adjustment!")
+            return False
+    #multiply proportions of categories by expansion factor from above above, depending on category of divisions
+    new_p = [] #initiialize
+    for cat, proportion in zip(full_cats, full_p):
+        new_p.append(proportion*divisions[cat[category]][2])
+    return new_p
+         
