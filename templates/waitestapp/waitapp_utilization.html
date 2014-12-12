@@ -182,19 +182,19 @@ $(document).ready( function() {
 //create graphs
 acuteData = new Array(
 	{% for phys, values in phys_demand.items %}	
-   	[{{values.1 | floatformat:"0"}},'{{phys}}','{% cycle '#c90707' '#fd482f' %}']{% if not forloop.last %},{% endif %}	
+   	[{{values.0 | floatformat:"0"}},'{{phys}}','{% cycle '#c90707' '#fd482f' %}']{% if not forloop.last %},{% endif %}	
 	{% endfor %}   	
 ); 
 
 prevData = new Array(
    {% for phys, values in phys_demand.items %}  
-   	[{{values.2 | floatformat:"0"}},'{{phys}}','{% cycle '#064222' '#11a523' %}'] {% if not forloop.last %},{% endif %}		
+   	[{{values.1 | floatformat:"0"}},'{{phys}}','{% cycle '#064222' '#11a523' %}'] {% if not forloop.last %},{% endif %}		
 	{% endfor %}   
 ); 
 
 chronicData = new Array(
    	{% for phys, values in phys_demand.items %}	
-   	[{{values.3 | floatformat:"0"}},'{{phys}}','{% cycle '#11187c' '#1f2bd4' %}']{% if not forloop.last %},{% endif %}	
+   	[{{values.2 | floatformat:"0"}},'{{phys}}','{% cycle '#11187c' '#1f2bd4' %}']{% if not forloop.last %},{% endif %}	
 	{% endfor %}   
 ); 
 
