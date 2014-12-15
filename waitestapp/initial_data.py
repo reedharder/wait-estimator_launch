@@ -7,11 +7,11 @@ Created on Fri Nov  7 19:10:08 2014
 #
 #CHECKING MECHANISM FOR NUMBERS, MAKE SURE THEY ARE SENSIBLE
 
-capacity_json = [{"Provider_Name":"Doctor 1","Hours_Per_Day":"8","Days_Per_Year":"340","Position":"Physician","Team":"Team A"},
-                 {"Provider_Name":"Doctor 2","Hours_Per_Day":"8","Days_Per_Year":"340","Position":"Physician","Team":"Team B"},
-                 {"Provider_Name":"Doctor 3","Hours_Per_Day":"8","Days_Per_Year":"340","Position":"Physician","Team":"Team C"},
-                 {"Provider_Name":"Nurse 1","Hours_Per_Day":"8","Days_Per_Year":"340","Position":"Nurse Practitioner","Team":"Team B"},
-                 {"Provider_Name":"Assist. 1","Hours_Per_Day":"8","Days_Per_Year":"340","Position":"Physician Assistant","Team":"Team A"}]                 
+capacity_json = [{"Provider_Name":"Doctor 1","Hours_Per_Day":"8","Days_Per_Year":"347","Position":"Physician","Team":"Team A"},
+                 {"Provider_Name":"Doctor 2","Hours_Per_Day":"8","Days_Per_Year":"347","Position":"Physician","Team":"Team B"},
+                 {"Provider_Name":"Doctor 3","Hours_Per_Day":"8","Days_Per_Year":"347","Position":"Physician","Team":"Team C"},
+                 {"Provider_Name":"Nurse 1","Hours_Per_Day":"8","Days_Per_Year":"347","Position":"Nurse Practitioner","Team":"Team B"},
+                 {"Provider_Name":"Assist. 1","Hours_Per_Day":"8","Days_Per_Year":"347","Position":"Physician Assistant","Team":"Team A"}]                 
                  
 aff_json = [{"Provider":"Doctor 1","Patient":"Patient A"},
             {"Provider":"Doctor 1","Patient":"Patient B"},

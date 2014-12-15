@@ -34,6 +34,7 @@
 			<div class="tab-content col-md-10">
 				<div class="tab-pane active" id="tab_table">
 					<div id="borderTable" style="border:1px solid black; padding:30px;">
+						
 						<table id="utilgrid">
 							<tr>
 								<td><strong>Physician</strong></td> 
@@ -62,6 +63,14 @@
 							</tr>
 							{% endfor %}
 						</table>
+						<br>
+						<div style="padding-left:500px;"><strong>Avg. Time with MD:</strong><br>
+							<ul>
+								<li> Acute: 19 min </li>
+								<li> Preventative: 20 min </li>
+								<li> Chronic: 21 min </li>
+							</ul>
+						</div>
 					</div>
 				</div>
 				
@@ -70,9 +79,11 @@
 						<div>
 							<label>Demand by Visit Type:</label>
 							<select id="graphSelect">
+								
 								<option>Acute</option>
 								<option>Preventative</option>
 								<option>Chronic</option>
+								<option>Overall</option>
 							</select>
 						</div>
 						<br>
@@ -178,7 +189,7 @@ $(document).ready( function() {
 
 <!--table functionality and toggle show/hide table script -->
 <script language="javascript">
-
+//
 //create graphs
 acuteData = new Array(
 	{% for phys, values in phys_demand.items %}	
@@ -198,6 +209,12 @@ chronicData = new Array(
 	{% endfor %}   
 ); 
 
+overallData = new Array(
+   	{% for phys, values in phys_demand.items %}	
+   	[{{values.3 | floatformat:"0"}},'{{phys}}','{% cycle '#00a6a6' '#007474' %}']{% if not forloop.last %},{% endif %}	
+	{% endfor %}   
+); 
+
 //initial graph
 $('#demandGraph').jqBarGraph({ data: acuteData, }); 
 
@@ -212,6 +229,9 @@ $('#graphSelect').on('change', function() {
 	}
 	else if ($(this).val() == "Chronic") {
 		$('#demandGraph').jqBarGraph({ data: chronicData, });
+	}
+	else if ($(this).val() == "Overall") {
+		$('#demandGraph').jqBarGraph({ data: overallData, });
 	}
 });
 

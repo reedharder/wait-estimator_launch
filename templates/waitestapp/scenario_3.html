@@ -14,86 +14,131 @@
 		  <!-- Main component for a primary marketing message or call to action -->
 		  <div class="jumbotron">
 			<ul class="pager pull-right">
-				<li><a class="submitPrev" href="/waitapp/results" >Previous</a></li>
-				<li><a class="submitCatch" href="/waitapp/scenario/2">Next</a></li>
+				<li><a class="submitPrev" href="/waitapp/scenario/2" >Previous</a></li>
+				<li><a class="submitCatch" href="/waitapp/scenario/4">Next</a></li>
 			</ul>
 			<div style="display:none;">
-				<a id="prevPage" href="/waitapp/results"  style="display:none;"> PREV</a>
-				<a id="nextPage" href="/waitapp/scenario/2"  style="display:none;"> NEXT</a>
+				<a id="prevPage" href="/waitapp/scenario/2"  style="display:none;"> PREV</a>
+				<a id="nextPage" href="/waitapp/scenario/4"  style="display:none;"> NEXT</a>
 			</div>
 			
-			<h3>Scenario: Patient Assignment</h3>
-			<p>Patients Assignment - Reassigning patients to other physicians to reduce panel sizes:</p>
+			<h3>Scenario: Continuity Rules</h3>
+			<p>Assign Rules for Patient-Physician Continuity:</p>
 			<br>
 			<!-- Rule Form -->
 			
-			<div id="reassignment"  style="border:1px solid black;  padding:30px;">
-			<label>Reassign Patients:</label>
-				<table id="queryGrid">
-				 <tr>
-					
-					<td>Gender</td>
-					<td>Age Range</td> 
-					<td>Conditions</td>					
-					<td>Number of Patients</td>
-					<td>Reassign From:</td>
-					<td>To:</td>
-					<td></td>
-					<td></td>
-				 </tr>
-				  <tr>
-					<td>
-						<select class="queryOption">
-							<option>M</option>
-							<option>F</option>
-						</select>
-					</td>
-					<td>
-						<select class="queryOption" id="ageselect">
-							<option title="1" selected>0-14</option>
-							<option title="2">15-24</option>
-							<option title="3">24-44</option>
-							<option title="4">45-64</option>
-							<option title="5">65-74</option>
-							<option title="6">75+</option>
-						</select>
-					</td>				
-					<td>
-						<select class="queryOption">
-							<option>0</option>
-							<option>1</option>
-							<option>2</option>
-							<option>3+</option>
-						</select>
-					</td>					
-					<td><input type="text" class="queryOption"></td>
-					<td>
-						<select class="queryOption"  name="from"  >
-							{% for phys in phys_list %}
-							<option>{{phys}}</option>
-							{% endfor %}
-						</select>					
-					</td>
-					<td>
-						<select class="queryOption"  name="to"  >
-							{% for phys in phys_list %}
-							<option>{{phys}}</option>
-							{% endfor %}
-						</select>					
-					</td>
-					<td>
-						<button id="reassign" style="height:30px; line-height:25px;">Reassign</button>
-					</td>
-					<td><div id="numassigned" style="text-align:center;">-</div></td>
-					
-				  </tr>
-				 </table>
-			</div>
-			 <br>
 			
+			<div id="border2" style="border:1px solid black;  padding:30px;">
+			<label>Assign Continuity Rules:</label>
+			<br>
+			<br>
+			<div style="padding-left:200px;">
+				<form>
+					Default continuity strategy: 
+					<select id="defCont">					
+						<option value="noshare">Do Not Share</option>
+						<option value="share">Share</option>
+					</select>		
+				</form>
+			</div>
+			<br>		
+			    <div id="errors"></div>
+				<form class="contRuleBox">
+				<div  style="padding-bottom:10px;">
+					<input class="Check" type="checkbox" name="gender" value="Gender"> &nbsp;Gender:					
+					<select class="rule-form" name="gender-rule">					    
+						<option>M</option>
+						<option>F</option>
+					</select>					
+				</div>
+				<div style="padding-bottom:10px;">
+					<input class="Check"  type="checkbox" name="agerange" value="Age"> &nbsp;Age Range: &nbsp;					
+					<input class="rule-form"  type="text"  name="agerange-rule" id="agerange-rule" placeholder="0-100" style="max-width:45px;">					
+				</div>
+				<div class="contRule" style="padding-bottom:10px;">
+					<input class="Check"  type="checkbox" name="condrange" value="Chronic"> &nbsp; # Conditions:					
+					<input class="rule-form"  type="text" name="condrange-rule" id="condrange-rule" placeholder="0-100" style="max-width:45px;">					
+				</div>
+				<div class="contRule" style="padding-bottom:10px;">
+					<input class="Check" type="checkbox" name="visit" value="Visit"> &nbsp; Visit Type:					
+					<select class="rule-form"  name="visit-rule" style="width:100px;">
+						<option>Acute</option>
+						<option>Preventative</option>
+						<option>Chronic</option>
+					</select>					
+				</div>
+				<div class="contRule" style="padding-bottom:10px;">
+					<input class="Check"  type="checkbox" name="affiliation" value="Provider"> &nbsp; Affiliation:					
+					<select class="rule-form"  name="affiliation-rule" id="affiliation-rule" style="width:100px;">
+					    {% for phys in phys_list %}
+						<option>{{phys}}</option>
+						{% endfor %}
+					</select>			
+				</div>
+				<div  style="padding-bottom:10px;">					
+					Rule: 
+					<select class="rule" name="continuity-rule" style="width:100px;">
+						<option>Share</option>
+						<option>Do Not Share</option>
+					</select>					
+				</div>								
+			</form>					
+			<div >							
+				<button id="addContRule" class="btn btn-primary" style="margin-top:20px;" >Add Rule</button>						
+			</div>
 		
 		
 		
+		<br>    
+		
+		<!-- File input widget -->
+		<div>
+			<div id="file_input">
+				<label>Or, upload text file:</label>		
+				<div class="input-group">
+					<span class="input-group-btn">
+						<span class="btn btn-primary btn-file">
+							Browse&hellip; <input type="file">
+						</span>
+					</span>
+					<div>
+					<input type="text" class="form-control" style="width:300px">
+					&nbsp;&nbsp;
+					<button type="button" class="btn btn-primary" style="display:inline; ">Load File</button>
+					</div>
+				</div>			
+			</div>    
+		</div>
+		
+
+	<br>
+	<button id="toggleTable" type="button" class="btn btn-primary">Show Table</button>
+	<br>
+	<div id="tableDiv">
+		<table id="contRuleTable">
+			<thead>
+				<tr>
+					<th data-field="state" data-checkbox="true"></th>
+					<th data-field="rule">Rule</th>
+					<th data-field="continuity">Continuity</th>			
+				</tr>
+			</thead>
+			<tbody>
+				{% for row in table_data %}
+				<tr>
+					<td></td>
+					<td>{{row.Rule}}</td>
+					<td>{{row.Continuity}}</td>   	
+				</tr>    
+				{% endfor %}
+			</tbody>
+		</table>
+	<button class="btn btn-default" id="remove-data" data-method="remove">
+			Clear Selected Rows
+	</button>
+	</div>
+	</div>
+	<br>
 	<div id="querydiv"  style="border:1px solid black;  padding:30px;">
 		<label>Run Simulation with Adjusted Data: &nbsp;&nbsp;&nbsp;&nbsp;</label>
 		<button id="recalculate" style="height:30px; line-height:25px;">Recalculate Demand</button>
@@ -393,7 +438,7 @@ $('#recalculate').click( function() {
 	$.ajax({      		
 		  url: "?",
 		  type: "POST",
-		  data : {'type': 'recalculate', 'doc': doc},       
+		  data : {'type': 'recalculate', 'doc': doc, 'id_table': table, 'defCont': defCont},       
 		  success: function(data) {	
 			$("#imgProgress").hide();		  
 		   $('#demand').text(data.dem);  

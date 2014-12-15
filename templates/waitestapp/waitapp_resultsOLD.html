@@ -24,11 +24,19 @@
         <h3>Current Simulation Results</h3>        
 		<br>
 		<div style="padding-left:25px;">
-			
-			
+			<form>
+				<label>Results for:</label>
+				<select class="pageSelect">
+					<option>Overall</option>
+					{% for phys in phys_list %}
+					<option>{{phys}}</option>
+					{% endfor %}
+				</select>		
+			</form>
+			<br>
 			<div style="padding-left:25px;">
-				<!-- <label> Overall estimated wait time: <span id="overallTime"></span>&nbsp; days</label> -->
-				<br>
+				<label> Overall estimated wait time: <span id="overallTime"></span>&nbsp; days</label>
+				<br><br>
 				<div id="border1" style="border:1px solid black;  padding:30px;">
 					<!--<span><strong> For patient with </strong>
 						<select class = "tableSelect">
@@ -39,6 +47,7 @@
 						</select> 
 						<strong>chronic conditions: </strong>
 					</span><br> -->
+					<br>
 					<div id="resultsTable">		
 						<table><!--
 							<thead>
@@ -53,8 +62,8 @@
 							<tbody>
 							<tr>
 								<td></td>								
-								<td><strong>Physician</strong></td>   
-								<td><strong>Est. Wait Time (days)</strong></td>
+								<td>Visit Type</td>   
+								<td>Est. Wait Time (days)</td>
 								<td>
 									<select class="colSelect">
 										<option title="100">100% of Patients wait less than:</option>
@@ -64,18 +73,21 @@
 									</select>
 								</td>
 							</tr>
-							 <tr class="row" title="rowSelect doc0">
-								<td style="font-style: italic;" class="doc">Overall</td>								
-								<td><div id="wait0" style="text-align:center;"></div></td>
-								<td><div id="percentile0" style="text-align:center;"></div></td>
+							 <tr class="row" title="rowSelect age1">
+								<td style="font-style: italic;">Preventative</td>								
+								<td><div id="wait1" style="text-align:center;"></div></td>
+								<td><div id="percentile1" style="text-align:center;"></div></td>
 							</tr>
-							{% for phys in phys_list %}
-							<tr class="row" title="rowSelect doc{{ forloop.counter }}">
-								<td style="font-style: italic;" class="doc">{{phys}}</td>								
-								<td><div id="wait{{ forloop.counter }}" style="text-align:center;"></div></td>
-								<td><div id="percentile{{ forloop.counter }}" style="text-align:center;"></div></td>
+							<tr class="row" title="rowSelect age2">
+								<td style="font-style: italic;">Acute</td>								
+								<td><div id="wait2" style="text-align:center;"></div></td>
+								<td><div id="percentile2" style="text-align:center;"></div></td>
 							</tr>
-							{% endfor %}
+							<tr class="row" title="rowSelect age3">
+								<td style="font-style: italic;">Chronic</td>
+								<td><div id="wait3" style="text-align:center;"></div></td>
+								<td><div id="percentile3" style="text-align:center;"></div></td>
+							</tr>
 								
 							</tbody>
 						</table>
@@ -83,14 +95,7 @@
 				</div>
 			<br>
 			<div id="border2" style="border:1px solid black; padding:30px;">
-				<label>Make results query for 
-					<select id="queryDoc">
-						<option>Overall</option>
-						{% for phys in phys_list %}
-						<option>{{phys}}</option>
-						{% endfor %}
-					</select>&nbsp;:
-				</label>
+				<label>Make results query:</label>
 				<table id="queryGrid">
 				 <tr>
 					<td>Gender</td>
@@ -227,9 +232,9 @@ $.ajaxSetup({
 
 //set up page
 $( document ).ready(function() {
-	/*var doc = $('.pageSelect').val();
+	var doc = $('.pageSelect').val();
 	//var chron_cond = $('.tableSelect').val();
-	
+	var perc = $('.colSelect option:selected').attr('title')
 	//get overall
 	$.ajax({      
 	  url: "?",
@@ -238,12 +243,10 @@ $( document ).ready(function() {
       success: function(data) {	   
        $('#overallTime').text(data.exp);   
       }
-    });*/
-	var perc = $('.colSelect option:selected').attr('title')
+    });
+	
 	//loopthrough rows of table, query information
 	$('.row').each( function() {
-		var doc = $(this).find(".doc").text();
-		//alert(doc);
 		//get row class stored in tr title
 		var rowclass = $(this).attr('title');	
 		//filter out age class 
@@ -251,17 +254,17 @@ $( document ).ready(function() {
 		//get row/agegroup
 		row = rowclass.slice(-1);	
 		//get array of gender and visit type
-		///var params= $(rowclass).map(function() {
-			//return $(this).val();
-		//}).get();
-		//var gender = params.toString().split(",")[0]
-		//var visit = params.toString().split(",")[1]
+		var params= $(rowclass).map(function() {
+			return $(this).val();
+		}).get();
+		var gender = params.toString().split(",")[0]
+		var visit = params.toString().split(",")[1]
 		var waitid = "#wait" + row
 		var percid = "#percentile" + row
 		$.ajax({      		
 		  url: "?",
 		  type: "POST",
-		  data : {'type': 'overall', 'doc': doc,  'perc':perc},       
+		  data : {'type': 'rowselect', 'doc': doc, 'visit': row,  'perc':perc},       
 		  success: function(data) {	
 			//alert(data.exp);
 		   $(waitid).text(data.exp);  
@@ -382,13 +385,11 @@ $('.pageSelect').on('change', function() {
 //change percentile
 $('.colSelect').on('change', function() {
 	
-	//var chron_cond = $('.tableSelect').val()
-	//var doc = $('.pageSelect').val()
+	var chron_cond = $('.tableSelect').val()
+	var doc = $('.pageSelect').val()
 	var perc = $('.colSelect option:selected').attr('title')
 	//loopthrough rows of table, query information
 	$('.row').each( function() {
-		var doc = $(this).find(".doc").text();
-		//alert(doc);
 		//get row class stored in tr title
 		var rowclass = $(this).attr('title');	
 		//filter out age class 
@@ -396,17 +397,17 @@ $('.colSelect').on('change', function() {
 		//get row/agegroup
 		row = rowclass.slice(-1);	
 		//get array of gender and visit type
-		///var params= $(rowclass).map(function() {
-			//return $(this).val();
-		//}).get();
-		//var gender = params.toString().split(",")[0]
-		//var visit = params.toString().split(",")[1]
+		var params= $(rowclass).map(function() {
+			return $(this).val();
+		}).get();
+		var gender = params.toString().split(",")[0]
+		var visit = params.toString().split(",")[1]
 		var waitid = "#wait" + row
 		var percid = "#percentile" + row
 		$.ajax({      		
 		  url: "?",
 		  type: "POST",
-		  data : {'type': 'overall', 'doc': doc,  'perc':perc},       
+		  data : {'type': 'rowselect', 'doc': doc, 'visit': row,  'perc':perc},       
 		  success: function(data) {	
 			//alert(data.exp);
 		   $(waitid).text(data.exp);  
@@ -418,7 +419,7 @@ $('.colSelect').on('change', function() {
 
 //button to submit qery action
 $('#query').click( function() {
-	var doc = $('#queryDoc').val()
+	var doc = $('.pageSelect').val()
 	var age = $('#ageselect option:selected').attr('title')
 	var perc = $('.queryColSelect option:selected').attr('title')
 	var qParams= $('.queryOption').map(function() {
@@ -438,7 +439,7 @@ $('#query').click( function() {
 });
 //query change perc, resubmit query
 $('.queryColSelect').on('change', function() {
-	var doc = $('#queryDoc').val()
+	var doc = $('.pageSelect').val()
 	var age = $('#ageselect option:selected').attr('title')
 	var perc = $('.queryColSelect option:selected').attr('title')
 	var qParams= $('.queryOption').map(function() {

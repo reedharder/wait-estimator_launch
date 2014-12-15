@@ -245,9 +245,15 @@ def waitapp_utilization(request):#get doctors in list
             if row['Position'] == 'Physician': 
                 phys_to_num[row['Provider Name']] = i        
                 num_to_phys[i] = row['Provider Name']
-                phys_mins[i]=60*int(row['Hours Per Day'])*(int(row['Days Per Year']))/360
+                try:
+                    phys_mins[i]=60*float(row['Hours Per Day'])*(float(row['Days Per Year']))/360
+                except ValueError:
+                    phys_mins[i] = 347 #expected from 40hrs a week 52 weeks a year
             else:
-                non_phys_mins[i]=60*int(row['Hours Per Day'])*(int(row['Days Per Year']))/360
+                try:
+                    non_phys_mins[i]=60*float(row['Hours Per Day'])*(float(row['Days Per Year']))/360
+                except ValueError:
+                    non_phys_mins[i] = 347
                 prov_to_num[row['Provider Name']] = i        
                 num_to_prov[i] = row['Provider Name']
         
@@ -300,6 +306,7 @@ def waitapp_utilization(request):#get doctors in list
         #estimate panel composition of each based on namcs
         request.session['prov_to_num'] = prov_to_num
         request.session['phys_to_num'] = phys_to_num
+        
         panelTable = request.session['proftable']
         import ast
         panelTable = ast.literal_eval(str(panelTable)) #convert string to list of lists
@@ -476,8 +483,10 @@ def waitapp_results(request):
         #change overall expected wait
         if  request.POST['type'] ==  'overall':
             doc = request.POST['doc']
-            exp = overall_query( doc, waited, phys_to_num, doc_lookup)
-            data = {'exp':exp}
+            print(doc)
+            q = int(request.POST['perc'])
+            exp, p = overall_query( doc, waited, phys_to_num, doc_lookup, q)
+            data = {'exp':exp, 'p':p}
             return HttpResponse(json.dumps(data), content_type='application/json')
         #change wait for individual row or query
         elif request.POST['type'] == 'rowselect':
@@ -509,8 +518,7 @@ def waitapp_results(request):
 @ensure_csrf_cookie
 def scenario_1(request):
     import ast
-    import numpy as np 
-    from itertools import product
+    import numpy as np     
     waited = np.array(request.session['wait_mat'])
     ##waited = np.array(request.session['s_wait_mat'])
     ##print("...waited")
@@ -562,8 +570,12 @@ def scenario_1(request):
             ##non_phys_mins=ast.literal_eval(request.session['non_phys_mins'])
             print(phys_mins)
             doc_lookup= np.array(request.session['doc_lookup'])
-            exp = overall_query( doc, waited, phys_to_num, doc_lookup)
-            exp_old = overall_query( doc, np.array(request.session['wait_mat']), phys_to_num, doc_lookup)
+            try:
+                new_mat = np.array(request.session['s1_wait_mat'])
+            except KeyError:
+                new_mat = waited
+            exp, p = overall_query( doc, new_mat, phys_to_num, doc_lookup, 100)
+            exp_old, p = overall_query( doc, np.array(request.session['wait_mat']), phys_to_num, doc_lookup, 100)
            
             #get old and new demand
             old_demand=0
@@ -575,7 +587,268 @@ def scenario_1(request):
             #get capacity 
             capacity_info=ast.literal_eval(request.session['phys_capacity'])[doc]
             capacity = capacity_info[0]*capacity_info[1]
-            data = {'dem':round(new_demand), 'demc': round(new_demand-old_demand),'wait':exp,'waitc': (exp-exp_old), 'cap':round(capacity) }
+            data = {'dem':round(new_demand), 'olddem':round(old_demand), 'demc': round(new_demand-old_demand),'wait':exp,'waitc': (exp-exp_old), 'cap':round(capacity) }
+            return HttpResponse(json.dumps(data), content_type='application/json')
+        # recalculate with new nums and cont rules
+        elif request.POST['type'] == 'recalculate':  
+            #load and processes continuity rules
+            doc =request.POST['doc']
+             #run simulator
+            print("importing")
+            from  waitestapp import waitsimulator
+            print("preparing")
+            s_nums=np.array(request.session['s_nums']) #new numbers
+            freqs=np.array(request.session['freqs'] )
+            durs=np.array(request.session['durs'] )
+            ##shared_categories = request.session['shared_categories'] 
+            phys_mins=ast.literal_eval(request.session['phys_mins']) 
+            ##non_phys_mins=ast.literal_eval(request.session['non_phys_mins'])
+            print(phys_mins)
+            doc_lookup= np.array(request.session['doc_lookup'])
+            from collections import Counter
+            print(Counter(doc_lookup))
+            #run simulation 
+            print("simulating")
+            
+            K=waitsimulator.mat_sim(cut_off=0, carve_out=False,  days=500, freqs=freqs, durs=durs,  nums=s_nums, num_classes=len(durs), nurse_dict={}, phys_mins=phys_mins, non_phys_mins={}, doc_lookup=doc_lookup, shared_categories=[])
+            print("storing...")
+            #get matrix of days waited vs patient demand class
+            request.session['s1_wait_mat']  = K[0].tolist()
+            
+            
+            #get wait for doctor, as well as change in wait
+            exp, p = overall_query( doc, waited, phys_to_num, doc_lookup , 100)
+            exp_old, p = overall_query( doc, K[0], phys_to_num, doc_lookup, 100)
+           
+            #get old and new demand
+            old_demand=0
+            new_demand=0
+            for i, freq in enumerate(freqs):
+               if doc_lookup[i] == phys_to_num[doc]: 
+                   old_demand += nums[i]*freq*360*durs[i]*(1/60)
+                   new_demand += s_nums[i]*freq*360*durs[i]*(1/60)
+            #get capacity 
+            capacity_info=ast.literal_eval(request.session['phys_capacity'])[doc]
+            capacity = capacity_info[0]*capacity_info[1]
+            request.session['scenario1'] = [round(new_demand), round(new_demand-old_demand),exp,(exp-exp_old), round(capacity)]
+            data = {'dem':round(new_demand), 'olddem':round(old_demand), 'demc': round(new_demand-old_demand),'wait':exp,'waitc': (exp-exp_old), 'cap':round(capacity) }
+            return HttpResponse(json.dumps(data), content_type='application/json')         
+        else:
+            return HttpResponse('done')
+            
+        
+    else:       
+        ##table_query_generator(waited, doc, cond, gender, age, visit, q, category_full_to_ind, phys_to_num)    
+        return render(request, 'waitestapp/scenario_1.html', {'phys_list':request.session['phys_list']})
+        
+@ensure_csrf_cookie
+def scenario_2(request):
+    import ast
+    import numpy as np 
+    import json 
+    waited = np.array(request.session['wait_mat'])
+    ##waited = np.array(request.session['s_wait_mat'])
+    ##print("...waited")
+    ##print(waited)
+    ##category_full_to_ind =  ast.literal_eval(request.session['category_full_to_ind'])
+    nums =request.session['nums']
+    phys_to_num=request.session['phys_to_num'] 
+    try:
+        s_nums = request.session['s_nums']
+    except KeyError:
+        s_nums = request.session['nums'].copy()
+        request.session['s_nums'] = s_nums
+    ##print(len(category_full_to_ind))
+    ##print(category_full_to_ind.keys())
+    
+    doc_lookup = request.session['doc_lookup']
+    if request.method == 'POST':   
+            
+        #change overall expected wait
+        if request.POST['type'] ==  'extend':  
+            try:
+                phys_mins=ast.literal_eval(request.session['s_phys_mins'])
+            except KeyError:
+                phys_mins=ast.literal_eval(request.session['phys_mins'])
+            try:
+                non_phys_mins=ast.literal_eval(request.session['s_non_phys_mins'])
+            except KeyError:
+                non_phys_mins=ast.literal_eval(request.session['non_phys_mins'])
+                   
+            hours = float(request.POST['hours'])
+            days = float(request.POST['days'])
+            prov = request.POST['prov']
+            prov_to_num = request.session['prov_to_num']
+            phys_to_num = request.session['phys_to_num']
+            try:                                 
+                
+                phys_mins[phys_to_num[prov]]  += (60*hours*days)/360
+                request.session['s_phys_mins'] = str(phys_mins)
+            except KeyError:
+                non_phys_mins[prov_to_num[prov]]  += (60*hours*days)/360
+                request.session['s_non_phys_mins'] = str(non_phys_mins)
+            return HttpResponse('Hours added')
+            
+        elif request.POST['type'] == 'query': 
+           
+            
+            doc =request.POST['doc']
+            ##s_nums=np.array(request.session['s_nums']) #new numbers
+            freqs=np.array(request.session['freqs'] )
+            durs=np.array(request.session['durs'] )
+            ##shared_categories = request.session['shared_categories'] 
+            try:
+                phys_mins=ast.literal_eval(request.session['s_phys_mins'])
+            except KeyError:
+                phys_mins=ast.literal_eval(request.session['phys_mins'])
+            try:
+                non_phys_mins=ast.literal_eval(request.session['s_non_phys_mins'])
+            except KeyError:
+                non_phys_mins=ast.literal_eval(request.session['non_phys_mins']) 
+            ##non_phys_mins=ast.literal_eval(request.session['non_phys_mins'])
+            print(phys_mins)
+            doc_lookup= np.array(request.session['doc_lookup'])
+            try:
+                new_mat = np.array(request.session['s2_wait_mat'])
+            except KeyError:
+                new_mat = waited
+            exp, p = overall_query( doc, new_mat, phys_to_num, doc_lookup, 100)
+            exp_old, p = overall_query( doc, np.array(request.session['wait_mat']), phys_to_num, doc_lookup, 100)
+           
+            #get old and new demand
+            old_demand=0
+            new_demand=0
+            for i, freq in enumerate(freqs):
+               if doc_lookup[i] == phys_to_num[doc]: 
+                   old_demand += nums[i]*freq*360*durs[i]*(1/60)
+                   new_demand += nums[i]*freq*360*durs[i]*(1/60)
+            #get capacity 
+            try:
+                capacity_info=ast.literal_eval(request.session['s_phys_capacity'])[doc]
+            except KeyError:
+                capacity_info=ast.literal_eval(request.session['phys_capacity'])[doc]
+            capacity = capacity_info[0]*capacity_info[1]
+            data = {'dem':round(new_demand), 'olddem':round(old_demand), 'demc': round(new_demand-old_demand),'wait':exp,'waitc': (exp-exp_old), 'cap':round(capacity) }
+            return HttpResponse(json.dumps(data), content_type='application/json')
+        # recalculate with new nums and cont rules
+        elif request.POST['type'] == 'recalculate':  
+           
+            #load and processes continuity rules
+            doc =request.POST['doc']
+             #run simulator
+            print("importing")
+            from  waitestapp import waitsimulator
+            print("preparing")
+            s_nums=np.array(request.session['s_nums']) #new numbers
+            freqs=np.array(request.session['freqs'] )
+            durs=np.array(request.session['durs'] )
+            ##shared_categories = request.session['shared_categories'] 
+            phys_mins=ast.literal_eval(request.session['phys_mins']) 
+            try:
+                phys_mins=ast.literal_eval(request.session['s_phys_mins'])
+            except KeyError:
+                phys_mins=ast.literal_eval(request.session['phys_mins'])
+            try:
+                non_phys_mins=ast.literal_eval(request.session['s_non_phys_mins'])
+            except KeyError:
+                non_phys_mins=ast.literal_eval(request.session['non_phys_mins'])
+            
+            
+            print(phys_mins)
+            doc_lookup= np.array(request.session['doc_lookup'])
+            from collections import Counter
+            print(Counter(doc_lookup))
+            #run simulation 
+            print("simulating")
+            
+            K=waitsimulator.mat_sim(cut_off=0, carve_out=False,  days=500, freqs=freqs, durs=durs,  nums=nums, num_classes=len(durs), nurse_dict=[], phys_mins=phys_mins, non_phys_mins=non_phys_mins, doc_lookup=doc_lookup, shared_categories=[])
+            print("storing...")
+            #get matrix of days waited vs patient demand class
+            request.session['s2_wait_mat']  = K[0].tolist()
+            
+            
+            #get wait for doctor, as well as change in wait
+            exp, p = overall_query( doc, waited, phys_to_num, doc_lookup , 100)
+            exp_old, p = overall_query( doc, K[0], phys_to_num, doc_lookup, 100)
+           
+            #get old and new demand
+            old_demand=0
+            new_demand=0
+            for i, freq in enumerate(freqs):
+               if doc_lookup[i] == phys_to_num[doc]: 
+                   old_demand += nums[i]*freq*360*durs[i]*(1/60)
+                   new_demand += s_nums[i]*freq*360*durs[i]*(1/60)
+            #get capacity 
+            capacity_info=ast.literal_eval(request.session['phys_capacity'])[doc]
+            capacity = min(24,(capacity_info[0]))*min(360,(capacity_info[1]))
+            request.session['scenario2'] = [round(new_demand), round(new_demand-old_demand),exp,(exp-exp_old), round(capacity)]
+            data = {'dem':round(new_demand), 'olddem':round(old_demand), 'demc': round(new_demand-old_demand),'wait':exp,'waitc': (exp-exp_old), 'cap':round(capacity) }
+            return HttpResponse(json.dumps(data), content_type='application/json')         
+        
+        else:
+            return HttpResponse('done')
+        
+    else:       
+        ##table_query_generator(waited, doc, cond, gender, age, visit, q, category_full_to_ind, phys_to_num)    
+        return render(request, 'waitestapp/scenario_2.html', {'phys_list':request.session['phys_list'], 'non_phys_list':request.session['nonphys_list']})
+
+
+
+
+
+def scenario_3(request):
+    import ast
+    import numpy as np 
+    from itertools import product
+    waited = np.array(request.session['wait_mat'])
+    ##waited = np.array(request.session['s_wait_mat'])
+    ##print("...waited")
+    ##print(waited)
+    ##category_full_to_ind =  ast.literal_eval(request.session['category_full_to_ind'])
+    nums =request.session['nums']
+    phys_to_num=request.session['phys_to_num'] 
+    try:
+        s_nums = request.session['s_nums']
+    except KeyError:
+        s_nums = request.session['nums'].copy()
+        request.session['s_nums'] = s_nums
+    ##print(len(category_full_to_ind))
+    ##print(category_full_to_ind.keys())
+    phys_to_num = request.session['phys_to_num']
+    doc_lookup = request.session['doc_lookup']
+    if request.method == 'POST':    
+        import json               
+        #change overall expected wait
+        
+        #change wait for individual row or query
+        if request.POST['type'] == 'query': 
+            doc =request.POST['doc']
+            s_nums=np.array(request.session['s_nums']) #new numbers
+            freqs=np.array(request.session['freqs'] )
+            durs=np.array(request.session['durs'] )
+            ##shared_categories = request.session['shared_categories'] 
+            phys_mins=ast.literal_eval(request.session['phys_mins']) 
+            ##non_phys_mins=ast.literal_eval(request.session['non_phys_mins'])
+            print(phys_mins)
+            doc_lookup= np.array(request.session['doc_lookup'])
+            try:
+                new_mat = np.array(request.session['s3_wait_mat'])
+            except KeyError:
+                new_mat = waited
+            exp, p = overall_query( doc, new_mat, phys_to_num, doc_lookup, 100)
+            exp_old, p = overall_query( doc, np.array(request.session['wait_mat']), phys_to_num, doc_lookup, 100)
+           
+            #get old and new demand
+            old_demand=0
+            new_demand=0
+            for i, freq in enumerate(freqs):
+               if doc_lookup[i] == phys_to_num[doc]: 
+                   old_demand += nums[i]*freq*360*durs[i]*(1/60)
+                   new_demand += s_nums[i]*freq*360*durs[i]*(1/60)
+            #get capacity 
+            capacity_info=ast.literal_eval(request.session['phys_capacity'])[doc]
+            capacity = capacity_info[0]*capacity_info[1]
+            data = {'dem':round(new_demand), 'olddem':round(old_demand), 'demc': round(new_demand-old_demand),'wait':exp,'waitc': (exp-exp_old), 'cap':round(capacity) }
             return HttpResponse(json.dumps(data), content_type='application/json')
         # recalculate with new nums and cont rules
         elif request.POST['type'] == 'recalculate':  
@@ -649,15 +922,15 @@ def scenario_1(request):
             #run simulation 
             print("simulating")
             
-            K=waitsimulator.mat_sim(cut_off=0, carve_out=False,  days=500, freqs=freqs, durs=durs,  nums=s_nums, num_classes=len(durs), nurse_dict={}, phys_mins=phys_mins, non_phys_mins={}, doc_lookup=doc_lookup, shared_categories=shared_categories)
+            K=waitsimulator.mat_sim(cut_off=0, carve_out=False,  days=500, freqs=freqs, durs=durs,  nums=nums, num_classes=len(durs), nurse_dict={}, phys_mins=phys_mins, non_phys_mins={}, doc_lookup=doc_lookup, shared_categories=shared_categories)
             print("storing...")
             #get matrix of days waited vs patient demand class
-            request.session['s1_wait_mat']  = K[0].tolist()
+            request.session['s3_wait_mat']  = K[0].tolist()
             
             
             #get wait for doctor, as well as change in wait
-            exp = overall_query( doc, waited, phys_to_num, doc_lookup)
-            exp_old = overall_query( doc, K[0], phys_to_num, doc_lookup)
+            exp, p = overall_query( doc, waited, phys_to_num, doc_lookup , 100)
+            exp_old, p = overall_query( doc, K[0], phys_to_num, doc_lookup, 100)
            
             #get old and new demand
             old_demand=0
@@ -665,11 +938,12 @@ def scenario_1(request):
             for i, freq in enumerate(freqs):
                if doc_lookup[i] == phys_to_num[doc]: 
                    old_demand += nums[i]*freq*360*durs[i]*(1/60)
-                   new_demand += s_nums[i]*freq*360*durs[i]*(1/60)
+                   new_demand += nums[i]*freq*360*durs[i]*(1/60)
             #get capacity 
             capacity_info=ast.literal_eval(request.session['phys_capacity'])[doc]
             capacity = capacity_info[0]*capacity_info[1]
-            data = {'dem':round(new_demand), 'demc': round(new_demand-old_demand),'wait':exp,'waitc': (exp-exp_old), 'cap':round(capacity) }
+            request.session['scenario3'] = [round(new_demand), round(new_demand-old_demand),exp,(exp-exp_old), round(capacity)]
+            data = {'dem':round(new_demand), 'olddem':round(old_demand), 'demc': round(new_demand-old_demand),'wait':exp,'waitc': (exp-exp_old), 'cap':round(capacity) }
             return HttpResponse(json.dumps(data), content_type='application/json')         
         else:
             return HttpResponse('done')
@@ -677,10 +951,18 @@ def scenario_1(request):
         
     else:       
         ##table_query_generator(waited, doc, cond, gender, age, visit, q, category_full_to_ind, phys_to_num)    
-        return render(request, 'waitestapp/scenario_1.html', {'phys_list':request.session['phys_list']})
+        return render(request, 'waitestapp/scenario_3.html', {'phys_list':request.session['phys_list']})
         
+#table for comparison of different scenarios
+def scenario_table(request):
+    scenario1 = request.session['scenario1']
+    scenario2 = request.session['scenario2']
+    scenario3 = request.session['scenario3']
+    scenario4 = request.session['scenario4']
+    return render(request, 'waitestapp/scenario_table.html', {'scenario1':scenario1,'scenario2':scenario2,'scenario3':scenario3,'scenario4':scenario4})
+    
 @ensure_csrf_cookie
-def scenario_2(request):
+def scenario_4(request):
     import ast
     import numpy as np 
     from itertools import product
@@ -688,7 +970,7 @@ def scenario_2(request):
     ##waited = np.array(request.session['s_wait_mat'])
     ##print("...waited")
     ##print(waited)
-    category_full_to_ind =  ast.literal_eval(request.session['category_full_to_ind'])
+    ##category_full_to_ind =  ast.literal_eval(request.session['category_full_to_ind'])
     nums =request.session['nums']
     phys_to_num=request.session['phys_to_num'] 
     try:
@@ -705,21 +987,25 @@ def scenario_2(request):
         #change overall expected wait
         
         if request.POST['type'] == 'query': 
-            hours = float(request.post['hours'])
-            days = float(request.post['hours'])
+            
             doc =request.POST['doc']
             ##s_nums=np.array(request.session['s_nums']) #new numbers
             freqs=np.array(request.session['freqs'] )
             durs=np.array(request.session['durs'] )
             ##shared_categories = request.session['shared_categories'] 
-            phys_mins=ast.literal_eval(request.session['s_phys_mins']) 
+            phys_mins=ast.literal_eval(request.session['phys_mins']) 
             ##non_phys_mins=ast.literal_eval(request.session['non_phys_mins'])
             print(phys_mins)
             doc_lookup= np.array(request.session['doc_lookup'])
-            exp = overall_query( doc, waited, phys_to_num, doc_lookup)
-            exp_old = overall_query( doc, np.array(request.session['wait_mat']), phys_to_num, doc_lookup)
+            try:
+                new_mat = np.array(request.session['s4_wait_mat'])
+            except KeyError:
+                new_mat = waited
+            exp, p = overall_query( doc, new_mat, phys_to_num, doc_lookup, 100)
+            exp_old, p = overall_query( doc, np.array(request.session['wait_mat']), phys_to_num, doc_lookup, 100)
            
-            #get old and new demand
+            
+           #get old and new demand
             old_demand=0
             new_demand=0
             for i, freq in enumerate(freqs):
@@ -727,14 +1013,13 @@ def scenario_2(request):
                    old_demand += nums[i]*freq*360*durs[i]*(1/60)
                    new_demand += nums[i]*freq*360*durs[i]*(1/60)
             #get capacity 
-            capacity_info=ast.literal_eval(request.session['s_phys_capacity'])[doc]
+            capacity_info=ast.literal_eval(request.session['phys_capacity'])[doc]
             capacity = capacity_info[0]*capacity_info[1]
-            data = {'dem':round(new_demand), 'demc': round(new_demand-old_demand),'wait':exp,'waitc': (exp-exp_old), 'cap':round(capacity) }
+            data = data = {'dem':round(new_demand), 'olddem':round(old_demand), 'demc': round(new_demand-old_demand),'wait':exp,'waitc': (exp-exp_old), 'cap':round(capacity) }
             return HttpResponse(json.dumps(data), content_type='application/json')
         # recalculate with new nums and cont rules
         elif request.POST['type'] == 'recalculate':  
-            hours = float(request.POST['hours'])
-            days = float(request.POST['hours'])
+            
             #load and processes continuity rules
             table = ast.literal_eval(request.POST['id_table'])
             request.session['s_del_table'] = table
@@ -802,11 +1087,7 @@ def scenario_2(request):
             ##shared_categories = request.session['shared_categories'] 
             phys_mins=ast.literal_eval(request.session['phys_mins']) 
             non_phys_mins=ast.literal_eval(request.session['non_phys_mins'])
-            #modify phys and non phys mins with new hours
-            for prov in phys_mins:
-                phys_mins[prov] += (60*hours*days)/360
-            for prov in non_phys_mins:
-                non_phys_mins[prov] += (60*hours*days)/360
+            
             
             print(phys_mins)
             doc_lookup= np.array(request.session['doc_lookup'])
@@ -818,12 +1099,12 @@ def scenario_2(request):
             K=waitsimulator.mat_sim(cut_off=0, carve_out=False,  days=500, freqs=freqs, durs=durs,  nums=nums, num_classes=len(durs), nurse_dict=nurse_dict, phys_mins=phys_mins, non_phys_mins=non_phys_mins, doc_lookup=doc_lookup, shared_categories=[])
             print("storing...")
             #get matrix of days waited vs patient demand class
-            request.session['s1_wait_mat']  = K[0].tolist()
+            request.session['s4_wait_mat']  = K[0].tolist()
             
             
             #get wait for doctor, as well as change in wait
-            exp = overall_query( doc, waited, phys_to_num, doc_lookup)
-            exp_old = overall_query( doc, K[0], phys_to_num, doc_lookup)
+            exp, p = overall_query( doc, waited, phys_to_num, doc_lookup , 100)
+            exp_old, p = overall_query( doc, K[0], phys_to_num, doc_lookup, 100)
            
             #get old and new demand
             old_demand=0
@@ -834,8 +1115,9 @@ def scenario_2(request):
                    new_demand += s_nums[i]*freq*360*durs[i]*(1/60)
             #get capacity 
             capacity_info=ast.literal_eval(request.session['phys_capacity'])[doc]
-            capacity = min(24,(capacity_info[0] + hours))*min(360,(capacity_info[1] + days))
-            data = {'dem':round(new_demand), 'demc': round(new_demand-old_demand),'wait':exp,'waitc': (exp-exp_old), 'cap':round(capacity) }
+            capacity = min(24,(capacity_info[0]))*min(360,(capacity_info[1]))
+            request.session['scenario4'] = [round(new_demand), round(new_demand-old_demand),exp,(exp-exp_old), round(capacity)]
+            data = {'dem':round(new_demand), 'olddem':round(old_demand), 'demc': round(new_demand-old_demand),'wait':exp,'waitc': (exp-exp_old), 'cap':round(capacity) }
             return HttpResponse(json.dumps(data), content_type='application/json')         
         
         else:
@@ -843,8 +1125,9 @@ def scenario_2(request):
         
     else:       
         ##table_query_generator(waited, doc, cond, gender, age, visit, q, category_full_to_ind, phys_to_num)    
-        return render(request, 'waitestapp/scenario_2.html', {'phys_list':request.session['phys_list']})
-    
+        return render(request, 'waitestapp/scenario_4.html', {'phys_list':request.session['phys_list'], 'nonphys_list':request.session['nonphys_list']})
+
+
 @ensure_csrf_cookie
 def scenario_capacity(request):
     if request.method == 'POST':
@@ -1391,17 +1674,27 @@ def exp_percentile( matrix, percentile):
     return exp, percentile        
  
 # get overall estimate
-def overall_query( doc, waited, phys_to_num, doc_lookup):
+def overall_query( doc, waited, phys_to_num, doc_lookup, q):
     import numpy as np
     if not doc == 'Overall':
         #get provider integer code for doctor specified in dropdown
         doc_code=phys_to_num[doc]
+        print("doc_lookup")
+        print(doc_lookup)
+        print(doc_code)
         #get column indices whose provider (mapped to by doc_pat_index) matches the comboBox selection indicated by doc_code
-        columns_relevant=np.where(doc_lookup == doc_code)[0]
-                  
+        columns_relevant=np.where(np.array(doc_lookup) == doc_code)[0]
+        print("columns_relevant")
+        print(columns_relevant)
+        print(len(columns_relevant))
+        print(waited)
         matrix= waited[:,columns_relevant]
+        print("matrix.shape")
+        print(matrix.shape)
+        
     else:
         matrix= waited
+    '''
     try:
         dist=np.sum(matrix, axis=1) # might fail to sum if only one column
     except ValueError:
@@ -1414,7 +1707,12 @@ def overall_query( doc, waited, phys_to_num, doc_lookup):
         exp=int(sum(exp))
     except ValueError: #no distribution for this!
         exp='N/A'
-    return exp
+        '''
+    try: 
+        exp, percentile = exp_percentile(matrix, q)
+    except ValueError:
+        exp, percentile = ('N/A', 'N/A')
+    return exp, percentile
     
 def table_query_generator(waited, doc, cond, gender, age, visit, q, category_full_to_ind, phys_to_num):
     #get integer category

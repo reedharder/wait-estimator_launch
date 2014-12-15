@@ -4,7 +4,7 @@
 <div >
 	<div style="padding-right:104px; padding-bottom:20px;">
 		<ul class="nav nav-tabs pull-right">		  
-		  <li class="active"><a href="/waitapp/scenario/1" data-toggle="tab">Scenario</a></li>		 
+		  <li class="active"><a href="/waitapp/scenario/2" data-toggle="tab">Scenario</a></li>		 
 		  <li ><a href="/waitapp/results" >Current Input</a></li>
 		</ul>
 		<br>
@@ -14,86 +14,119 @@
 		  <!-- Main component for a primary marketing message or call to action -->
 		  <div class="jumbotron">
 			<ul class="pager pull-right">
-				<li><a class="submitPrev" href="/waitapp/results" >Previous</a></li>
-				<li><a class="submitCatch" href="/waitapp/scenario/2">Next</a></li>
+				<li><a class="submitPrev" href="/waitapp/scenario/3" >Previous</a></li>
+				<!--<li><a class="submitCatch" href="/waitapp/scenario/2">Next</a></li>-->
 			</ul>
 			<div style="display:none;">
-				<a id="prevPage" href="/waitapp/results"  style="display:none;"> PREV</a>
-				<a id="nextPage" href="/waitapp/scenario/2"  style="display:none;"> NEXT</a>
+				<a id="prevPage" href="/waitapp/scenario/1" style="display:none;"> PREV</a>
+				<!--<a id="nextPage" href="/waitapp/scenario/2"  style="display:none;"> NEXT</a>-->
 			</div>
 			
-			<h3>Scenario: Patient Assignment</h3>
-			<p>Patients Assignment - Reassigning patients to other physicians to reduce panel sizes:</p>
+			<h3>Scenario: Delegation Rules</h3>
+			<p>Delegate patients to non-physician providers:</p>
 			<br>
 			<!-- Rule Form -->
 			
-			<div id="reassignment"  style="border:1px solid black;  padding:30px;">
-			<label>Reassign Patients:</label>
-				<table id="queryGrid">
-				 <tr>
-					
-					<td>Gender</td>
-					<td>Age Range</td> 
-					<td>Conditions</td>					
-					<td>Number of Patients</td>
-					<td>Reassign From:</td>
-					<td>To:</td>
-					<td></td>
-					<td></td>
-				 </tr>
-				  <tr>
-					<td>
-						<select class="queryOption">
+			
+			 
+			<div id="border2" style="border:1px solid black;  padding:30px;">
+				<label>Assign Delegation Rules:</label><br><br>
+							<div id="errors"></div>
+				<form>
+					<div style="padding-bottom:10px;">
+						<input class="Check"  type="checkbox" name="gender" value="Gender"> &nbsp;Gender:
+						<select class="rule-form" name="gender-rule">
 							<option>M</option>
 							<option>F</option>
 						</select>
-					</td>
-					<td>
-						<select class="queryOption" id="ageselect">
-							<option title="1" selected>0-14</option>
-							<option title="2">15-24</option>
-							<option title="3">24-44</option>
-							<option title="4">45-64</option>
-							<option title="5">65-74</option>
-							<option title="6">75+</option>
+					</div>
+					<div style="padding-bottom:10px;">
+						<input class="Check"  type="checkbox" name="agerange" value="Age"> &nbsp;Age Range: &nbsp;
+						<input class="rule-form" type="text" placeholder="0-100" name="agerange-rule" id="agerange-rule" style="max-width:45px;">
+					</div>
+					<div style="padding-bottom:10px;">
+						<input class="Check"  type="checkbox" name="condrange" value="Chronic"> &nbsp; # Conditions:
+						<input class="rule-form" type="text" placeholder="0-100" name="condrange-rule" id="condrange-rule" style="max-width:45px;">
+					</div>
+					<div style="padding-bottom:10px;">
+						<input class="Check"  type="checkbox" name="visit" value="Visit"> &nbsp; Visit Type:
+						<select  class="rule-form" style="max-width:80px;" name="visit-rule">
+							<option>Acute</option>
+							<option>Preventative</option>
+							<option>Chronic</option>
 						</select>
-					</td>				
-					<td>
-						<select class="queryOption">
-							<option>0</option>
-							<option>1</option>
-							<option>2</option>
-							<option>3+</option>
-						</select>
-					</td>					
-					<td><input type="text" class="queryOption"></td>
-					<td>
-						<select class="queryOption"  name="from"  >
+					</div>
+					<div class="contRule" style="padding-bottom:10px;">
+						<input class="Check"  type="checkbox" name="affiliation" value="Provider"> &nbsp; Affiliation:					
+						<select class="rule-form"  name="affiliation-rule" id="affiliation-rule" style="width:100px;">
 							{% for phys in phys_list %}
 							<option>{{phys}}</option>
 							{% endfor %}
-						</select>					
-					</td>
-					<td>
-						<select class="queryOption"  name="to"  >
-							{% for phys in phys_list %}
-							<option>{{phys}}</option>
+						</select>			
+					</div>
+					<div style="padding-bottom:10px;">
+						<input class="Check" type="checkbox" name="patient" value="Patient"> &nbsp; Patient Name:
+						<input class="rule-form" type="text" placeholder="Enter Patient Name" name="patient-rule" id="patient-rule" style="width:150px;">
+					</div>
+					<div style="padding-bottom:10px;">
+						&nbsp; Delegation:					
+						<select class="rule" style="width:100px;" name="continuity-rule">
+							{% for nonphys in nonphys_list %}
+							<option>{{nonphys}}</option>
 							{% endfor %}
-						</select>					
-					</td>
-					<td>
-						<button id="reassign" style="height:30px; line-height:25px;">Reassign</button>
-					</td>
-					<td><div id="numassigned" style="text-align:center;">-</div></td>
+						</select>
+					</div>
 					
-				  </tr>
-				 </table>
-			</div>
-			 <br>
+				</form>
+				<div >							
+					<button id="addDelRule" class="btn btn-primary" style="margin-top:20px;" >Add Rule</button>						
+				</div>
+			<br>    
 			
-		
-		
-		
+			<div>
+				<div id="file_input">
+					<label>Or, upload text file:</label>		
+					<div class="input-group">
+						<span class="input-group-btn">
+							<span class="btn btn-primary btn-file">
+								Browse&hellip; <input type="file">
+							</span>
+						</span>
+						<div>
+						<input type="text" class="form-control" style="width:300px">
+						&nbsp;&nbsp;
+						<button type="button" class="btn btn-primary" style="display:inline; ">Load File</button>
+						</div>
+					</div>			
+				</div>    
+			</div>
+			
+		<br>
+		<button id="toggleTable" type="button" class="btn btn-primary">Show Table</button>
+		<br>
+		<div id="tableDiv">
+		<table id="delRuleTable">
+			<thead>
+				<tr>
+					<th data-field="state" data-checkbox="true"></th>
+					<th data-field="rule">Rule</th>
+					<th data-field="del">Delegation</th>			
+				</tr>
+			</thead>
+			<tbody>
+			{% for row in table_data %}
+			<tr>
+				<td></td>
+				<td>{{row.Rule}}</td>
+				<td>{{row.Delegation}}</td>   	
+			</tr>    
+			{% endfor %}
+			</tbody>
+		</table>
+		<button class="btn btn-default" id="remove-data" data-method="remove">Clear Selected Rows</button>
+		</div>
+	</div>
+	<br>
 	<div id="querydiv"  style="border:1px solid black;  padding:30px;">
 		<label>Run Simulation with Adjusted Data: &nbsp;&nbsp;&nbsp;&nbsp;</label>
 		<button id="recalculate" style="height:30px; line-height:25px;">Recalculate Demand</button>
@@ -223,19 +256,22 @@ $.ajaxSetup({
     }
 });
 
-/*
+
+
+
+
 //catch page change, convert table data to json, submit to hidden form, then change page
+/*
 $('.submitPrev').click(function(e) {
 	e.preventDefault(); //don't follow link yet
-	//var table = $('#contRuleTable').tableToJSON({ ignoreColumns: [0], ignoreHiddenRows: false });
+	//var table = $('#delRuleTable').tableToJSON({ ignoreColumns: [0], ignoreHiddenRows: false });
 	//table  = JSON.stringify(table);
 	//alert(table);
-	var defCont = $('#defCont').val();	
 	//stick stringified JSON of table into hidden form and submit	
 	$.ajax({      
 	  url: "?",
 	  type: "POST",
-      data : { 'type':'none' },       
+      data : {'type':'none'},       
       success: function() {
 	   //alert("data recieved!");
        $( "#prevPage" )[0].click();   
@@ -247,11 +283,9 @@ $('.submitPrev').click(function(e) {
 //catch page change, convert table data to json, submit to hidden form, then change page
 $('.submitCatch').click(function(e) {
 	e.preventDefault(); //don't follow link yet
-	//var table = $('#contRuleTable').tableToJSON({ ignoreColumns: [0], ignoreHiddenRows: false });
+	//var table = $('#delRuleTable').tableToJSON({ ignoreColumns: [0], ignoreHiddenRows: false });
 	//table  = JSON.stringify(table);
 	//alert(table);
-	var defCont = $('#defCont').val();
-	//alert(defCont);
 	//stick stringified JSON of table into hidden form and submit	
 	$.ajax({      
 	  url: "?",
@@ -262,10 +296,40 @@ $('.submitCatch').click(function(e) {
        $( "#nextPage" )[0].click();   
       }
     });
-});
+});*/
 
+/*
+//catch page change, convert table data to json, submit to hidden form, then change page
+$('.submitCatch').click(function(e) {
+	e.preventDefault(); //don't follow link yet
+	var table = $('#delRuleTable').tableToJSON({ ignoreColumns: [0] });
+	alert(JSON.stringify(table));
+	//stick stringified JSON of table into hidden form and submit
+	$('#id_table').val(JSON.stringify(table));
+	$('#id_table').submit();	
+	});
+
+$('.submitPrev').click(function(e) {
+	e.preventDefault(); //don't follow link yet
+	var table = $('#delRuleTable').tableToJSON({ ignoreColumns: [0] });
+	alert(JSON.stringify(table));
+	$('#id_table').val(JSON.stringify(table))
+	$.each($('#submitForm').serializeArray(), function(i, field) {
+		values[field.name] = field.value;		
+	});
+	//stick stringified JSON of table into hidden form and submit
+	;
+    $.ajax({      
+      data : values,      
+      success: function(){
+       $( "#buttonPrev" ).trigger( "submit" );   
+      }
+    });    
+});
 */
-$('#addContRule').click(function () {
+
+//add to table with addContRule button
+$('#addDelRule').click(function () {
 	$('#errors').html(''); //clear errors
 	var no_errors = true
 	//get form values in array
@@ -311,11 +375,11 @@ $('#addContRule').click(function () {
 		
 		//alert(row);
 		
-		$('#contRuleTable').bootstrapTable('destroy')
-		$('#contRuleTable').append(row);
-		$('#contRuleTable').bootstrapTable({
+		$('#delRuleTable').bootstrapTable('destroy')
+		$('#delRuleTable').append(row);
+		$('#delRuleTable').bootstrapTable({
 			cache: false,
-			//height: 200,
+			//height: 400,
 			striped: true,
 			pagination: true,
 			pageSize: 50,
@@ -324,10 +388,10 @@ $('#addContRule').click(function () {
 		});
 		$('#agerange-rule').val('');
 		$('#condrange-rule').val('');
-		
+		$('#patient-rule').val('');
 	}
 });
-
+	
 //delete selected rows button
 $('#remove-data').click(function () {
 	var selects = $('#contRuleTable').bootstrapTable('getSelections');
@@ -356,36 +420,15 @@ $(document).ready(function(){
   });
 });
 
-//button to reassign
-$('#reassign').click( function() {
-	var age = $('#ageselect option:selected').attr('title');
-	
-	var qParams= $('.queryOption').map(function() {
-				return $(this).val();}).get();	
-	var gender = qParams.toString().split(",")[0]	
-	var chron_cond = qParams.toString().split(",")[2]
-	var number = qParams.toString().split(",")[3]
-	var from = qParams.toString().split(",")[4]
-	var to = qParams.toString().split(",")[5]
-	data =  {'type':'reassign','age': age, 'chron': chron_cond, 'gender':gender, 'number':number, 'from':from, 'to':to}
-	
-	$.ajax({      		
-		  url: "?",
-		  type: "POST",
-		  data : data,       
-		  success: function(data) {	   
-		   $('#numassigned').text(data.num);  
-		   ;
-		  }
-		});		
-});
+
 
 //run simulation with new numbers and  cont rules
 $('#recalculate').click( function() {
 	$("#imgProgress").show();
-	
+	var hours = $('#hours').val()
+	var days = $('#hours').val()
 	var doc = $('#queryphys option:selected').val()	
-	var table = $('#contRuleTable').tableToJSON({ ignoreColumns: [0], ignoreHiddenRows: false });
+	var table = $('#delRuleTable').tableToJSON({ ignoreColumns: [0], ignoreHiddenRows: false });
 	table  = JSON.stringify(table);
 	//alert(table)
 	//alert(table);
@@ -393,11 +436,11 @@ $('#recalculate').click( function() {
 	$.ajax({      		
 		  url: "?",
 		  type: "POST",
-		  data : {'type': 'recalculate', 'doc': doc},       
+		  data : {'type': 'recalculate', 'doc': doc, 'id_table': table, 'hours':hours, 'days':days},       
 		  success: function(data) {	
 			$("#imgProgress").hide();		  
-		   $('#demand').text(data.dem);  
-		   $('#olddemand').text(data.olddem);
+		   $('#demand').text(data.dem);
+			$('#olddemand').text(data.olddem);
 		   $('#demandchange').text(data.demc);
 		   $('#capacity').text(data.cap);
 		   $('#waittime').text(data.wait);  
