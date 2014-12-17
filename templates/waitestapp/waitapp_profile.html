@@ -51,8 +51,8 @@ input[type=text]
 					</tr>
 					<tr>
 						<td>Gender</td>
-						<td><input type="text" class="gender" value="42"></td>
-						<td><input type="text" class="gender" value="58"></td>
+						<td><input type="text" class="gender" ></td>
+						<td><input type="text" class="gender"></td>
 						<td></td>
 						<td></td>
 						<td></td>
@@ -70,14 +70,24 @@ input[type=text]
 						<td></td>
 					</tr>
 					<tr>
-						<td>Age Group</td>
-						<td><input type="text" class="age" value="16"></td>
-						<td><input type="text" class="age" value="8"></td>
-						<td><input type="text" class="age" value="20"></td>
-						<td><input type="text" class="age" value="30"></td>
-						<td><input type="text" class="age" value="13"></td>
-						<td><input type="text" class="age" value="13"></td>
+						<td>Age Group M</td>
+						<td><input type="text" class="age" ></td>
+						<td><input type="text" class="age" ></td>
+						<td><input type="text" class="age" ></td>
+						<td><input type="text" class="age" ></td>
+						<td><input type="text" class="age" ></td>
+						<td><input type="text" class="age" ></td>
 						<td><input type="checkbox" class="agebox" name="{{forloop.counter0}}" checked>&nbsp;Use National Sample</td>
+					</tr>
+					<tr>
+						<td>Age Group F</td>
+						<td><input type="text" class="ageF"></td>
+						<td><input type="text" class="ageF" ></td>
+						<td><input type="text" class="ageF" ></td>
+						<td><input type="text" class="ageF"></td>
+						<td><input type="text" class="ageF" ></td>
+						<td><input type="text" class="ageF" ></td>
+						<td><input type="checkbox" class="ageboxF" name="{{forloop.counter0}}" checked>&nbsp;Use National Sample</td>
 					</tr>
 					<tr>
 						<td></td>
@@ -90,14 +100,24 @@ input[type=text]
 						<td></td>
 					</tr>
 					<tr>
-						<td>Conditions</td>
-						<td><input type="text" class="chron" value="43"></td>
-						<td><input type="text" class="chron" value="25"></td>
-						<td><input type="text" class="chron" value="15"></td>
-						<td><input type="text" class="chron" value="17"></td>
+						<td>Conditions M</td>
+						<td><input type="text" class="chron"></td>
+						<td><input type="text" class="chron" ></td>
+						<td><input type="text" class="chron"></td>
+						<td><input type="text" class="chron"></td>
 						<td></td>
 						<td></td>
 						<td><input type="checkbox" class="chronbox"  name="{{forloop.counter0}}" checked> &nbsp;Use National Sample</td>
+					</tr>
+					<tr>
+						<td>Conditions F</td>
+						<td><input type="text" class="chronF" ></td>
+						<td><input type="text" class="chronF" ></td>
+						<td><input type="text" class="chronF" ></td>
+						<td><input type="text" class="chronF"></td>
+						<td></td>
+						<td></td>
+						<td><input type="checkbox" class="chronboxF"  name="{{forloop.counter0}}" checked> &nbsp;Use National Sample</td>
 					</tr>
 				</table>
 			</div>
@@ -242,8 +262,18 @@ $('.submitPrev').click(function(e) {
 			$(this).find('.chron').each(function() {
 				chron.push($(this).val()) });
 				}
+		var ageF = []
+		if (!($(this).find(".ageboxF").is(":checked"))) {
+			$(this).find('.ageF').each(function() {
+				age.push($(this).val()) });
+				}
+		var chronF = []
+		if (!($(this).find(".chronboxF").is(":checked"))) {
+			$(this).find('.chronF').each(function() {
+				chron.push($(this).val()) });
+				}
 		
-		var panel = [panelsize, gender, age, chron]
+		var panel = [panelsize, gender, age, chron, ageF, chronF]
 		datatable.push(panel)
 		});
 	
@@ -292,7 +322,18 @@ $('.submitCatch').click(function(e) {
 				chron.push($(this).val()) });
 				}
 		
-		var panel = [panelsize, gender, age, chron]
+		var ageF = []
+		if (!($(this).find(".ageboxF").is(":checked"))) {
+			$(this).find('.ageF').each(function() {
+				age.push($(this).val()) });
+				}
+		var chronF = []
+		if (!($(this).find(".chronboxF").is(":checked"))) {
+			$(this).find('.chronF').each(function() {
+				chron.push($(this).val()) });
+				}
+		
+		var panel = [panelsize, gender, age, chron, ageF, chronF]
 		datatable.push(panel)
 		});
 	

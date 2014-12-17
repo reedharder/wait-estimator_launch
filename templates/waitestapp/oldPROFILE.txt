@@ -1,0 +1,62 @@
+	<tr>
+						<td></td>
+						<td>M</td>
+						<td>F</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>Gender</td>
+						<td><input type="text" class="gender" value="42"></td>
+						<td><input type="text" class="gender" value="58"></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td><input type="checkbox" class="genbox"  name="" checked>&nbsp;Use National Sample</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td>0-15</td>
+						<td>16-24</td>
+						<td>25-44</td>
+						<td>45-64</td>
+						<td>65-74</td>
+						<td>75+</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>Age Group</td>
+						<td><input type="text" class="age" value="16"></td>
+						<td><input type="text" class="age" value="8"></td>
+						<td><input type="text" class="age" value="20"></td>
+						<td><input type="text" class="age" value="30"></td>
+						<td><input type="text" class="age" value="13"></td>
+						<td><input type="text" class="age" value="13"></td>
+						<td><input type="checkbox" class="agebox" name="{{forloop.counter0}}" checked>&nbsp;Use National Sample</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td>0</td>
+						<td>1</td>
+						<td>2</td>
+						<td>3+</td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>Conditions</td>
+						<td><input type="text" class="chron" value="43"></td>
+						<td><input type="text" class="chron" value="25"></td>
+						<td><input type="text" class="chron" value="15"></td>
+						<td><input type="text" class="chron" value="17"></td>
+						<td></td>
+						<td></td>
+						<td><input type="checkbox" class="chronbox"  name="{{forloop.counter0}}" checked> &nbsp;Use National Sample</td>
+					</tr>
+				</table>
+			</div>

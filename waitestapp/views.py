@@ -326,6 +326,8 @@ def waitapp_utilization(request):#get doctors in list
             genarray = [int(string) for string in panelData[1]] if (all([string.isdigit() for string in panelData[1]]) and sum([int(string) for string in panelData[1]]))  else []      
             agearray =[int(string) for string in panelData[2]]  if (all([string.isdigit() for string in panelData[2]]) and sum([int(string) for string in panelData[2]]))  else [] 
             condarray = [int(string) for string in panelData[3]] if (all([string.isdigit() for string in panelData[3]]) and sum([int(string) for string in panelData[3]]))  else [] 
+            agearrayF =[int(string) for string in panelData[4]]  if (all([string.isdigit() for string in panelData[4]]) and sum([int(string) for string in panelData[4]]))  else [] 
+            condarrayF = [int(string) for string in panelData[5]] if (all([string.isdigit() for string in panelData[5]]) and sum([int(string) for string in panelData[5]]))  else [] 
             
             acute_demand = 0 # start counter of demand
             prev_demand = 0
@@ -333,7 +335,7 @@ def waitapp_utilization(request):#get doctors in list
             doc = phys_to_num[docname]
            
             #get full distribution of patient types on panel
-            panel_dict = Counter(np.random.choice(initial_data.full_cats_str, int(panel),adjust_ratios(full_p = initial_data.full_p, full_cats=initial_data.full_cats, sex=genarray, age=agearray,chronic=condarray)))
+            panel_dict = Counter(np.random.choice(initial_data.full_cats_str, int(panel),adjust_ratios(full_p = initial_data.full_p, full_cats=initial_data.full_cats, sex=genarray, age=agearray,chronic=condarray, ageF=agearrayF,chronicF=condarrayF)))
             #generate import simulation data
             for patient_category in panel_dict:
                 #ACUTE            
@@ -1776,14 +1778,59 @@ def visit_query_generator(waited, doc, visit, q, category_full_to_ind, phys_to_n
     return exp, percentile
 
 #function to adjust ratios
-def adjust_ratios(full_p = initial_data.full_p, full_cats=initial_data.full_cats, sex=[50,50], age=[15,15,20,20,15,15],chronic=[50,20,15,15]):
- 
-    if sex:
-     #initialize dictionary of category idenifier and values[current proportion, requested proportion, multiplicative factor]
-        divisions={i+1:[0,perc*.01,0] for i,perc in enumerate(sex)}
-        new_p = adjust_category(0, divisions, full_cats, full_p)
+def adjust_ratios(full_p = initial_data.full_p, full_cats=initial_data.full_cats, sex=[50,50], age=[15,15,20,20,15,15],chronic=[50,20,15,15],ageF=[15,15,20,20,15,15],chronicF=[50,20,15,15]):
+
+    male_p=[]   
+    female_p=[]
+    for cat, p in zip(full_cats, full_p):
+        if cat[0] == 1:
+            female_p.append(p)
+            male_p.append(0)
+        else:
+            female_p.append(0)
+            male_p.append(p)
+    mal_tot = sum(male_p)
+    fem_tot = sum(female_p)
+    male_p = [p/mal_tot for p in male_p]
+    female_p = [p/fem_tot for p in male_p]
+    if age:
+        #initialize dictionary of category idenifier and values[current proportion, requested proportion, multiplicative factor]
+        divisions={i+1:[0,perc*.01,0] for i,perc in enumerate(age)}
+        new_p = adjust_category(1, divisions, full_cats, male_p)
         if new_p: #if no errors, replace proportions with adjusted proportions
-            full_p=new_p
+            male_p=new_p
+    
+    if chronic:
+        #initialize dictionary of category idenifier and values[current proportion, requested proportion, multiplicative factor]
+        divisions={i:[0,perc*.01,0] for i,perc in enumerate(chronic)}
+        new_p = adjust_category(2, divisions, full_cats, male_p)
+        if new_p: #if no errors, replace proportions with adjusted proportions
+            male_p=new_p
+            
+    if ageF:
+        #initialize dictionary of category idenifier and values[current proportion, requested proportion, multiplicative factor]
+        divisions={i+1:[0,perc*.01,0] for i,perc in enumerate(ageF)}
+        new_p = adjust_category(1, divisions, full_cats, male_p)
+        if new_p: #if no errors, replace proportions with adjusted proportions
+            female_p=new_p
+    
+    if chronicF:
+        #initialize dictionary of category idenifier and values[current proportion, requested proportion, multiplicative factor]
+        divisions={i:[0,perc*.01,0] for i,perc in enumerate(chronicF)}
+        new_p = adjust_category(2, divisions, full_cats, male_p)
+        if new_p: #if no errors, replace proportions with adjusted proportions
+            female_p=new_p
+            
+    if sex:
+        male_p = [p*sex[0]*.01 for p in male_p]
+        female_p = [p*sex[0]*.01 for p in female_p]
+        full_p = [max(m,f) for m, f in zip(male_p,female_p)]
+    else:
+        male_p = [p*mal_tot for p in male_p]
+        female_p = [p*fem_tot for p in female_p]
+        full_p = [max(m,f) for m, f in zip(male_p,female_p)]
+    '''
+    
     if age:
         #initialize dictionary of category idenifier and values[current proportion, requested proportion, multiplicative factor]
         divisions={i+1:[0,perc*.01,0] for i,perc in enumerate(age)}
@@ -1796,8 +1843,15 @@ def adjust_ratios(full_p = initial_data.full_p, full_cats=initial_data.full_cats
         divisions={i:[0,perc*.01,0] for i,perc in enumerate(chronic)}
         new_p = adjust_category(2, divisions, full_cats, full_p)
         if new_p: #if no errors, replace proportions with adjusted proportions
+            full_p=new_p  
+            
+            if sex:
+     #initialize dictionary of category idenifier and values[current proportion, requested proportion, multiplicative factor]
+        divisions={i+1:[0,perc*.01,0] for i,perc in enumerate(sex)}
+        new_p = adjust_category(0, divisions, full_cats, full_p)
+        if new_p: #if no errors, replace proportions with adjusted proportions
             full_p=new_p
-        
+        '''
     return full_p
     
             
