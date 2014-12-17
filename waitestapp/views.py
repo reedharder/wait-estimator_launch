@@ -441,7 +441,7 @@ def waitapp_utilization(request):#get doctors in list
         
         for record in capacity_table:
             if record['Position'] == 'Physician':
-                phys_capacity[record['Provider Name']] = [int(record['Hours Per Day']), int(record['Days Per Year'])]
+                phys_capacity[record['Provider Name']] = int(record['Hours Per Day'])*int(record['Days Per Year'])
                 phys_demand[record['Provider Name']][4] = int(record['Hours Per Day'])*int(record['Days Per Year'])
                 phys_demand[record['Provider Name']][5] = record['Team'] #team name
                 #imbalance
@@ -586,7 +586,7 @@ def scenario_1(request):
                    new_demand += s_nums[i]*freq*360*durs[i]*(1/60)
             #get capacity 
             capacity_info=ast.literal_eval(request.session['phys_capacity'])[doc]
-            capacity = capacity_info[0]*capacity_info[1]
+            capacity =capacity_info
             data = {'dem':round(new_demand), 'olddem':round(old_demand), 'demc': round(new_demand-old_demand),'wait':exp,'waitc': (exp-exp_old), 'cap':round(capacity) }
             return HttpResponse(json.dumps(data), content_type='application/json')
         # recalculate with new nums and cont rules
@@ -629,7 +629,7 @@ def scenario_1(request):
                    new_demand += s_nums[i]*freq*360*durs[i]*(1/60)
             #get capacity 
             capacity_info=ast.literal_eval(request.session['phys_capacity'])[doc]
-            capacity = capacity_info[0]*capacity_info[1]
+            capacity = capacity_info
             request.session['scenario1'] = [round(new_demand), round(new_demand-old_demand),exp,(exp-exp_old), round(capacity)]
             data = {'dem':round(new_demand), 'olddem':round(old_demand), 'demc': round(new_demand-old_demand),'wait':exp,'waitc': (exp-exp_old), 'cap':round(capacity) }
             return HttpResponse(json.dumps(data), content_type='application/json')         
@@ -674,18 +674,28 @@ def scenario_2(request):
                 non_phys_mins=ast.literal_eval(request.session['s_non_phys_mins'])
             except KeyError:
                 non_phys_mins=ast.literal_eval(request.session['non_phys_mins'])
-                   
+            #get capacity 
+            try:
+                capacity_dict=ast.literal_eval(request.session['s_phys_capacity'])
+            except KeyError:
+                capacity_dict=ast.literal_eval(request.session['phys_capacity'])  
+             #get additional capacity 
+           
             hours = float(request.POST['hours'])
             days = float(request.POST['days'])
             prov = request.POST['prov']
             prov_to_num = request.session['prov_to_num']
             phys_to_num = request.session['phys_to_num']
+           
             try:                                 
-                
-                phys_mins[phys_to_num[prov]]  += (60*hours*days)/360
+               
+                phys_mins[phys_to_num[prov]]  += (60*hours*days*52)/360
                 request.session['s_phys_mins'] = str(phys_mins)
+                capacity_dict[prov] += hours*days*52
+                request.session['s_phys_capacity'] = str(capacity_dict)
+                
             except KeyError:
-                non_phys_mins[prov_to_num[prov]]  += (60*hours*days)/360
+                non_phys_mins[prov_to_num[prov]]  += (60*hours*days*52)/360
                 request.session['s_non_phys_mins'] = str(non_phys_mins)
             return HttpResponse('Hours added')
             
@@ -727,7 +737,7 @@ def scenario_2(request):
                 capacity_info=ast.literal_eval(request.session['s_phys_capacity'])[doc]
             except KeyError:
                 capacity_info=ast.literal_eval(request.session['phys_capacity'])[doc]
-            capacity = capacity_info[0]*capacity_info[1]
+            capacity = capacity_info
             data = {'dem':round(new_demand), 'olddem':round(old_demand), 'demc': round(new_demand-old_demand),'wait':exp,'waitc': (exp-exp_old), 'cap':round(capacity) }
             return HttpResponse(json.dumps(data), content_type='application/json')
         # recalculate with new nums and cont rules
@@ -779,8 +789,12 @@ def scenario_2(request):
                    old_demand += nums[i]*freq*360*durs[i]*(1/60)
                    new_demand += s_nums[i]*freq*360*durs[i]*(1/60)
             #get capacity 
-            capacity_info=ast.literal_eval(request.session['phys_capacity'])[doc]
-            capacity = min(24,(capacity_info[0]))*min(360,(capacity_info[1]))
+            #get capacity 
+            try:
+                capacity_info=ast.literal_eval(request.session['s_phys_capacity'])[doc]
+            except KeyError:
+                capacity_info=ast.literal_eval(request.session['phys_capacity'])[doc]
+            capacity =  capacity_info
             request.session['scenario2'] = [round(new_demand), round(new_demand-old_demand),exp,(exp-exp_old), round(capacity)]
             data = {'dem':round(new_demand), 'olddem':round(old_demand), 'demc': round(new_demand-old_demand),'wait':exp,'waitc': (exp-exp_old), 'cap':round(capacity) }
             return HttpResponse(json.dumps(data), content_type='application/json')         
@@ -847,7 +861,7 @@ def scenario_3(request):
                    new_demand += s_nums[i]*freq*360*durs[i]*(1/60)
             #get capacity 
             capacity_info=ast.literal_eval(request.session['phys_capacity'])[doc]
-            capacity = capacity_info[0]*capacity_info[1]
+            capacity = capacity_info
             data = {'dem':round(new_demand), 'olddem':round(old_demand), 'demc': round(new_demand-old_demand),'wait':exp,'waitc': (exp-exp_old), 'cap':round(capacity) }
             return HttpResponse(json.dumps(data), content_type='application/json')
         # recalculate with new nums and cont rules
@@ -941,7 +955,7 @@ def scenario_3(request):
                    new_demand += nums[i]*freq*360*durs[i]*(1/60)
             #get capacity 
             capacity_info=ast.literal_eval(request.session['phys_capacity'])[doc]
-            capacity = capacity_info[0]*capacity_info[1]
+            capacity = capacity_info
             request.session['scenario3'] = [round(new_demand), round(new_demand-old_demand),exp,(exp-exp_old), round(capacity)]
             data = {'dem':round(new_demand), 'olddem':round(old_demand), 'demc': round(new_demand-old_demand),'wait':exp,'waitc': (exp-exp_old), 'cap':round(capacity) }
             return HttpResponse(json.dumps(data), content_type='application/json')         
@@ -1014,7 +1028,7 @@ def scenario_4(request):
                    new_demand += nums[i]*freq*360*durs[i]*(1/60)
             #get capacity 
             capacity_info=ast.literal_eval(request.session['phys_capacity'])[doc]
-            capacity = capacity_info[0]*capacity_info[1]
+            capacity = capacity_info
             data = data = {'dem':round(new_demand), 'olddem':round(old_demand), 'demc': round(new_demand-old_demand),'wait':exp,'waitc': (exp-exp_old), 'cap':round(capacity) }
             return HttpResponse(json.dumps(data), content_type='application/json')
         # recalculate with new nums and cont rules
@@ -1115,7 +1129,7 @@ def scenario_4(request):
                    new_demand += s_nums[i]*freq*360*durs[i]*(1/60)
             #get capacity 
             capacity_info=ast.literal_eval(request.session['phys_capacity'])[doc]
-            capacity = min(24,(capacity_info[0]))*min(360,(capacity_info[1]))
+            capacity = capacity_info
             request.session['scenario4'] = [round(new_demand), round(new_demand-old_demand),exp,(exp-exp_old), round(capacity)]
             data = {'dem':round(new_demand), 'olddem':round(old_demand), 'demc': round(new_demand-old_demand),'wait':exp,'waitc': (exp-exp_old), 'cap':round(capacity) }
             return HttpResponse(json.dumps(data), content_type='application/json')         
