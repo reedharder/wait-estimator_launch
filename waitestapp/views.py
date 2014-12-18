@@ -619,8 +619,8 @@ def scenario_1(request):
             
             
             #get wait for doctor, as well as change in wait
-            exp, p = overall_query( doc, waited, phys_to_num, doc_lookup , 100)
-            exp_old, p = overall_query( doc, K[0], phys_to_num, doc_lookup, 100)
+            exp, p = overall_query( doc,  K[0], phys_to_num, doc_lookup , 100)
+            exp_old, p = overall_query( doc,waited, phys_to_num, doc_lookup, 100)
            
             #get old and new demand
             old_demand=0
@@ -780,8 +780,8 @@ def scenario_2(request):
             
             
             #get wait for doctor, as well as change in wait
-            exp, p = overall_query( doc, waited, phys_to_num, doc_lookup , 100)
-            exp_old, p = overall_query( doc, K[0], phys_to_num, doc_lookup, 100)
+            exp, p = overall_query( doc,  K[0], phys_to_num, doc_lookup , 100)
+            exp_old, p = overall_query( doc,waited, phys_to_num, doc_lookup, 100)
            
             #get old and new demand
             old_demand=0
@@ -789,7 +789,7 @@ def scenario_2(request):
             for i, freq in enumerate(freqs):
                if doc_lookup[i] == phys_to_num[doc]: 
                    old_demand += nums[i]*freq*360*durs[i]*(1/60)
-                   new_demand += s_nums[i]*freq*360*durs[i]*(1/60)
+                   new_demand += nums[i]*freq*360*durs[i]*(1/60)
             #get capacity 
             #get capacity 
             try:
@@ -860,7 +860,7 @@ def scenario_3(request):
             for i, freq in enumerate(freqs):
                if doc_lookup[i] == phys_to_num[doc]: 
                    old_demand += nums[i]*freq*360*durs[i]*(1/60)
-                   new_demand += s_nums[i]*freq*360*durs[i]*(1/60)
+                   new_demand += nums[i]*freq*360*durs[i]*(1/60)
             #get capacity 
             capacity_info=ast.literal_eval(request.session['phys_capacity'])[doc]
             capacity = capacity_info
@@ -945,8 +945,8 @@ def scenario_3(request):
             
             
             #get wait for doctor, as well as change in wait
-            exp, p = overall_query( doc, waited, phys_to_num, doc_lookup , 100)
-            exp_old, p = overall_query( doc, K[0], phys_to_num, doc_lookup, 100)
+            exp, p = overall_query( doc,  K[0], phys_to_num, doc_lookup , 100)
+            exp_old, p = overall_query( doc,waited, phys_to_num, doc_lookup, 100)
            
             #get old and new demand
             old_demand=0
