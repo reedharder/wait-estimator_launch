@@ -8,6 +8,7 @@ Created on Tue Nov 11 20:16:02 2014
 
 import numpy as np
 
+
 '''
 #acute, prev, chron
 #number of patient categories (not differentiated by visit type)
@@ -35,7 +36,7 @@ doc_lookup=np.array([1,2,3,4]*(24*3))
 '''
 exp_sload={'Acute':(100,50), 'Preventative':(100,50) , 'Chronic': (100,50), 'Overall':(100,50) ,} 
 '''
-days=500
+days=100
 
 def mat_sim(cut_off, carve_out, days, freqs, durs,  nums, num_classes, nurse_dict, doc_lookup, phys_mins, non_phys_mins, shared_categories):
     #initialize matrix of distrubution of waiting times for all classes
@@ -50,6 +51,7 @@ def mat_sim(cut_off, carve_out, days, freqs, durs,  nums, num_classes, nurse_dic
     # ADD PATIENT WAITING CUTTOFFS AND TOTAL CUTTOFFS. STOP SIM? OR JUST ALERT    
     
     #get matrix of demand for each patient class (cols) each day (rows)
+    np.random.seed()
     demand_matrix=np.random.binomial(nums, freqs, (days, num_classes))
     #get daily demands
     ##daily_demands=np.sum(demand_matrix, axis=1)

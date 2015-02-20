@@ -1416,7 +1416,6 @@ def scenario_utilization(request):
         ind = 0 # start increment counter
         phys_demand = {} #dictionary of demand per physician
         for panel in panelTable:
-            np.random.seed(42)
             acute_demand = 0 # start counter of demand
             prev_demand = 0
             chronic_demand = 0
