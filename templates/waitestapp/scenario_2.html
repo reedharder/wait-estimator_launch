@@ -81,10 +81,13 @@
 		<table id="querytable">
 		 <tr>
 			<td>Doctor</td>
-			<td>New Demand (hrs/yr)</td> 
+			<td>Demand (hrs/yr)</td> 
+			<!--
 			<td>Old Demand (hrs/yr)</td>
-			<td>Demand Change</td>		
-			<td>Capacity (hrs/yr)</td>	
+			<td>Demand Change</td>		-->
+			<td>New Capacity (hrs/yr)</td>
+			<td>Old Capacity (hrs/yr)</td>
+			<td>Capacity Change</td>
 			<td>Expected Wait Time</td>
 			<td>Wait Time Change</td>			
 		 </tr>
@@ -97,9 +100,13 @@
 				</select>					
 			</td>
 			<td><div id="demand" style="text-align:center;">-</div></td>
+			<!--
 			<td><div id="olddemand" style="text-align:center;">-</div></td>
 			<td><div id="demandchange" style="text-align:center;">-</div></td>
+			-->
 			<td><div id="capacity" style="text-align:center;">-</div></td>
+			<td><div id="oldcapacity" style="text-align:center;">-</div></td>
+			<td><div id="capacitychange" style="text-align:center;">-</div></td>
 			<td><div id="waittime" style="text-align:center;">-</div></td>
 			<td><div id="waittimechange" style="text-align:center;">-</div></td>
 		  </tr>
@@ -218,8 +225,8 @@ $('#recalculate').click( function(e) {
 		  success: function(data) {	
 			$("#imgProgress").hide();		  
 		   $('#demand').text(data.dem);  
-		   $('#olddemand').text(data.olddem);
-		   $('#demandchange').text(data.demc);
+		   $('#oldcapacity').text(data.oldcap);
+		   $('#capacitychange').text(data.capc);
 		   $('#capacity').text(data.cap);
 		   $('#waittime').text(data.wait);  
 		   $('#waittimechange').text(data.waitc);

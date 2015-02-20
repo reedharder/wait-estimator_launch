@@ -798,11 +798,13 @@ def scenario_2(request):
             #get capacity 
             try:
                 capacity_info=ast.literal_eval(request.session['s_phys_capacity'])[doc]
+                capacity_info_old = ast.literal_eval(request.session['phys_capacity'])[doc]
             except KeyError:
                 capacity_info=ast.literal_eval(request.session['phys_capacity'])[doc]
+                capacity_info_old=ast.literal_eval(request.session['phys_capacity'])[doc]
             capacity =  capacity_info
             request.session['scenario2'] = [round(new_demand), round(new_demand-old_demand),exp,(exp-exp_old), round(capacity)]
-            data = {'dem':round(new_demand), 'olddem':round(old_demand), 'demc': round(new_demand-old_demand),'wait':exp,'waitc': (exp-exp_old), 'cap':round(capacity) }
+            data = {'dem':round(new_demand), 'oldcap':round(capacity_info_old), 'capc': round(capacity_info-capacity_info_old),'wait':exp,'waitc': (exp-exp_old), 'cap':round(capacity) }
             return HttpResponse(json.dumps(data), content_type='application/json')         
         
         else:
@@ -1772,6 +1774,48 @@ def table_query_generator(waited, doc, cond, gender, age, visit, q, category_ful
 
 #get for overall visit type
 def visit_query_generator(waited, doc, visit, q, category_full_to_ind, phys_to_num):
+    #get integer category
+    from itertools import product
+    ##gender= 2 if (gender == 'M') else 1       
+    if not doc == 'Overall': 
+        indices=[category_full_to_ind[i] for i in product([1,2],[1,2,3,4,5,6],[0,1,2,3],[visit],[phys_to_num[doc]])]
+    else:
+        docs=phys_to_num.values()
+        indices=[category_full_to_ind[i] for i in product([1,2],[1,2,3,4,5,6],[0,1,2,3],[visit],docs )]
+       
+    try:
+        exp, percentile = exp_percentile(waited[:,indices], q)
+    except ValueError:
+        exp, percentile = ('N/A', 'N/A')
+        
+    return exp, percentile
+    
+#CHANGE THIS!!!
+def visit_query_generator_alls(waited, doc, visit, q, category_full_to_ind, phys_to_num):
+    
+    if 
+        element.lstrip().rstrip()
+        rule_dict[element.split(':')[0]]=element.split(':')[1]
+    if 'Gender' in rule_dict:
+        rule_categories[0] = [2] if rule_dict['Gender']=='M' else [1] 
+    else:
+        rule_categories[0] = [1,2]
+    if 'Age' in rule_dict:
+        rule_categories[1]=list(range(age_bracket(rule_dict['Age'].split('-')[0]), age_bracket(rule_dict['Age'].split('-')[1]) + 1))
+    else:
+        rule_categories[1]=[1,2,3,4,5,6]
+    if 'Chronic' in rule_dict:
+        rule_categories[2]=list(range(chron_bracket(rule_dict['Cond'].split('-')[0]), chron_bracket(rule_dict['Cond'].split('-')[1]) + 1))
+    else:
+        rule_categories[2]=[0,1,2,3]
+    if 'Visit' in rule_dict:
+        rule_categories[3]=[visit_bracket(rule_dict['Visit'])]
+    else:
+        rule_categories[3]=[1,2,3]
+    if 'Provider' in rule_dict:
+        rule_categories[4]=[phys_to_num[rule_dict['Provider']]]
+    else:
+        rule_categories[4]=phys_to_num.values()
     #get integer category
     from itertools import product
     ##gender= 2 if (gender == 'M') else 1       

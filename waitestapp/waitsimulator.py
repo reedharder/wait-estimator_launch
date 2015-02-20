@@ -51,7 +51,7 @@ def mat_sim(cut_off, carve_out, days, freqs, durs,  nums, num_classes, nurse_dic
     # ADD PATIENT WAITING CUTTOFFS AND TOTAL CUTTOFFS. STOP SIM? OR JUST ALERT    
     
     #get matrix of demand for each patient class (cols) each day (rows)
-    np.random.seed()
+    np.random.seed(42)
     demand_matrix=np.random.binomial(nums, freqs, (days, num_classes))
     #get daily demands
     ##daily_demands=np.sum(demand_matrix, axis=1)
