@@ -1789,7 +1789,7 @@ def visit_query_generator(waited, doc, visit, q, category_full_to_ind, phys_to_n
         exp, percentile = ('N/A', 'N/A')
         
     return exp, percentile
-    
+'''    
 #CHANGE THIS!!!
 def visit_query_generator_alls(waited, doc, visit, q, category_full_to_ind, phys_to_num):
     
@@ -1831,6 +1831,7 @@ def visit_query_generator_alls(waited, doc, visit, q, category_full_to_ind, phys
         exp, percentile = ('N/A', 'N/A')
         
     return exp, percentile
+'''
 
 #function to adjust ratios
 def adjust_ratios(full_p = initial_data.full_p, full_cats=initial_data.full_cats, sex=[50,50], age=[15,15,20,20,15,15],chronic=[50,20,15,15],ageF=[15,15,20,20,15,15],chronicF=[50,20,15,15]):
