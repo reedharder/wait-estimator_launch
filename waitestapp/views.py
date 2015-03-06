@@ -495,11 +495,11 @@ def waitapp_results(request):
         #change wait for individual row or query
         elif request.POST['type'] == 'rowselect':
             
-            gender  = request.POST['gender']            
-            age  = request.POST['age']
-            doc = request.POST['doc']
-            visit = request.POST['visit'] 
-            chron = request.POST['chron']
+            gender  = request.POST.get('gender')            
+            age  = request.POST.get('age')
+            doc = request.POST.get('doc')
+            visit = request.POST.get('visit') 
+            chron = request.POST.get('chron')
             #take overall or individual parameter values, depending on user selection
             if doc =="Overall":
                 docs=phys_to_num.values()
