@@ -494,22 +494,44 @@ def waitapp_results(request):
             return HttpResponse(json.dumps(data), content_type='application/json')
         #change wait for individual row or query
         elif request.POST['type'] == 'rowselect':
-            '''
-            gender  = request.POST['gender']
-            gender = gender_bracket(gender)
+            
+            gender  = request.POST['gender']            
             age  = request.POST['age']
-            age=int(age)        
+            doc = request.POST['doc']
+            visit = request.POST['visit'] 
             chron = request.POST['chron']
-            chron=int(chron[0])   '''         
+            #take overall or individual parameter values, depending on user selection
+            if doc =="Overall":
+                docs=phys_to_num.values()
+            else: 
+                docs = [phys_to_num[doc]]
+                
+            if age == "All":
+                ages = [1,2,3,4,5,6]
+            else:
+                ages = [int(age)]
+                
+            if chron == "All":
+                chrons = [0,1,2,3]
+            else:
+                chrons = int(chron[0])
+        
+            if gender  == 'All':
+                genders = [1,2]
+            else:
+                genders = gender_bracket(gender)
+           
+            if visit == 'All':
+                visits = [1,2,3]
+            else:
+                visits = int(visit)                    
             
-            doc = request.POST['doc']            
             
-            visit = int(request.POST['visit'])
-            
+            #percentile
             q = int(request.POST['perc'])
            
-            print([phys_to_num[phys] for phys in phys_to_num ])
-            exp, p = visit_query_generator(waited, doc, visit, q, category_full_to_ind, phys_to_num)
+            
+            exp, p = visit_query_generator_alls(waited, docs, ages, chrons, genders, visits, q, category_full_to_ind, phys_to_num)
             data = {'exp':exp, 'p':p}
             return HttpResponse(json.dumps(data), content_type='application/json')
     else:       
@@ -1789,49 +1811,20 @@ def visit_query_generator(waited, doc, visit, q, category_full_to_ind, phys_to_n
         exp, percentile = ('N/A', 'N/A')
         
     return exp, percentile
-'''    
-#CHANGE THIS!!!
-def visit_query_generator_alls(waited, doc, visit, q, category_full_to_ind, phys_to_num):
     
-    if 
-        element.lstrip().rstrip()
-        rule_dict[element.split(':')[0]]=element.split(':')[1]
-    if 'Gender' in rule_dict:
-        rule_categories[0] = [2] if rule_dict['Gender']=='M' else [1] 
-    else:
-        rule_categories[0] = [1,2]
-    if 'Age' in rule_dict:
-        rule_categories[1]=list(range(age_bracket(rule_dict['Age'].split('-')[0]), age_bracket(rule_dict['Age'].split('-')[1]) + 1))
-    else:
-        rule_categories[1]=[1,2,3,4,5,6]
-    if 'Chronic' in rule_dict:
-        rule_categories[2]=list(range(chron_bracket(rule_dict['Cond'].split('-')[0]), chron_bracket(rule_dict['Cond'].split('-')[1]) + 1))
-    else:
-        rule_categories[2]=[0,1,2,3]
-    if 'Visit' in rule_dict:
-        rule_categories[3]=[visit_bracket(rule_dict['Visit'])]
-    else:
-        rule_categories[3]=[1,2,3]
-    if 'Provider' in rule_dict:
-        rule_categories[4]=[phys_to_num[rule_dict['Provider']]]
-    else:
-        rule_categories[4]=phys_to_num.values()
-    #get integer category
+    
+#query some combination of all
+def visit_query_generator_alls(waited, docs, ages, chrons, genders, visits, q, category_full_to_ind, phys_to_num):
     from itertools import product
-    ##gender= 2 if (gender == 'M') else 1       
-    if not doc == 'Overall': 
-        indices=[category_full_to_ind[i] for i in product([1,2],[1,2,3,4,5,6],[0,1,2,3],[visit],[phys_to_num[doc]])]
-    else:
-        docs=phys_to_num.values()
-        indices=[category_full_to_ind[i] for i in product([1,2],[1,2,3,4,5,6],[0,1,2,3],[visit],docs )]
-       
+    indices=[category_full_to_ind[i] for i in product(genders,ages,chrons,visits,docs)]
+           
     try:
         exp, percentile = exp_percentile(waited[:,indices], q)
     except ValueError:
         exp, percentile = ('N/A', 'N/A')
         
     return exp, percentile
-'''
+
 
 #function to adjust ratios
 def adjust_ratios(full_p = initial_data.full_p, full_cats=initial_data.full_cats, sex=[50,50], age=[15,15,20,20,15,15],chronic=[50,20,15,15],ageF=[15,15,20,20,15,15],chronicF=[50,20,15,15]):
