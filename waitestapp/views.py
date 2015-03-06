@@ -514,17 +514,17 @@ def waitapp_results(request):
             if chron == "All":
                 chrons = [0,1,2,3]
             else:
-                chrons = int(chron[0])
+                chrons = [int(chron[0])]
         
             if gender  == 'All':
                 genders = [1,2]
             else:
-                genders = gender_bracket(gender)
+                genders = [gender_bracket(gender)]
            
             if visit == 'All':
                 visits = [1,2,3]
             else:
-                visits = int(visit)                    
+                visits = [int(visit)]                    
             
             
             #percentile
