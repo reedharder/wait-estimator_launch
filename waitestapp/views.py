@@ -1447,9 +1447,51 @@ def scenario_utilization(request):
             doc = phys_to_num[panel['Physician']]
             num_males = int(panel['Males'])
             num_females = int(panel['Females'])
+            problem_females =['1, 1, 2',
+            '1, 2, 1',
+            '1, 1, 3',
+            '1, 3, 3',
+            '1, 2, 3',
+            '1, 2, 2']
+            
+            noprob_females=['1,3,1',
+             '1,4,3',
+             '1,2,0',
+             '1,4,2',
+             '1,6,3',
+             '1,5,3']
+            problem_males = ['2, 2, 1',
+            '2, 1, 2',
+            '2, 1, 3',
+            '2, 2, 3']
+            
+            noprob_males = ['2,5,3',
+             '2,3,1',
+             '2,2,0',
+             '2,5,1',]
             #generate panel accordin to male female ratio and namcs proportions
             male_dist = Counter(np.random.choice(initial_data.male_cats, num_males, initial_data.male_p))
+            
             female_dist = Counter(np.random.choice(initial_data.female_cats, num_females, initial_data.female_p))
+            #uneven the distributions            
+            if doc == 'Doctor 1':
+                for prob, noprob in zip(problem_females, noprob_females):
+                    transf = min(30, female_dist['noprob_females'])
+                    female_dist['noprob_females'] -= transf
+                    female_dist['prob_females'] += transf
+                for prob, noprob in zip(problem_males, noprob_males):
+                    transf = min(30, female_dist[noprob])
+                    male_dist[noprob] -= transf
+                    male_dist[prob] += transf
+            if doc == 'Doctor 3':
+                for prob, noprob in zip(problem_females, noprob_females):
+                    transf = min(10, female_dist['noprob_females'])
+                    female_dist['noprob_females'] -= transf
+                    female_dist['prob_females'] += transf
+                for prob, noprob in zip(problem_males, noprob_males):
+                    transf = min(10, female_dist[noprob])
+                    male_dist[noprob] -= transf
+                    male_dist[prob] += transf
             #get full distribution of patient types on panel
             panel_dict = male_dist + female_dist
             #generate import simulation data
