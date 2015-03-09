@@ -1476,11 +1476,11 @@ def scenario_utilization(request):
             #uneven the distributions            
             if panel['Physician'] == 'Doctor 1':
                 for prob, noprob in zip(problem_females, noprob_females):
-                    transf = min(30, female_dist[noprob])
+                    transf = min(50, female_dist[noprob])
                     female_dist[noprob] -= transf
                     female_dist[prob] += transf
                 for prob, noprob in zip(problem_males, noprob_males):
-                    transf = min(30, male_dist[noprob])
+                    transf = min(50, male_dist[noprob])
                     male_dist[noprob] -= transf
                     male_dist[prob] += transf
             if panel['Physician'] == 'Doctor 3':
