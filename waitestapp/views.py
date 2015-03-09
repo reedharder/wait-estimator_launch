@@ -1474,22 +1474,22 @@ def scenario_utilization(request):
             
             female_dist = Counter(np.random.choice(initial_data.female_cats, num_females, initial_data.female_p))
             #uneven the distributions            
-            if doc == 'Doctor 1':
+            if panel['Physician'] == 'Doctor 1':
                 for prob, noprob in zip(problem_females, noprob_females):
-                    transf = min(30, female_dist['noprob_females'])
-                    female_dist['noprob_females'] -= transf
-                    female_dist['prob_females'] += transf
-                for prob, noprob in zip(problem_males, noprob_males):
                     transf = min(30, female_dist[noprob])
+                    female_dist[noprob] -= transf
+                    female_dist[prob] += transf
+                for prob, noprob in zip(problem_males, noprob_males):
+                    transf = min(30, male_dist[noprob])
                     male_dist[noprob] -= transf
                     male_dist[prob] += transf
-            if doc == 'Doctor 3':
+            if panel['Physician'] == 'Doctor 3':
                 for prob, noprob in zip(problem_females, noprob_females):
-                    transf = min(10, female_dist['noprob_females'])
-                    female_dist['noprob_females'] -= transf
-                    female_dist['prob_females'] += transf
-                for prob, noprob in zip(problem_males, noprob_males):
                     transf = min(10, female_dist[noprob])
+                    female_dist[noprob] -= transf
+                    female_dist[prob] += transf
+                for prob, noprob in zip(problem_males, noprob_males):
+                    transf = min(10, male_dist[noprob])
                     male_dist[noprob] -= transf
                     male_dist[prob] += transf
             #get full distribution of patient types on panel
