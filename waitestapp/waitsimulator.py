@@ -38,7 +38,7 @@ exp_sload={'Acute':(100,50), 'Preventative':(100,50) , 'Chronic': (100,50), 'Ove
 '''
 days=100
 
-def mat_sim(cut_off, carve_out, days, freqs, durs,  nums, num_classes, nurse_dict, doc_lookup, phys_mins, non_phys_mins, shared_categories):
+def mat_sim(urgents, cut_off, carve_out, days, freqs, durs,  nums, num_classes, nurse_dict, doc_lookup, phys_mins, non_phys_mins, shared_categories):
     #initialize matrix of distrubution of waiting times for all classes
     waited=np.zeros((days, num_classes), dtype=int)
     #idles times per day for each doctor
@@ -58,6 +58,14 @@ def mat_sim(cut_off, carve_out, days, freqs, durs,  nums, num_classes, nurse_dic
     #initialize daily supplies
     daily_supplys=[0]*days
     
+    #if carveout, recalulate physmins and carve out time with 10% carveout
+    ##print(phys_mins)
+    increment_per_doc = {doc:.1*mins for doc, mins in phys_mins.items() } #get number of mins to transfer to carveout for each doc
+    ##print(increment_per_doc)    
+    phys_mins = {doc:mins-increment_per_doc[doc] for doc, mins in phys_mins.items()}
+    ##print(phys_mins)
+    carve_out = {doc:increment_per_doc[doc] for doc, mins in increment_per_doc.items()}
+    ##print(carve_out)
     #go through each day
     
     for ind, day in enumerate(demand_matrix):
@@ -67,12 +75,12 @@ def mat_sim(cut_off, carve_out, days, freqs, durs,  nums, num_classes, nurse_dic
         
         #if using carve outs, set aside time for the day by initializing carve out slots
         if carve_out:
-            curr_carve_out={}  ##phys_carve_out.copy()
+            curr_carve_out=carve_out.copy()  ##phys_carve_out.copy()
         
         # get randomized list of patient classes calling in today, in order of call        
         new_patients=np.repeat(range(0,num_classes),day).tolist()
        
-        wait_times=[]
+        ###wait_times=[]
         #go thru patients arriving, schedule them
         for patient in new_patients:
             #durs[patient] is expected duration of patient visit
@@ -92,7 +100,7 @@ def mat_sim(cut_off, carve_out, days, freqs, durs,  nums, num_classes, nurse_dic
             #get expected patient duration
             curr_dur=durs[patient]
             #if following carve out policy and patient is urgent, attempt to put in a same day carve_out KEEP TRACK OF URGENT PATIENTS THAT WERE NOT SEEN            
-            if carve_out:    
+            if carve_out and urgents[patient]:    
                 #if urgent patient can be accomadated in carve out...
                 if curr_carve_out[relevant_doc] - curr_dur > 0 :
                     
@@ -111,6 +119,8 @@ def mat_sim(cut_off, carve_out, days, freqs, durs,  nums, num_classes, nurse_dic
                 doc_lines[relevant_doc]=doc_lines[relevant_doc] + curr_dur
                 #get number of days patient must wait                   
                 wait_time, rem  = divmod(doc_lines[relevant_doc], phys_mins[relevant_doc])
+                ##print("lines %s doc %s mins %s" % (doc_lines[relevant_doc],relevant_doc,phys_mins[relevant_doc] ))
+                ##print("WAIT TIME %s" % wait_time)
                 #if patient cant be seen by doctor that day and can be delegated to nurse, and a relevant nurse has time, do so
                 if wait_time > 0 and (patient in nurse_dict) and any([min(curr_nurse_mins[nurse]-curr_dur, 0) for nurse in nurse_dict[patient]]):
                     # get available times of relevant nurses 
@@ -133,10 +143,11 @@ def mat_sim(cut_off, carve_out, days, freqs, durs,  nums, num_classes, nurse_dic
                             pass
                     #try to add to daily demand list, unless patient is scheduled outside timeframe
                     try:
+                        
                         daily_supplys[int(ind)+int(wait_time)] +=1
                     except IndexError:
                         pass
-            wait_times.append(wait_time)
+            #wait_times.append(wait_time)
         ##print(max(wait_times))
 
                     

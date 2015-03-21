@@ -44,13 +44,15 @@
 				  <tr>
 					<td>
 						<select class="queryOption">
+							<option>All</option>
 							<option>M</option>
 							<option>F</option>
 						</select>
 					</td>
 					<td>
 						<select class="queryOption" id="ageselect">
-							<option title="1" selected>0-14</option>
+							<option title="all" selected>All</option>
+							<option title="1" >0-14</option>
 							<option title="2">15-24</option>
 							<option title="3">24-44</option>
 							<option title="4">45-64</option>
@@ -60,6 +62,7 @@
 					</td>				
 					<td>
 						<select class="queryOption">
+							<option>All</option>
 							<option>0</option>
 							<option>1</option>
 							<option>2</option>
@@ -87,6 +90,17 @@
 					<td><div id="numassigned" style="text-align:center;">-</div></td>
 					
 				  </tr>
+				   <tr>
+					
+					<td></td>
+					<td></td> 
+					<td></td>					
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td><button id="reset" style="height:30px; line-height:25px;float: right">Undo All Changes</button></td>
+				 </tr>
 				 </table>
 			</div>
 			 <br>
@@ -379,6 +393,25 @@ $('#reassign').click( function() {
 		  }
 		});		
 });
+
+
+// function to undo panel changes
+$('#reset').click( function() {
+	
+	data =  {'type':'reset'}
+	
+	$.ajax({      		
+		  url: "?",
+		  type: "POST",
+		  data : data,       
+		  success: function(data) {	   
+		   $('#numassigned').text("Panels reset");  
+		   ;
+		  }
+		});		
+});
+
+
 
 //run simulation with new numbers and  cont rules
 $('#recalculate').click( function() {

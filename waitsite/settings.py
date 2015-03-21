@@ -23,7 +23,7 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE =True
 SECRET_KEY = '6fz4)msy09$df6reo78v$beh8#sdi($6soti1#z98xg+9u1e2!'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 TEMPLATE_DEBUG = True
 
@@ -69,7 +69,7 @@ DATABASES = {
     }
 }
 
-##DATABASES['default'] =  dj_database_url.config()
+DATABASES['default'] =  dj_database_url.config()
 
 #emails
 EMAIL_USE_TLS = True
@@ -109,7 +109,7 @@ STATICFILES_DIRS = (
 # Simplified static file serving.
 # https://warehouse.python.org/project/whitenoise/
 
-##STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
+STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 
 
 

@@ -3,7 +3,7 @@ from django.http import HttpResponse
 ##from django.contrib.formtools.wizard.views import SessionWizardView
 from  waitestapp import initial_data
 from django.views.decorators.csrf import ensure_csrf_cookie
-
+from itertools import product
 '''
 
 CURRENT_TEMPLATES={'capacity':'waitestapp/waitapp_capacity.html', 
@@ -210,6 +210,7 @@ def waitapp_utilization(request):#get doctors in list
         nums=np.array(request.session['nums']) 
         freqs=np.array(request.session['freqs'] )
         durs=np.array(request.session['durs'] )
+        urgents=np.array(request.session['urgents'] )
         shared_categories = request.session['shared_categories'] 
         phys_mins=ast.literal_eval(request.session['phys_mins']) 
         non_phys_mins=ast.literal_eval(request.session['non_phys_mins'])
@@ -220,7 +221,7 @@ def waitapp_utilization(request):#get doctors in list
         #run simulation 
         print("simulating")
         
-        K=waitsimulator.mat_sim(cut_off=0, carve_out=False,  days=500, freqs=freqs, durs=durs,  nums=nums, num_classes=len(durs), nurse_dict={}, phys_mins=phys_mins, non_phys_mins={}, doc_lookup=doc_lookup, shared_categories=shared_categories)
+        K=waitsimulator.mat_sim(urgents=urgents, cut_off=0, carve_out=True,  days=500, freqs=freqs, durs=durs,  nums=nums, num_classes=len(durs), nurse_dict={}, phys_mins=phys_mins, non_phys_mins={}, doc_lookup=doc_lookup, shared_categories=shared_categories)
         print("storing...")
         #get matrix of days waited vs patient demand class
         request.session['wait_mat']  = K[0].tolist()
@@ -252,9 +253,9 @@ def waitapp_utilization(request):#get doctors in list
                     phys_mins[i] = 347 #expected from 40hrs a week 52 weeks a year
             else:
                 try:
-                    non_phys_mins[i]=60*float(row['Hours Per Day'])*(float(row['Days Per Year']))/360
+                    non_phys_mins[i]=.7*60*float(row['Hours Per Day'])*(float(row['Days Per Year']))/360
                 except ValueError:
-                    non_phys_mins[i] = 347
+                    non_phys_mins[i] = 347*.7
                 prov_to_num[row['Provider Name']] = i        
                 num_to_prov[i] = row['Provider Name']
         
@@ -318,6 +319,7 @@ def waitapp_utilization(request):#get doctors in list
         nums = []
         freqs = []
         durs = []
+        urgents = []
         doc_lookup = []
         ind = 0 # start increment counter
         phys_demand = {} #dictionary of demand per physician
@@ -334,9 +336,44 @@ def waitapp_utilization(request):#get doctors in list
             prev_demand = 0
             chronic_demand = 0
             doc = phys_to_num[docname]
-           
-            #get full distribution of patient types on panel
+            problem_pat =['1,1,2',
+            '1,2,1',
+            '1,1,3',
+            '1,3,3',
+            '1,2,3',
+            '1,2,2',
+            '2,2,1',
+            '2,1,2',
+            '2,1,3',
+            '2,2,3']
+            
+            noprob_pat = ['2,5,3',
+             '2,3,1',
+             '2,2,0',
+             '2,5,1',
+             '1,3,1',
+             '1,4,3',
+             '1,2,0',
+             '1,4,2',
+             '1,6,3',
+             '1,5,3']
+            #generate panel accordin to male female ratio and namcs proportions
             panel_dict = Counter(np.random.choice(initial_data.full_cats_str, int(panel),adjust_ratios(full_p = initial_data.full_p, full_cats=initial_data.full_cats, sex=genarray, age=agearray,chronic=condarray, ageF=agearrayF,chronicF=condarrayF)))
+            #uneven the distributions            
+            if docname == 'Doctor 1':
+                for prob, noprob in zip(problem_pat, noprob_pat):
+                    transf = min(40, panel_dict[noprob])
+                    panel_dict[noprob] -= transf
+                    panel_dict[prob] += transf
+               
+            if docname == 'Doctor 3':
+                 for prob, noprob in zip(problem_pat, noprob_pat):
+                    transf = min(10, panel_dict[noprob])
+                    panel_dict[noprob] -= transf
+                    panel_dict[prob] += transf
+               
+            #get full distribution of patient types on panel
+            ##panel_dict = Counter(np.random.choice(initial_data.full_cats_str, int(panel),adjust_ratios(full_p = initial_data.full_p, full_cats=initial_data.full_cats, sex=genarray, age=agearray,chronic=condarray, ageF=agearrayF,chronicF=condarrayF)))
             #generate import simulation data
             for patient_category in panel_dict:
                 #ACUTE            
@@ -354,7 +391,8 @@ def waitapp_utilization(request):#get doctors in list
                 except KeyError:
                     dur = 0
                 freqs.append(freq)
-                durs.append(dur)      
+                durs.append(dur)  
+                urgents.append(1)
                 #add to acute demand
                 acute_demand += int(panel_dict[patient_category])*freq*360*dur*(1/60)
                 doc_lookup.append(int(doc))            
@@ -374,6 +412,7 @@ def waitapp_utilization(request):#get doctors in list
                     dur = 0
                 freqs.append(freq)
                 durs.append(dur) 
+                urgents.append(0)
                 #add to prev demand
                 prev_demand += int(panel_dict[patient_category])*freq*360*dur*(1/60)
                 doc_lookup.append(int(doc))
@@ -393,6 +432,7 @@ def waitapp_utilization(request):#get doctors in list
                     dur = 0
                 freqs.append(freq)
                 durs.append(dur)   
+                urgents.append(0)
                 #add to acute demand
                 chronic_demand += int(panel_dict[patient_category])*freq*360*dur*(1/60)
                 doc_lookup.append(int(doc))
@@ -405,6 +445,7 @@ def waitapp_utilization(request):#get doctors in list
         #save nums, freqs, durs,  category_full_to_ind, shared_categories, phys_mins
         print(1)
         request.session['nums'] = nums
+        request.session['urgents'] = urgents
         print(2)
         request.session['freqs'] = freqs
         print(3)
@@ -564,26 +605,49 @@ def scenario_1(request):
     doc_lookup = request.session['doc_lookup']
     if request.method == 'POST':    
         import json               
+        #reset to original numbers
+        if  request.POST['type'] ==  'reset':  
+            s_nums = request.session['nums'].copy()
+            request.session['s_nums'] = s_nums
+            data = {'status' : 'ok'} #respond to page
+            return HttpResponse(json.dumps(data), content_type='application/json')
+        
         #change overall expected wait
         if  request.POST['type'] ==  'reassign':
-           
-            age = int(request.POST.get('age'))
+            #get data (i.e. requested patient categories) from post
+            if request.POST.get('age') == 'all':
+                age = [1,2,3,4,5,6]
+            else:
+                age = [int(request.POST.get('age'))]
             chron = request.POST['chron']
-            chron=int(chron[0]) 
-            gender = request.POST['gender']            
-            gender = gender_bracket(gender)
+            if chron.lower() == 'all':
+                chron = [0,1,2,3]
+            else:
+                chron=[int(chron[0])]
+            gender = request.POST['gender']    
+            if gender.lower() == 'all':
+                gender = [1,2]
+            else:
+                gender = [gender_bracket(gender)]
             number = int(request.POST['number'])
             fromdoc = phys_to_num[request.POST['from']]
             todoc = phys_to_num[request.POST['to']]
+            #categories for transfer
+            categories = list(product(gender,age,chron))
+            print(categories)
+            print(s_nums)
             for i in range(1,4): #for each visit type
-                indfrom = category_full_to_ind[(gender, age, chron, i, fromdoc)] #get categories index of doctor losing patients
-                indto = category_full_to_ind[(gender, age, chron, i, todoc)] ##category from doc gaining patients
-                transfer=min(s_nums[indfrom],number) #number in category can be at min zero
-                #increment and decrement appropriate categories
-                s_nums[indfrom] = s_nums[indfrom] - transfer
-                s_nums[indto] = s_nums[indto] + transfer
+                tot_trans = 0
+                for category in categories:
+                    indfrom = category_full_to_ind[(category[0], category[1], category[2], i, fromdoc)] #get categories index of doctor losing patients
+                    indto = category_full_to_ind[(category[0], category[1], category[2], i, todoc)] ##category from doc gaining patients
+                    transfer=min(s_nums[indfrom],number) #number in category can be at min zero
+                    #increment and decrement appropriate categories
+                    s_nums[indfrom] = s_nums[indfrom] - transfer
+                    s_nums[indto] = s_nums[indto] + transfer
+                    tot_trans += transfer
             request.session['s_nums'] = s_nums #save in session variable
-            response = "%s patients reassigned" % transfer
+            response = "%s patients reassigned" % tot_trans
             data = {'num' : response} #respond to page
             return HttpResponse(json.dumps(data), content_type='application/json')
         #change wait for individual row or query
@@ -627,6 +691,7 @@ def scenario_1(request):
             s_nums=np.array(request.session['s_nums']) #new numbers
             freqs=np.array(request.session['freqs'] )
             durs=np.array(request.session['durs'] )
+            urgents=np.array(request.session['urgents'] )
             ##shared_categories = request.session['shared_categories'] 
             phys_mins=ast.literal_eval(request.session['phys_mins']) 
             ##non_phys_mins=ast.literal_eval(request.session['non_phys_mins'])
@@ -637,7 +702,7 @@ def scenario_1(request):
             #run simulation 
             print("simulating")
             
-            K=waitsimulator.mat_sim(cut_off=10, carve_out=False,  days=500, freqs=freqs, durs=durs,  nums=s_nums, num_classes=len(durs), nurse_dict={}, phys_mins=phys_mins, non_phys_mins={}, doc_lookup=doc_lookup, shared_categories=[])
+            K=waitsimulator.mat_sim(urgents=urgents, cut_off=10, carve_out=True,  days=500, freqs=freqs, durs=durs,  nums=s_nums, num_classes=len(durs), nurse_dict={}, phys_mins=phys_mins, non_phys_mins={}, doc_lookup=doc_lookup, shared_categories=[])
             print("storing...")
             #get matrix of days waited vs patient demand class
             request.session['s1_wait_mat']  = K[0].tolist()
@@ -780,6 +845,7 @@ def scenario_2(request):
             s_nums=np.array(request.session['s_nums']) #new numbers
             freqs=np.array(request.session['freqs'] )
             durs=np.array(request.session['durs'] )
+            urgents=np.array(request.session['urgents'] )
             ##shared_categories = request.session['shared_categories'] 
             phys_mins=ast.literal_eval(request.session['phys_mins']) 
             try:
@@ -799,7 +865,7 @@ def scenario_2(request):
             #run simulation 
             print("simulating")
             
-            K=waitsimulator.mat_sim(cut_off=0, carve_out=False,  days=500, freqs=freqs, durs=durs,  nums=nums, num_classes=len(durs), nurse_dict=[], phys_mins=phys_mins, non_phys_mins=non_phys_mins, doc_lookup=doc_lookup, shared_categories=[])
+            K=waitsimulator.mat_sim(urgents=urgents, cut_off=0, carve_out=True,  days=500, freqs=freqs, durs=durs,  nums=nums, num_classes=len(durs), nurse_dict=[], phys_mins=phys_mins, non_phys_mins=non_phys_mins, doc_lookup=doc_lookup, shared_categories=[])
             print("storing...")
             #get matrix of days waited vs patient demand class
             request.session['s2_wait_mat']  = K[0].tolist()
@@ -957,6 +1023,7 @@ def scenario_3(request):
             s_nums=np.array(request.session['s_nums']) #new numbers
             freqs=np.array(request.session['freqs'] )
             durs=np.array(request.session['durs'] )
+            urgents=np.array(request.session['urgents'] )
             ##shared_categories = request.session['shared_categories'] 
             phys_mins=ast.literal_eval(request.session['phys_mins']) 
             ##non_phys_mins=ast.literal_eval(request.session['non_phys_mins'])
@@ -967,7 +1034,7 @@ def scenario_3(request):
             #run simulation 
             print("simulating")
             
-            K=waitsimulator.mat_sim(cut_off=0, carve_out=False,  days=500, freqs=freqs, durs=durs,  nums=nums, num_classes=len(durs), nurse_dict={}, phys_mins=phys_mins, non_phys_mins={}, doc_lookup=doc_lookup, shared_categories=shared_categories)
+            K=waitsimulator.mat_sim(urgents, cut_off=0, carve_out=True,  days=500, freqs=freqs, durs=durs,  nums=nums, num_classes=len(durs), nurse_dict={}, phys_mins=phys_mins, non_phys_mins={}, doc_lookup=doc_lookup, shared_categories=shared_categories)
             print("storing...")
             #get matrix of days waited vs patient demand class
             request.session['s3_wait_mat']  = K[0].tolist()
@@ -1130,6 +1197,7 @@ def scenario_4(request):
             s_nums=np.array(request.session['s_nums']) #new numbers
             freqs=np.array(request.session['freqs'] )
             durs=np.array(request.session['durs'] )
+            urgents=np.array(request.session['urgents'] )
             ##shared_categories = request.session['shared_categories'] 
             phys_mins=ast.literal_eval(request.session['phys_mins']) 
             non_phys_mins=ast.literal_eval(request.session['non_phys_mins'])
@@ -1142,7 +1210,7 @@ def scenario_4(request):
             #run simulation 
             print("simulating")
             
-            K=waitsimulator.mat_sim(cut_off=0, carve_out=False,  days=500, freqs=freqs, durs=durs,  nums=nums, num_classes=len(durs), nurse_dict=nurse_dict, phys_mins=phys_mins, non_phys_mins=non_phys_mins, doc_lookup=doc_lookup, shared_categories=[])
+            K=waitsimulator.mat_sim(urgents=urgents, cut_off=0, carve_out=True,  days=500, freqs=freqs, durs=durs,  nums=nums, num_classes=len(durs), nurse_dict=nurse_dict, phys_mins=phys_mins, non_phys_mins=non_phys_mins, doc_lookup=doc_lookup, shared_categories=[])
             print("storing...")
             #get matrix of days waited vs patient demand class
             request.session['s4_wait_mat']  = K[0].tolist()
@@ -1293,6 +1361,7 @@ def scenario_utilization(request):
         nums=np.array(request.session['s_nums']) 
         freqs=np.array(request.session['s_freqs'] )
         durs=np.array(request.session['s_durs'] )
+        urgents=np.array(request.session['urgents'] )
         shared_categories = request.session['s_shared_categories'] 
         phys_mins=ast.literal_eval(request.session['s_phys_mins'])
         non_phys_mins=ast.literal_eval(request.session['s_non_phys_mins'])
@@ -1304,7 +1373,7 @@ def scenario_utilization(request):
         #run simulation 
         print("simulating")
         
-        K=waitsimulator.mat_sim(cut_off=0, carve_out=False,  days=500, freqs=freqs, durs=durs,  nums=nums, num_classes=len(durs), nurse_dict=nurse_dict, phys_mins=phys_mins, non_phys_mins=non_phys_mins, doc_lookup=doc_lookup, shared_categories=shared_categories)
+        K=waitsimulator.mat_sim(urgents=urgents, cut_off=0, carve_out=True,  days=500, freqs=freqs, durs=durs,  nums=nums, num_classes=len(durs), nurse_dict=nurse_dict, phys_mins=phys_mins, non_phys_mins=non_phys_mins, doc_lookup=doc_lookup, shared_categories=shared_categories)
         print("storing...")
         #get matrix of days waited vs patient demand class
         request.session['s_wait_mat']  = K[0].tolist()
@@ -1757,7 +1826,11 @@ def exp_percentile( matrix, percentile):
         dist=matrix
     ##print(dist)
     exp=sum(dist*np.array(range(0,500)))/sum(dist)
-    percentile=int(round(np.percentile(np.repeat(np.array(range(0,500)),dist), percentile)))
+    ##percentile=int(round(np.percentile(np.repeat(np.array(range(0,500)),dist), percentile)))
+    #each patient coded by their waitime
+    coded_patients = np.repeat(np.array(range(0,500)),dist)
+    #get percent of patients who waited less than specified number of days
+    percentile = str(round(100*(coded_patients < percentile).sum()/coded_patients.size))[:-2] + "%"
     #CHECK HERE 
     try:
         exp=int(exp)
