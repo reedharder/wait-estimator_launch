@@ -740,6 +740,7 @@ def scenario_2(request):
     import ast
     #import numpy as np 
     np.random.seed(42)
+    del request.session['s_nums']
     import json 
     waited = np.array(request.session['wait_mat'])
     ##waited = np.array(request.session['s_wait_mat'])
@@ -911,6 +912,7 @@ def scenario_2(request):
 def scenario_3(request):
     import ast
     #import numpy as np 
+    del request.session['s_nums']
     np.random.seed(42)
     from itertools import product
     waited = np.array(request.session['wait_mat'])
@@ -1085,7 +1087,7 @@ def scenario_4(request):
     ##waited = np.array(request.session['s_wait_mat'])
     ##print("...waited")
     ##print(waited)
-    ##category_full_to_ind =  ast.literal_eval(request.session['category_full_to_ind'])
+    category_full_to_ind =  ast.literal_eval(request.session['category_full_to_ind'])
     nums =request.session['nums']
     phys_to_num=request.session['phys_to_num'] 
     try:
@@ -1138,7 +1140,7 @@ def scenario_4(request):
             #load and processes continuity rules
             table = ast.literal_eval(request.POST['id_table'])
             request.session['s_del_table'] = table
-           
+            s_nums=np.array(request.session['s_nums']) #new numbers
             doc =request.POST['doc']
                 #generate list of shared categories
             #share everything if default 
@@ -1177,26 +1179,40 @@ def scenario_4(request):
                     else:
                         rule_categories[4]=phys_to_num.values() 
                     
-                    rule = line['Delegation'] # name of non physisian provider
+                    rule = line['Delegation'] # name of delegated provider
                     # list of category integer indices for which the current rule applies
-                   
-                    categories_affected=[categ for categ in product(rule_categories[0], rule_categories[1], rule_categories[2], rule_categories[3], rule_categories[4])]
                     
-                    #add nurse to approriate patient
-                    for category in categories_affected:
-                        if category in nurse_dict: 
-                            nurse_dict[category] += [prov_to_num[rule]]
-                        else:
-                            nurse_dict[category] = [prov_to_num[rule]]
-                #save to session          
-                request.session['s_nurse_dict'] =str(nurse_dict) #add to session
+                    categories_affected=[categ for categ in product(rule_categories[0], rule_categories[1], rule_categories[2], rule_categories[3], rule_categories[4])]
+                    #if provider is a physician, temporarily reassign patient                    
+                    if rule in phys_to_num.keys():
+                        
+                     #for each visit type, transfer all patients                            
+                        for category in categories_affected:
+                            indfrom = category_full_to_ind[(category[0], category[1], category[2], category[3], category[4])] #get categories index of doctor losing patients
+                            indto = category_full_to_ind[(category[0], category[1], category[2], category[3], phys_to_num[rule])] ##category from doc gaining patients
+                            
+                            #increment and decrement appropriate categories 
+                            s_nums[indto] = s_nums[indto] + s_nums[indfrom]
+                            s_nums[indfrom] =  0 
+                           
+                            
+                        request.session['s_nums'] = s_nums
+                    else: # if non_physician
+                        #add nurse to approriate patient
+                        for category in categories_affected:
+                            if category in nurse_dict: 
+                                nurse_dict[category] += [prov_to_num[rule]]
+                            else:
+                                nurse_dict[category] = [prov_to_num[rule]]
+                        #save to session          
+                        request.session['s_nurse_dict'] =str(nurse_dict) #add to session
             else:
                 request.session['s_nurse_dict'] =str({})
              #run simulator
             print("importing")
             from  waitestapp import waitsimulator
             print("preparing")
-            s_nums=np.array(request.session['s_nums']) #new numbers
+           
             freqs=np.array(request.session['freqs'] )
             durs=np.array(request.session['durs'] )
             urgents=np.array(request.session['urgents'] )
