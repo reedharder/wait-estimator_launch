@@ -1183,7 +1183,7 @@ def scenario_4(request):
                     
                     rule = line['Delegation'] # name of delegated provider
                     # list of category integer indices for which the current rule applies
-                    
+                    print("del %s" % rule)
                     categories_affected=[categ for categ in product(rule_categories[0], rule_categories[1], rule_categories[2], rule_categories[3], rule_categories[4])]
                     #if provider is a physician, temporarily reassign patient                    
                     if rule in phys_to_num.keys():
@@ -1230,7 +1230,7 @@ def scenario_4(request):
             #run simulation 
             print("simulating")
             
-            K=waitsimulator.mat_sim(urgents=urgents, cut_off=0, carve_out=True,  days=500, freqs=freqs, durs=durs,  nums=nums, num_classes=len(durs), nurse_dict=nurse_dict, phys_mins=phys_mins, non_phys_mins=non_phys_mins, doc_lookup=doc_lookup, shared_categories=[])
+            K=waitsimulator.mat_sim(urgents=urgents, cut_off=0, carve_out=True,  days=500, freqs=freqs, durs=durs,  nums=s_nums, num_classes=len(durs), nurse_dict=nurse_dict, phys_mins=phys_mins, non_phys_mins=non_phys_mins, doc_lookup=doc_lookup, shared_categories=[])
             print("storing...")
             #get matrix of days waited vs patient demand class
             request.session['s4_wait_mat']  = K[0].tolist()
