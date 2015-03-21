@@ -7,7 +7,7 @@ Created on Tue Nov 11 20:16:02 2014
 
 
 import numpy as np
-
+np.random.seed(42)
 
 '''
 #acute, prev, chron

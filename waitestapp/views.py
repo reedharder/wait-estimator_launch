@@ -4,6 +4,8 @@ from django.http import HttpResponse
 from  waitestapp import initial_data
 from django.views.decorators.csrf import ensure_csrf_cookie
 from itertools import product
+import numpy as np
+np.random.seed(42)
 '''
 
 CURRENT_TEMPLATES={'capacity':'waitestapp/waitapp_capacity.html', 
@@ -194,7 +196,7 @@ def waitapp_delrule(request):
 
 @ensure_csrf_cookie
 def waitapp_utilization(request):#get doctors in list
-    import numpy as np
+    
     np.random.seed(42)
     import ast
     #empty data for cont_rule and del rule screens
@@ -512,7 +514,7 @@ def waitapp_utilization(request):#get doctors in list
 @ensure_csrf_cookie    
 def waitapp_results(request):
     import ast
-    import numpy as np
+    #import numpy as np
     np.random.seed(42)
     waited = np.array(request.session['wait_mat'])
     print("...waited")
@@ -585,7 +587,7 @@ def waitapp_results(request):
 @ensure_csrf_cookie
 def scenario_1(request):
     import ast
-    import numpy as np     
+    #import numpy as np     
     np.random.seed(42)
     waited = np.array(request.session['wait_mat'])
     ##waited = np.array(request.session['s_wait_mat'])
@@ -736,7 +738,7 @@ def scenario_1(request):
 @ensure_csrf_cookie
 def scenario_2(request):
     import ast
-    import numpy as np 
+    #import numpy as np 
     np.random.seed(42)
     import json 
     waited = np.array(request.session['wait_mat'])
@@ -908,7 +910,7 @@ def scenario_2(request):
 
 def scenario_3(request):
     import ast
-    import numpy as np 
+    #import numpy as np 
     np.random.seed(42)
     from itertools import product
     waited = np.array(request.session['wait_mat'])
@@ -1076,7 +1078,7 @@ def scenario_table(request):
 @ensure_csrf_cookie
 def scenario_4(request):
     import ast
-    import numpy as np 
+    #import numpy as np 
     np.random.seed(42)
     from itertools import product
     waited = np.array(request.session['wait_mat'])
@@ -1346,7 +1348,7 @@ def scenario_delrule(request):
     
 @ensure_csrf_cookie
 def scenario_utilization(request):
-    import numpy as np
+    #import numpy as np
     np.random.seed(42)
     import ast
     request.session['s_cont_table'] = []
@@ -1695,7 +1697,7 @@ def scenario_utilization(request):
 @ensure_csrf_cookie    
 def scenario_results(request):
     import ast
-    import numpy as np
+    #import numpy as np
     np.random.seed(42)
     old_waited = np.array(request.session['wait_mat'])
     waited = np.array(request.session['s_wait_mat'])
@@ -1817,7 +1819,7 @@ def chron_bracket(chron):
 
     
 def exp_percentile( matrix, percentile):
-    import numpy as np
+    #import numpy as np
     np.random.seed(42)
     try:
         dist=np.sum(matrix, axis=1)
@@ -1840,7 +1842,7 @@ def exp_percentile( matrix, percentile):
  
 # get overall estimate
 def overall_query( doc, waited, phys_to_num, doc_lookup, q):
-    import numpy as np
+    #import numpy as np
     np.random.seed(42)
     if not doc == 'Overall':
         #get provider integer code for doctor specified in dropdown
