@@ -222,7 +222,7 @@ def waitapp_utilization(request):#get doctors in list
         print(Counter(doc_lookup))
         #run simulation 
         print("simulating")
-        
+        np.random.seed(42)
         K=waitsimulator.mat_sim(urgents=urgents, cut_off=0, carve_out=True,  days=500, freqs=freqs, durs=durs,  nums=nums, num_classes=len(durs), nurse_dict={}, phys_mins=phys_mins, non_phys_mins={}, doc_lookup=doc_lookup, shared_categories=shared_categories)
         print("storing...")
         #get matrix of days waited vs patient demand class
@@ -360,6 +360,7 @@ def waitapp_utilization(request):#get doctors in list
              '1,6,3',
              '1,5,3']
             #generate panel accordin to male female ratio and namcs proportions
+            np.random.seed(42)
             panel_dict = Counter(np.random.choice(initial_data.full_cats_str, int(panel),adjust_ratios(full_p = initial_data.full_p, full_cats=initial_data.full_cats, sex=genarray, age=agearray,chronic=condarray, ageF=agearrayF,chronicF=condarrayF)))
             #uneven the distributions            
             if docname == 'Doctor 1':
@@ -1557,8 +1558,9 @@ def scenario_utilization(request):
              '2,2,0',
              '2,5,1',]
             #generate panel accordin to male female ratio and namcs proportions
+            np.random.seed(42)
             male_dist = Counter(np.random.choice(initial_data.male_cats, num_males, initial_data.male_p))
-            
+            np.random.seed(42)
             female_dist = Counter(np.random.choice(initial_data.female_cats, num_females, initial_data.female_p))
             #uneven the distributions            
             if panel['Physician'] == 'Doctor 1':
@@ -1961,7 +1963,7 @@ def visit_query_generator_alls(waited, docs, ages, chrons, genders, visits, q, c
 
 #function to adjust ratios
 def adjust_ratios(full_p = initial_data.full_p, full_cats=initial_data.full_cats, sex=[50,50], age=[15,15,20,20,15,15],chronic=[50,20,15,15],ageF=[15,15,20,20,15,15],chronicF=[50,20,15,15]):
-
+    np.random.seed(42)
     male_p=[]   
     female_p=[]
     for cat, p in zip(full_cats, full_p):
