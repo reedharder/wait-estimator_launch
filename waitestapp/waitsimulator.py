@@ -52,7 +52,8 @@ def mat_sim(urgents, cut_off, carve_out, days, freqs, durs,  nums, num_classes, 
     
     #get matrix of demand for each patient class (cols) each day (rows)
     np.random.seed(42)
-    demand_matrix=np.random.binomial(nums, freqs, (days, num_classes))
+    prng = np.random.RandomState(42)
+    demand_matrix=prng.binomial(nums, freqs, (days, num_classes))
     #get daily demands
     ##daily_demands=np.sum(demand_matrix, axis=1)
     #initialize daily supplies

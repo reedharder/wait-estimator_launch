@@ -361,7 +361,8 @@ def waitapp_utilization(request):#get doctors in list
              '1,5,3']
             #generate panel accordin to male female ratio and namcs proportions
             np.random.seed(42)
-            panel_dict = Counter(np.random.choice(initial_data.full_cats_str, int(panel),adjust_ratios(full_p = initial_data.full_p, full_cats=initial_data.full_cats, sex=genarray, age=agearray,chronic=condarray, ageF=agearrayF,chronicF=condarrayF)))
+            prng = np.random.RandomState(42)
+            panel_dict = Counter(prng.choice(initial_data.full_cats_str, int(panel),adjust_ratios(full_p = initial_data.full_p, full_cats=initial_data.full_cats, sex=genarray, age=agearray,chronic=condarray, ageF=agearrayF,chronicF=condarrayF)))
             #uneven the distributions            
             if docname == 'Doctor 1':
                 for prob, noprob in zip(problem_pat, noprob_pat):
