@@ -56,7 +56,7 @@ def mat_sim(urgents, cut_off, carve_out, days, freqs, durs,  nums, num_classes, 
     ##print(prng.get_state())
     demand_matrix=prng.binomial(nums, freqs, (days, num_classes))
     
-    np.savetxt("C:/users/reed/desktop/demand1.txt",demand_matrix)
+    ##np.savetxt("C:/users/reed/desktop/demand1.txt",demand_matrix)
     #get daily demands
     ##daily_demands=np.sum(demand_matrix, axis=1)
     #initialize daily supplies
