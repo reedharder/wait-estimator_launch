@@ -1134,6 +1134,7 @@ def scenario_4(request):
             #get capacity 
             capacity_info=ast.literal_eval(request.session['phys_capacity'])[doc]
             capacity = capacity_info
+            
             data = data = {'dem':round(new_demand), 'olddem':round(old_demand), 'demc': round(new_demand-old_demand),'wait':exp,'waitc': (exp-exp_old), 'cap':round(capacity) }
             return HttpResponse(json.dumps(data), content_type='application/json')
         # recalculate with new nums and cont rules
@@ -1153,7 +1154,7 @@ def scenario_4(request):
             
             #Parse delegation rules
             nurse_dict={} #dictionary, keys: patients values: list of nurses that can provide for them
-            if request.session['cont_table'] and request.session['cont_table'][0]["Rule"][:1] != "":
+            if request.session['s_del_table'] and request.session['s_del_table'][0]["Rule"][:1] != "":
                 for line in request.session['s_del_table']:
                     rule_dict={}
                     rule_categories=[[],[],[],[],[]]
@@ -1185,6 +1186,7 @@ def scenario_4(request):
                     # list of category integer indices for which the current rule applies
                     print("del %s" % rule)
                     categories_affected=[categ for categ in product(rule_categories[0], rule_categories[1], rule_categories[2], rule_categories[3], rule_categories[4])]
+                    print("cat %s" % categories_affected)                    
                     #if provider is a physician, temporarily reassign patient                    
                     if rule in phys_to_num.keys():
                         
@@ -1195,18 +1197,20 @@ def scenario_4(request):
                             
                             #increment and decrement appropriate categories 
                             s_nums[indto] = s_nums[indto] + s_nums[indfrom]
+                            print('transf %s' % s_nums[indfrom])
                             s_nums[indfrom] =  0 
                            
                             
-                        request.session['s_nums'] = s_nums
+                        request.session['s_nums'] = s_nums.tolist()
                     else: # if non_physician
                         #add nurse to approriate patient
                         for category in categories_affected:
                             if category in nurse_dict: 
-                                nurse_dict[category] += [prov_to_num[rule]]
+                                nurse_dict[category_full_to_ind[category]] += [prov_to_num[rule]]
                             else:
-                                nurse_dict[category] = [prov_to_num[rule]]
+                                nurse_dict[category_full_to_ind[category]] = [prov_to_num[rule]]
                         #save to session          
+                        print("nurse_Dct %s" % nurse_dict)
                         request.session['s_nurse_dict'] =str(nurse_dict) #add to session
             else:
                 request.session['s_nurse_dict'] =str({})
@@ -1237,8 +1241,8 @@ def scenario_4(request):
             
             
             #get wait for doctor, as well as change in wait
-            exp, p = overall_query( doc, waited, phys_to_num, doc_lookup , 100)
-            exp_old, p = overall_query( doc, K[0], phys_to_num, doc_lookup, 100)
+            exp, p = overall_query( doc, K[0], phys_to_num, doc_lookup , 100)
+            exp_old, p = overall_query( doc, waited, phys_to_num, doc_lookup, 100)
            
             #get old and new demand
             old_demand=0

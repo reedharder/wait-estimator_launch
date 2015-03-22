@@ -53,7 +53,10 @@ def mat_sim(urgents, cut_off, carve_out, days, freqs, durs,  nums, num_classes, 
     #get matrix of demand for each patient class (cols) each day (rows)
     np.random.seed(42)
     prng = np.random.RandomState(42)
+    ##print(prng.get_state())
     demand_matrix=prng.binomial(nums, freqs, (days, num_classes))
+    
+    np.savetxt("C:/users/reed/desktop/demand1.txt",demand_matrix)
     #get daily demands
     ##daily_demands=np.sum(demand_matrix, axis=1)
     #initialize daily supplies
@@ -73,6 +76,9 @@ def mat_sim(urgents, cut_off, carve_out, days, freqs, durs,  nums, num_classes, 
         #if delegation is possible, make copy of nurse capacity for calculations   
         if nurse_dict:
             curr_nurse_mins=non_phys_mins.copy()
+            ##print("nurse")
+            ##print(nurse_dict)
+            ##print(curr_nurse_mins)
         
         #if using carve outs, set aside time for the day by initializing carve out slots
         if carve_out:
@@ -123,7 +129,7 @@ def mat_sim(urgents, cut_off, carve_out, days, freqs, durs,  nums, num_classes, 
                 ##print("lines %s doc %s mins %s" % (doc_lines[relevant_doc],relevant_doc,phys_mins[relevant_doc] ))
                 ##print("WAIT TIME %s" % wait_time)
                 #if patient cant be seen by doctor that day and can be delegated to nurse, and a relevant nurse has time, do so
-                if wait_time > 0 and (patient in nurse_dict) and any([min(curr_nurse_mins[nurse]-curr_dur, 0) for nurse in nurse_dict[patient]]):
+                if wait_time > 0 and (patient in nurse_dict) and any([max(curr_nurse_mins[nurse]-curr_dur, 0) for nurse in nurse_dict[patient]]):
                     # get available times of relevant nurses 
                     pat_nurse_dict={k:v for k,v in curr_nurse_mins.items() if k in nurse_dict[patient]}                    
                     #get relevant nurse with most time available
@@ -135,6 +141,7 @@ def mat_sim(urgents, cut_off, carve_out, days, freqs, durs,  nums, num_classes, 
                     daily_supplys[ind]+=1 #increment number served today
                     #remove patient time from main queue
                     doc_lines[relevant_doc]=doc_lines[relevant_doc] - curr_dur
+                    ##print("curr dur %s" % curr_dur)
                 else:
                     #add patient to days waited list 
                     if ind >= cut_off:

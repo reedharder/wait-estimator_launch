@@ -397,12 +397,12 @@ $('#addDelRule').click(function () {
 	
 //delete selected rows button
 $('#remove-data').click(function () {
-	var selects = $('#contRuleTable').bootstrapTable('getSelections');
+	var selects = $('#delRuleTable').bootstrapTable('getSelections');
 		states = $.map(selects, function (row) {
 			return row.state;
 		});
 
-	$('#contRuleTable').bootstrapTable('remove', {
+	$('#delRuleTable').bootstrapTable('remove', {
 		field: 'state',
 		values: states
 	});
