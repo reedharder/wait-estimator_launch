@@ -4,7 +4,10 @@ from django.http import HttpResponse
 from  waitestapp import initial_data
 from django.views.decorators.csrf import ensure_csrf_cookie
 from itertools import product
+import time
+from waitestapp.models import CapacitySave, ProfileSave
 import numpy as np
+##from models import cap_data, prof_data
 np.random.seed(42)
 '''
 
@@ -92,7 +95,7 @@ def home_view(request):
 
 @ensure_csrf_cookie
 def waitapp_capacity(request):
-    if request.method == 'POST':
+    if request.method == 'POST' and request.POST['type'] =='page':
         import ast
         table = ast.literal_eval(request.POST['id_table'])
         print(table)
@@ -102,6 +105,13 @@ def waitapp_capacity(request):
         request.session['phys_list'] = phys_list
         request.session['nonphys_list'] = nonphys_list
         request.session['capacity_table'] = table
+        
+        return HttpResponse('ok')
+    elif request.method == 'POST' and request.POST['type'] =='save':        
+        table = request.POST['id_table']
+        newcapsave = CapacitySave(table=table, savetime=str(time.time()))
+        newcapsave.save()       
+        #get lists of physicians, non physicians   
         
         return HttpResponse('ok')
     try: 
@@ -115,10 +125,18 @@ def waitapp_capacity(request):
     
 @ensure_csrf_cookie
 def waitapp_prof(request):
-    if request.method == 'POST':
+    if request.method == 'POST' and request.POST['type'] =='page':
         import ast
         table = ast.literal_eval(request.POST['datatable'])
         request.session['proftable'] = table
+    elif request.method == 'POST' and request.POST['type'] =='save':        
+        table = request.POST['datatable']
+        newprofsave = ProfileSave(table=table, savetime=str(time.time()))
+        newprofsave.save()       
+        #get lists of physicians, non physicians   
+        
+        return HttpResponse('ok')
+        
    
     return render(request, 'waitestapp/waitapp_profile.html',{'phys_list':request.session['phys_list']})
     
@@ -375,7 +393,22 @@ def waitapp_utilization(request):#get doctors in list
                     transf = min(10, panel_dict[noprob])
                     panel_dict[noprob] -= transf
                     panel_dict[prob] += transf
-               
+            
+            
+            '''
+            docnum = docname.split()[1]
+            with open('C:/Users/Reed/Desktop/doc%spanel.txt' % docnum,'w') as outfile:
+                outfile.write('\t'.join(['Gender','Agegroup','Conditions','Num Patients']) + '\n')
+                for cat, num in panel_dict.items():
+                    catsplit = cat.split(",")
+                    if catsplit[0] == '1':
+                        catsplit[0] = 'F'
+                    else:
+                        catsplit[0] = 'M'
+                    catsplit=catsplit + [str(num)]
+                    outfile.write('\t'.join(catsplit)  + '\n')
+            '''    
+            
             #get full distribution of patient types on panel
             ##panel_dict = Counter(np.random.choice(initial_data.full_cats_str, int(panel),adjust_ratios(full_p = initial_data.full_p, full_cats=initial_data.full_cats, sex=genarray, age=agearray,chronic=condarray, ageF=agearrayF,chronicF=condarrayF)))
             #generate import simulation data

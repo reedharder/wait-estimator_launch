@@ -123,6 +123,8 @@
 						Clear Selected Rows
 				</button>
 			</div>
+			<br>
+			<button id="save" type="button" class="btn btn-primary" style="display:inline; ">Save Data</button>
 		</div>
 	</div>
 </div>
@@ -234,10 +236,27 @@ $('.submitCatch').click(function(e) {
 	$.ajax({      
 	  url: "?",
 	  type: "POST",
-      data : {'id_table': table},       
+      data : {'id_table': table, 'type':'page'},       
       success: function() {
 	   //alert("data recieved!");
        $( "#nextPage" )[0].click();   
+      }
+    });
+});
+
+$('#save').click(function(e) {
+	//get table data
+	var table = $('#provTable').tableToJSON({ ignoreColumns: [0], ignoreHiddenRows: false });
+	table  = JSON.stringify(table);
+	//alert(table);
+	//stick stringified JSON of table into hidden form and submit	
+	$.ajax({      
+	  url: "?",
+	  type: "POST",
+      data : {'id_table': table, 'type':'save'},       
+      success: function() {
+	   //alert("data recieved!");
+       alert("Data Saved!");   
       }
     });
 });

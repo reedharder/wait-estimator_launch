@@ -38,6 +38,9 @@ input[type=text]
 			{% for phys in phys_list %}
 			<div class="panel">
 				<label>{{phys}} &nbsp;&nbsp;&nbsp;&nbsp;</label> Panel Size: <input type="text" class="panelsize" placeholder="Enter Panel Size" value="{% if phys == "Doctor 1" %}1800{% elif phys == "Doctor 2" %}1800{% elif phys == "Doctor 3" %}1800{% else %}1800{% endif %}" />
+				<br><br>
+				<span><b>Panel breakdown by percentage:</b></span>
+				<br>
 				<table>
 					<tr>
 						<td></td>
@@ -61,8 +64,8 @@ input[type=text]
 					</tr>
 					<tr>
 						<td></td>
-						<td>0-15</td>
-						<td>16-24</td>
+						<td>0-14</td>
+						<td>15-24</td>
 						<td>25-44</td>
 						<td>45-64</td>
 						<td>65-74</td>
@@ -146,6 +149,8 @@ input[type=text]
 			
 		</div>    
 		</div>
+		<br>
+		<button id="save" type="button" class="btn btn-primary" style="display:inline; ">Save Data</button>
 
 
 	<br>
@@ -278,7 +283,7 @@ $('.submitPrev').click(function(e) {
 		});
 	
 	datatable=JSON.stringify(datatable);
-	alert(datatable);
+	//alert(datatable);
 	
 	//var table = $('#panelTable').tableToJSON({ ignoreColumns: [0], ignoreHiddenRows: false });
 	//table  = JSON.stringify(table);
@@ -290,7 +295,7 @@ $('.submitPrev').click(function(e) {
 	$.ajax({      
 	  url: "?",
 	  type: "POST",
-      data : {'datatable':datatable },       
+      data : {'datatable':datatable, 'type':'page' },       
       success: function() {
 	   //alert("data recieved!");
        $( "#prevPage" )[0].click();   
@@ -344,7 +349,7 @@ $('.submitCatch').click(function(e) {
 	$.ajax({      
 	  url: "?",
 	  type: "POST",
-      data : {'datatable':datatable },       
+      data : {'datatable':datatable, 'type':'page'},       
       success: function() {
 	   //alert("data recieved!");
        $( "#nextPage" )[0].click();   
@@ -352,8 +357,57 @@ $('.submitCatch').click(function(e) {
     });
 });
 
-
+$('#save').click(function(e) {
+	//get table data
+		var datatable = [];
+	$('.panel').each(function() {
+		
+		var panelsize = $(this).find('.panelsize').val() //get panelsize
+		var gender = []
+		if (!($(this).find(".genbox").is(":checked"))) {			
+			$(this).find('.gender').each(function() {				
+				gender.push($(this).val()) });
+				}
+		var age = []
+		if (!($(this).find(".agebox").is(":checked"))) {
+			$(this).find('.age').each(function() {
+				age.push($(this).val()) });
+				}
+		var chron = []
+		if (!($(this).find(".chronbox").is(":checked"))) {
+			$(this).find('.chron').each(function() {
+				chron.push($(this).val()) });
+				}
+		
+		var ageF = []
+		if (!($(this).find(".ageboxF").is(":checked"))) {
+			$(this).find('.ageF').each(function() {
+				age.push($(this).val()) });
+				}
+		var chronF = []
+		if (!($(this).find(".chronboxF").is(":checked"))) {
+			$(this).find('.chronF').each(function() {
+				chron.push($(this).val()) });
+				}
+		
+		var panel = [panelsize, gender, age, chron, ageF, chronF]
+		datatable.push(panel)
+		});
 	
+	datatable=JSON.stringify(datatable);
+	//alert(datatable);
+	//alert(table);
+	//stick stringified JSON of table into hidden form and submit	
+	$.ajax({      
+	  url: "?",
+	  type: "POST",
+      data : {'datatable':datatable, 'type':'save'},       
+      success: function() {
+	   //alert("data recieved!");
+       alert("Data Saved!");   
+      }
+    });
+});
 
 
 </script>
