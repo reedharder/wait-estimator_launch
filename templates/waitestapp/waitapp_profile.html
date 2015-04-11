@@ -60,7 +60,7 @@ input[type=text]
 						<td></td>
 						<td></td>
 						<td></td>
-						<td><input type="checkbox" class="genbox"  name="" checked>&nbsp;Use National Sample</td>
+						<td><input type="checkbox" class="genbox"  name="" >&nbsp;Use National Sample</td>
 					</tr>
 					<tr>
 						<td></td>
@@ -80,7 +80,7 @@ input[type=text]
 						<td><input type="text" class="age" ></td>
 						<td><input type="text" class="age" ></td>
 						<td><input type="text" class="age" ></td>
-						<td><input type="checkbox" class="agebox" name="{{forloop.counter0}}" checked>&nbsp;Use National Sample</td>
+						<td><input type="checkbox" class="agebox" name="{{forloop.counter0}}" >&nbsp;Use National Sample</td>
 					</tr>
 					<tr>
 						<td>Age Group F</td>
@@ -90,7 +90,7 @@ input[type=text]
 						<td><input type="text" class="ageF"></td>
 						<td><input type="text" class="ageF" ></td>
 						<td><input type="text" class="ageF" ></td>
-						<td><input type="checkbox" class="ageboxF" name="{{forloop.counter0}}" checked>&nbsp;Use National Sample</td>
+						<td><input type="checkbox" class="ageboxF" name="{{forloop.counter0}}" >&nbsp;Use National Sample</td>
 					</tr>
 					<tr>
 						<td></td>
@@ -110,7 +110,7 @@ input[type=text]
 						<td><input type="text" class="chron"></td>
 						<td></td>
 						<td></td>
-						<td><input type="checkbox" class="chronbox"  name="{{forloop.counter0}}" checked> &nbsp;Use National Sample</td>
+						<td><input type="checkbox" class="chronbox"  name="{{forloop.counter0}}" > &nbsp;Use National Sample</td>
 					</tr>
 					<tr>
 						<td>Conditions F</td>
@@ -120,7 +120,7 @@ input[type=text]
 						<td><input type="text" class="chronF"></td>
 						<td></td>
 						<td></td>
-						<td><input type="checkbox" class="chronboxF"  name="{{forloop.counter0}}" checked> &nbsp;Use National Sample</td>
+						<td><input type="checkbox" class="chronboxF"  name="{{forloop.counter0}}" > &nbsp;Use National Sample</td>
 					</tr>
 				</table>
 			</div>
@@ -149,6 +149,8 @@ input[type=text]
 			
 		</div>    
 		</div>
+		<button id="clear" type="button" class="btn btn-primary" style="display:inline; ">Clear Data</button>
+			<br>
 		<br>
 		<button id="save" type="button" class="btn btn-primary" style="display:inline; ">Save Data</button>
 
@@ -355,6 +357,14 @@ $('.submitCatch').click(function(e) {
        $( "#nextPage" )[0].click();   
       }
     });
+});
+
+//clear all text inputs
+$('#clear').click(function() {
+	$('input:text').each(function() {
+		$(this).val('');	
+	});
+
 });
 
 $('#save').click(function(e) {
