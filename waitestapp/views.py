@@ -268,12 +268,12 @@ def waitapp_utilization(request):#get doctors in list
                 phys_to_num[row['Provider Name']] = i        
                 num_to_phys[i] = row['Provider Name']
                 try:
-                    phys_mins[i]=60*float(row['Hours Per Day'])*(float(row['Days Per Year']))/360
+                    phys_mins[i]=60*float(row['Hours Per Week'])*(float(row['Weeks Per Year']))/360
                 except ValueError:
                     phys_mins[i] = 347 #expected from 40hrs a week 52 weeks a year
             else:
                 try:
-                    non_phys_mins[i]=.7*60*float(row['Hours Per Day'])*(float(row['Days Per Year']))/360
+                    non_phys_mins[i]=.7*60*float(row['Hours Per Week'])*(float(row['Weeks Per Year']))/360
                 except ValueError:
                     non_phys_mins[i] = 347*.7
                 prov_to_num[row['Provider Name']] = i        
@@ -522,18 +522,18 @@ def waitapp_utilization(request):#get doctors in list
         
         for record in capacity_table:
             if record['Position'] == 'Physician':
-                phys_capacity[record['Provider Name']] = int(record['Hours Per Day'])*int(record['Days Per Year'])
-                phys_demand[record['Provider Name']][4] = int(record['Hours Per Day'])*int(record['Days Per Year'])
+                phys_capacity[record['Provider Name']] = int(record['Hours Per Week'])*int(record['Weeks Per Year'])
+                phys_demand[record['Provider Name']][4] = int(record['Hours Per Week'])*int(record['Weeks Per Year'])
                 phys_demand[record['Provider Name']][5] = record['Team'] #team name
                 #imbalance
                 phys_demand[record['Provider Name']][7] = phys_demand[record['Provider Name']][4] - phys_demand[record['Provider Name']][3]
             try:
                 team_capacity[record['Team']][0] += [record['Position'] + ' ' + record['Provider Name']]
-                team_capacity[record['Team']][1] += int(record['Hours Per Day'])*int(record['Days Per Year'])
+                team_capacity[record['Team']][1] += int(record['Hours Per Week'])*int(record['Weeks Per Year'])
             except KeyError:
                 team_capacity[record['Team']] = ['','']
                 team_capacity[record['Team']][0] = [record['Position']  + ' ' + record['Provider Name']]
-                team_capacity[record['Team']][1] = int(record['Hours Per Day'])*int(record['Days Per Year'])
+                team_capacity[record['Team']][1] = int(record['Hours Per Week'])*int(record['Weeks Per Year'])
         for phys in phys_demand: # get list of team members for each physician
             if phys_demand[phys][5] =='No Team':
                  phys_demand[phys][5] = ''
@@ -1456,9 +1456,9 @@ def scenario_utilization(request):
             if row['Position'] == 'Physician': 
                 phys_to_num[row['Provider Name']] = i        
                 num_to_phys[i] = row['Provider Name']
-                phys_mins[i]=60*int(row['Hours Per Day'])*(int(row['Days Per Year']))/360
+                phys_mins[i]=60*int(row['Hours Per Week'])*(int(row['Weeks Per Year']))/360
             else:
-                non_phys_mins[i]=60*int(row['Hours Per Day'])*(int(row['Days Per Year']))/360
+                non_phys_mins[i]=60*int(row['Hours Per Week'])*(int(row['Weeks Per Year']))/360
                 prov_to_num[row['Provider Name']] = i        
                 num_to_prov[i] = row['Provider Name']
         
@@ -1727,18 +1727,18 @@ def scenario_utilization(request):
         
         for record in capacity_table:
             if record['Position'] == 'Physician':
-                phys_capacity[record['Provider Name']] = [int(record['Hours Per Day']), int(record['Days Per Year'])]
-                phys_demand[record['Provider Name']][4] = int(record['Hours Per Day'])*int(record['Days Per Year'])
+                phys_capacity[record['Provider Name']] = [int(record['Hours Per Week']), int(record['Weeks Per Year'])]
+                phys_demand[record['Provider Name']][4] = int(record['Hours Per Week'])*int(record['Weeks Per Year'])
                 phys_demand[record['Provider Name']][5] = record['Team'] #team name
                 #imbalance
                 phys_demand[record['Provider Name']][7] = phys_demand[record['Provider Name']][4] - phys_demand[record['Provider Name']][3]
             try:
                 team_capacity[record['Team']][0] += [record['Position'] + ' ' + record['Provider Name']]
-                team_capacity[record['Team']][1] += int(record['Hours Per Day'])*int(record['Days Per Year'])
+                team_capacity[record['Team']][1] += int(record['Hours Per Week'])*int(record['Weeks Per Year'])
             except KeyError:
                 team_capacity[record['Team']] = ['','']
                 team_capacity[record['Team']][0] = [record['Position']  + ' ' + record['Provider Name']]
-                team_capacity[record['Team']][1] = int(record['Hours Per Day'])*int(record['Days Per Year'])
+                team_capacity[record['Team']][1] = int(record['Hours Per Week'])*int(record['Weeks Per Year'])
         for phys in phys_demand: # get list of team members for each physician
             if phys_demand[phys][5] =='No Team':
                  phys_demand[phys][5] = ''
