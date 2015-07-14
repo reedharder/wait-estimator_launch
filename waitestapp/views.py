@@ -9,85 +9,7 @@ from waitestapp.models import CapacitySave, ProfileSave
 import numpy as np
 ##from models import cap_data, prof_data
 np.random.seed(42)
-'''
 
-CURRENT_TEMPLATES={'capacity':'waitestapp/waitapp_capacity.html', 
-                   'aff':'waitestapp/waitapp_aff.html',
-                   'attr':'waitestapp/waitapp_attr.html',
-                   'cont':'waitestapp/waitapp_contrule.html',
-                   'del':'waitestapp/waitapp_delrule.html',
-                   'ut':'waitestapp/waitapp_utilization.html',
-                   'res':'waitestapp/waitapp_utilization.html',
-                   's_capacity':'waitestapp/scenario_capacity.html', 
-                   's_aff':'waitestapp/scenario_aff.html',
-                   's_attr':'waitestapp/scenario_attr.html',
-                   's_cont':'waitestapp/scenario_contrule.html',
-                   's_del':'waitestapp/scenario_delrule.html',
-                   's_ut':'waitestapp/scenario_utilization.html',
-                   's_res':'waitestapp/scenario_utilization.html',             
-                   
-                   }
-                   ## ADD SCENARIO TABS!
-
-CURRENT_FORMS = [("capacity", waitestapp.forms.CurrCapacityForm),
-                 ("aff", waitestapp.forms.CurrAffForm),
-                 ("attr", waitestapp.forms.CurrAttForm),
-                 ("cont", waitestapp.forms.CurrContForm),
-                 ("del", waitestapp.forms.CurrDelForm),
-                 ("ut", waitestapp.forms.CurrDelForm),
-                 ("res", waitestapp.forms.CurrDelForm),
-                 ("capacity", waitestapp.forms.CurrCapacityForm),
-                 ("aff", waitestapp.forms.CurrAffForm),
-                 ("attr", waitestapp.forms.CurrAttForm),
-                 ("cont", waitestapp.forms.CurrContForm),
-                 ("del", waitestapp.forms.CurrDelForm),
-
-
-]
-                 #ADD SCENARIO FORMS
-                 
-#Get list of physicians from capacity tab                 
-def get_physician_list(wizard):
-     # Get cleaned data from capacity step
-    cleaned_data = wizard.get_cleaned_data_for_step('capacity')
-    if cleaned_data:
-        phys_list=[record['Provider Name'] for record in cleaned_data['table'] if record['Position']=='Physician']
-    else:
-        phys_list = []
-    return phys_list
-    
-#Get list of physicians from capacity tab                 
-def get_nonphys_list(wizard):
-     # Get cleaned data from capacity step
-    cleaned_data = wizard.get_cleaned_data_for_step('capacity')
-    if cleaned_data:
-        phys_list=[record['Provider Name'] for record in cleaned_data['table'] if record['Position']!='Physician']
-    else:
-        phys_list = []
-    return phys_list
-        
-class CurrentWizard(SessionWizardView):
-    def get_template_names(self):
-        return [CURRENT_TEMPLATES[self.steps.current]]    
-        
-    def get_context_data(self, form, **kwargs):
-        context = super(CurrentWizard, self).get_context_data(form=form, **kwargs)
-        if self.steps.current == 'aff' or self.steps.current == 'attr':
-            phys_list=get_physician_list(self)
-            context.update({'phys_list': phys_list})
-        return context
-    
-    def done(self, form_list, form_dict, **kwargs):
-        return render_to_response('waitestapp/waitapp_utilization.html', {
-            'form_data': [form.cleaned_data for form in form_list],
-        })
-
-
-wizard_view = CurrentWizard.as_view(CURRENT_FORMS)
-
-def current_wizard_view(request):
-    return wizard_view(request)
-'''
 
 
 def home_view(request):       
@@ -138,7 +60,7 @@ def waitapp_prof(request):
         return HttpResponse('ok')
         
    
-    return render(request, 'waitestapp/waitapp_profile.html',{'phys_list':request.session['phys_list']})
+    return render(request, 'waitestapp/waitapp_profile.html',{'phys_list':request.session['phys_list'],'panel_list':initial_data.panel_datalist})
     
     
 @ensure_csrf_cookie
@@ -394,20 +316,7 @@ def waitapp_utilization(request):#get doctors in list
                     panel_dict[noprob] -= transf
                     panel_dict[prob] += transf
             
-            
-            '''
-            docnum = docname.split()[1]
-            with open('C:/Users/Reed/Desktop/doc%spanel.txt' % docnum,'w') as outfile:
-                outfile.write('\t'.join(['Gender','Agegroup','Conditions','Num Patients']) + '\n')
-                for cat, num in panel_dict.items():
-                    catsplit = cat.split(",")
-                    if catsplit[0] == '1':
-                        catsplit[0] = 'F'
-                    else:
-                        catsplit[0] = 'M'
-                    catsplit=catsplit + [str(num)]
-                    outfile.write('\t'.join(catsplit)  + '\n')
-            '''    
+          
             
             #get full distribution of patient types on panel
             ##panel_dict = Counter(np.random.choice(initial_data.full_cats_str, int(panel),adjust_ratios(full_p = initial_data.full_p, full_cats=initial_data.full_cats, sex=genarray, age=agearray,chronic=condarray, ageF=agearrayF,chronicF=condarrayF)))
@@ -2017,35 +1926,35 @@ def adjust_ratios(full_p = initial_data.full_p, full_cats=initial_data.full_cats
     female_p = [p/fem_tot for p in male_p]
     if age:
         #initialize dictionary of category idenifier and values[current proportion, requested proportion, multiplicative factor]
-        divisions={i+1:[0,perc*.01,0] for i,perc in enumerate(age)}
+        divisions={i+1:[0,num/sum(age),0] for i,num in enumerate(age)}
         new_p = adjust_category(1, divisions, full_cats, male_p)
         if new_p: #if no errors, replace proportions with adjusted proportions
             male_p=new_p
     
     if chronic:
         #initialize dictionary of category idenifier and values[current proportion, requested proportion, multiplicative factor]
-        divisions={i:[0,perc*.01,0] for i,perc in enumerate(chronic)}
+        divisions={i:[0,num/sum(chronic),0] for i,num in enumerate(chronic)}
         new_p = adjust_category(2, divisions, full_cats, male_p)
         if new_p: #if no errors, replace proportions with adjusted proportions
             male_p=new_p
             
     if ageF:
         #initialize dictionary of category idenifier and values[current proportion, requested proportion, multiplicative factor]
-        divisions={i+1:[0,perc*.01,0] for i,perc in enumerate(ageF)}
+        divisions={i+1:[0,num/sum(ageF),0] for i,num in enumerate(ageF)}
         new_p = adjust_category(1, divisions, full_cats, male_p)
         if new_p: #if no errors, replace proportions with adjusted proportions
             female_p=new_p
     
     if chronicF:
         #initialize dictionary of category idenifier and values[current proportion, requested proportion, multiplicative factor]
-        divisions={i:[0,perc*.01,0] for i,perc in enumerate(chronicF)}
+        divisions={i:[0,num/sum(chronicF),0] for i,num in enumerate(chronicF)}
         new_p = adjust_category(2, divisions, full_cats, male_p)
         if new_p: #if no errors, replace proportions with adjusted proportions
             female_p=new_p
             
     if sex:
-        male_p = [p*sex[0]*.01 for p in male_p]
-        female_p = [p*sex[0]*.01 for p in female_p]
+        male_p = [p*sex[0]/sum(sex) for p in male_p]
+        female_p = [p*sex[1]/sum(sex) for p in female_p]
         full_p = [max(m,f) for m, f in zip(male_p,female_p)]
     else:
         male_p = [p*mal_tot for p in male_p]

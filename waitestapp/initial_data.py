@@ -6,12 +6,23 @@ Created on Fri Nov  7 19:10:08 2014
 """
 #
 #CHECKING MECHANISM FOR NUMBERS, MAKE SURE THEY ARE SENSIBLE
+'''
 
 capacity_json = [{"Provider_Name":"Doctor 1","Hours_Per_Week":"55","Weeks_Per_Year":"50","Position":"Physician","Team":"Team A"},
                  {"Provider_Name":"Doctor 2","Hours_Per_Week":"55","Weeks_Per_Year":"50","Position":"Physician","Team":"Team B"},
                  {"Provider_Name":"Doctor 3","Hours_Per_Week":"55","Weeks_Per_Year":"50","Position":"Physician","Team":"Team C"},
                  {"Provider_Name":"Nurse 1","Hours_Per_Week":"40","Weeks_Per_Year":"50","Position":"Nurse Practitioner","Team":"Team B"},
                  {"Provider_Name":"Assist. 1","Hours_Per_Week":"40","Weeks_Per_Year":"50","Position":"Physician Assistant","Team":"Team A"}]                 
+'''
+capacity_json = [{"Provider_Name":"KIG","Hours_Per_Week":"19.5","Weeks_Per_Year":"46","Position":"Physician","Team":"Team A"},
+                 {"Provider_Name":"KG","Hours_Per_Week":"26","Weeks_Per_Year":"46","Position":"Physician","Team":"Team A"},
+                 {"Provider_Name":"LC","Hours_Per_Week":"16.25","Weeks_Per_Year":"46","Position":"Physician","Team":"Team A"},
+                 {"Provider_Name":"ML","Hours_Per_Week":"26.5","Weeks_Per_Year":"46","Position":"Physician","Team":"Team A"},
+                 {"Provider_Name":"DP","Hours_Per_Week":"26.5","Weeks_Per_Year":"46","Position":"Physician","Team":"Team A"},
+                 {"Provider_Name":"SU","Hours_Per_Week":"26.5","Weeks_Per_Year":"46","Position":"Physician","Team":"Team A"},
+                 {"Provider_Name":"JD","Hours_Per_Week":"26.5","Weeks_Per_Year":"46","Position":"Physician","Team":"Team A"},
+                 {"Provider_Name":"AT","Hours_Per_Week":"20","Weeks_Per_Year":"46","Position":"Physician","Team":"Team A"},
+                 {"Provider_Name":"JB","Hours_Per_Week":"20","Weeks_Per_Year":"46","Position":"Physician","Team":"Team A"}]                 
                  
 aff_json = [{"Provider":"Doctor 1","Patient":"Patient A"},
             {"Provider":"Doctor 1","Patient":"Patient B"},
@@ -19,6 +30,18 @@ aff_json = [{"Provider":"Doctor 1","Patient":"Patient A"},
             {"Provider":"Doctor 2","Patient":"Patient D"},
             {"Provider":"Doctor 3","Patient":"Patient E"},
             {"Provider":"Doctor 3","Patient":"Patient F"}]
+            
+            
+panel_datalist = [['LC',698,184,714,41,20,61,47,12,3,52,86,174,158,31,13],
+              ['KG',849,275,574,32,37,110,75,17,4,52,84,218,158,42,20],
+            ['KIG',265,96,169,13,10,35,31,6,1,16,22,61,54,14,2],
+            ['ML',1376,898,478,201,170,107,311,83,26,141,70,75,136,33,23],
+            ['DP',1424,1034,390,149,146,226,383,95,35,79,32,87,126,38,28],
+            ['SU',855,495,360,70,36,54,207,91,37,40,12,51	,120,86,51],
+            ['JD',927,178,749,61,32,24,38,17,6,92,100,117,327,79,34],
+            ['AT',719,175,544,75,21,10,42,19,8,114,63,99,189,47,32],
+            ['JB',852,371,481,18,39,53,175,58,30,32,38,69	,215,82,46]]
+              
             
 attr_json = [{"Physician":"Doctor 1", "Males":"900", "Females":"900", "Panel_Size":"1800"},
              {"Physician":"Doctor 2", "Males":"750", "Females":"750", "Panel_Size":"1500"},
