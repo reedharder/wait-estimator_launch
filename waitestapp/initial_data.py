@@ -15,14 +15,14 @@ capacity_json = [{"Provider_Name":"Doctor 1","Hours_Per_Week":"55","Weeks_Per_Ye
                  {"Provider_Name":"Assist. 1","Hours_Per_Week":"40","Weeks_Per_Year":"50","Position":"Physician Assistant","Team":"Team A"}]                 
 '''
 capacity_json = [{"Provider_Name":"KIG","Hours_Per_Week":"19.5","Weeks_Per_Year":"46","Position":"Physician","Team":"Team A"},
-                 {"Provider_Name":"KG","Hours_Per_Week":"26","Weeks_Per_Year":"46","Position":"Physician","Team":"Team A"},
-                 {"Provider_Name":"LC","Hours_Per_Week":"16.25","Weeks_Per_Year":"46","Position":"Physician","Team":"Team A"},
-                 {"Provider_Name":"ML","Hours_Per_Week":"26.5","Weeks_Per_Year":"46","Position":"Physician","Team":"Team A"},
-                 {"Provider_Name":"DP","Hours_Per_Week":"26.5","Weeks_Per_Year":"46","Position":"Physician","Team":"Team A"},
-                 {"Provider_Name":"SU","Hours_Per_Week":"26.5","Weeks_Per_Year":"46","Position":"Physician","Team":"Team A"},
-                 {"Provider_Name":"JD","Hours_Per_Week":"26.5","Weeks_Per_Year":"46","Position":"Physician","Team":"Team A"},
-                 {"Provider_Name":"AT","Hours_Per_Week":"20","Weeks_Per_Year":"46","Position":"Physician","Team":"Team A"},
-                 {"Provider_Name":"JB","Hours_Per_Week":"20","Weeks_Per_Year":"46","Position":"Physician","Team":"Team A"}]                 
+                 {"Provider_Name":"KG","Hours_Per_Week":"26","Weeks_Per_Year":"46","Position":"Physician","Team":"Team B"},
+                 {"Provider_Name":"LC","Hours_Per_Week":"16.25","Weeks_Per_Year":"46","Position":"Physician","Team":"Team C"},
+                 {"Provider_Name":"ML","Hours_Per_Week":"26.5","Weeks_Per_Year":"46","Position":"Physician","Team":"Team D"},
+                 {"Provider_Name":"DP","Hours_Per_Week":"26.5","Weeks_Per_Year":"46","Position":"Physician","Team":"Team E"},
+                 {"Provider_Name":"SU","Hours_Per_Week":"26.5","Weeks_Per_Year":"46","Position":"Physician","Team":"Team F"},
+                 {"Provider_Name":"JD","Hours_Per_Week":"26.5","Weeks_Per_Year":"46","Position":"Physician","Team":"Team G"},
+                 {"Provider_Name":"AT","Hours_Per_Week":"20","Weeks_Per_Year":"46","Position":"Physician","Team":"Team H"},
+                 {"Provider_Name":"JB","Hours_Per_Week":"20","Weeks_Per_Year":"46","Position":"Physician","Team":"Team I"}]                 
                  
 aff_json = [{"Provider":"Doctor 1","Patient":"Patient A"},
             {"Provider":"Doctor 1","Patient":"Patient B"},

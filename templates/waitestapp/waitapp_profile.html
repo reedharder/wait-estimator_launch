@@ -35,7 +35,7 @@ input[type=text]
 			<br>
 			<!-- Provider Addition Widget -->
 			
-			{% if phys_list %}
+			{% if panel_list %}
 			{% for panel in panel_list %}
 			<div class="panel">
 
@@ -93,6 +93,99 @@ input[type=text]
 						<td><input type="text" class="ageF" value="{{panel.13}}"></td>
 						<td><input type="text" class="ageF" value="{{panel.14}}"></td>
 						<td><input type="text" class="ageF" value="{{panel.15}}"></td>
+						<td><input type="checkbox" class="ageboxF" name="{{forloop.counter0}}" >&nbsp;Use National Sample</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td>0</td>
+						<td>1</td>
+						<td>2</td>
+						<td>3+</td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>Conditions M</td>
+						<td><input type="text" class="chron"></td>
+						<td><input type="text" class="chron" ></td>
+						<td><input type="text" class="chron"></td>
+						<td><input type="text" class="chron"></td>
+						<td></td>
+						<td></td>
+						<td><input type="checkbox" class="chronbox"  name="{{forloop.counter0}}" > &nbsp;Use National Sample</td>
+					</tr>
+					<tr>
+						<td>Conditions F</td>
+						<td><input type="text" class="chronF" ></td>
+						<td><input type="text" class="chronF" ></td>
+						<td><input type="text" class="chronF" ></td>
+						<td><input type="text" class="chronF"></td>
+						<td></td>
+						<td></td>
+						<td><input type="checkbox" class="chronboxF"  name="{{forloop.counter0}}" > &nbsp;Use National Sample</td>
+					</tr>
+				</table>
+			</div>
+			{% endfor %}
+			{% elif phys_list %}
+			{% for phys in phys_list %}
+			<div class="panel">
+
+			<label>{{phys}} &nbsp;&nbsp;&nbsp;&nbsp;</label> Panel Size: <input type="text" class="panelsize" placeholder="Enter Panel Size" value="{% if phys == "Doctor 1" %}1800{% elif phys == "Doctor 2" %}1800{% elif phys == "Doctor 3" %}1800{% else %}1800{% endif %}" />
+
+				<br><br>
+				<span><b>Panel breakdown by percentage:</b></span>
+				<br>
+				<table>
+					<tr>
+						<td></td>
+						<td>M</td>
+						<td>F</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>Gender</td>
+						<td><input type="text" class="gender" value=""></td>
+						<td><input type="text" class="gender" value=""></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td><input type="checkbox" class="genbox"  name="" >&nbsp;Use National Sample</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td>0-14</td>
+						<td>15-24</td>
+						<td>25-44</td>
+						<td>45-64</td>
+						<td>65-74</td>
+						<td>75+</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>Age Group M</td>
+						<td><input type="text" class="age" value="" ></td>
+						<td><input type="text" class="age" value=""></td>
+						<td><input type="text" class="age" value=""></td>
+						<td><input type="text" class="age" value=""></td>
+						<td><input type="text" class="age" value=""></td>
+						<td><input type="text" class="age" value=""></td>
+						<td><input type="checkbox" class="agebox" name="{{forloop.counter0}}" >&nbsp;Use National Sample</td>
+					</tr>
+					<tr>
+						<td>Age Group F</td>
+						<td><input type="text" class="ageF" value=""></td>
+						<td><input type="text" class="ageF" value=""></td>
+						<td><input type="text" class="ageF" value=""></td>
+						<td><input type="text" class="ageF" value=""></td>
+						<td><input type="text" class="ageF" value=""></td>
+						<td><input type="text" class="ageF" value=""></td>
 						<td><input type="checkbox" class="ageboxF" name="{{forloop.counter0}}" >&nbsp;Use National Sample</td>
 					</tr>
 					<tr>

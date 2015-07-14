@@ -58,9 +58,10 @@ def waitapp_prof(request):
         #get lists of physicians, non physicians   
         
         return HttpResponse('ok')
-        
-   
-    return render(request, 'waitestapp/waitapp_profile.html',{'phys_list':request.session['phys_list'],'panel_list':initial_data.panel_datalist})
+    plist = request.session['phys_list']
+    panlist = [panel[0] for panel in initial_data.panel_datalist]
+    panel_list = initial_data.panel_datalist if (plist==panlist) else []
+    return render(request, 'waitestapp/waitapp_profile.html',{'phys_list':request.session['phys_list'],'panel_list':panel_list})
     
     
 @ensure_csrf_cookie
