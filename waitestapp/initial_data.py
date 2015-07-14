@@ -32,9 +32,8 @@ aff_json = [{"Provider":"Doctor 1","Patient":"Patient A"},
             {"Provider":"Doctor 3","Patient":"Patient F"}]
             
             
-panel_datalist = [['LC',698,184,714,41,20,61,47,12,3,52,86,174,158,31,13],
-              ['KG',849,275,574,32,37,110,75,17,4,52,84,218,158,42,20],
-            ['KIG',265,96,169,13,10,35,31,6,1,16,22,61,54,14,2],
+panel_datalist = [['KIG',265,96,169,13,10,35,31,6,1,16,22,61,54,14,2], ['KG',849,275,574,32,37,110,75,17,4,52,84,218,158,42,20],
+                  ['LC',898,184,714,41,20,61,47,12,3,52,86,174,158,31,13],           
             ['ML',1376,898,478,201,170,107,311,83,26,141,70,75,136,33,23],
             ['DP',1424,1034,390,149,146,226,383,95,35,79,32,87,126,38,28],
             ['SU',855,495,360,70,36,54,207,91,37,40,12,51	,120,86,51],
@@ -672,3 +671,8 @@ def adjust_category(category, divisions, full_cats, full_p ):
         new_p.append(proportion*divisions[cat[category]][2])
     return new_p
          
+'''
+<!--{% if phys_list %}
+			{% for phys in phys_list %}-->
+<!--<label>{{phys}} &nbsp;&nbsp;&nbsp;&nbsp;</label> Panel Size: <input type="text" class="panelsize" placeholder="Enter Panel Size" value="{% if phys == "Doctor 1" %}1800{% elif phys == "Doctor 2" %}1800{% elif phys == "Doctor 3" %}1800{% else %}1800{% endif %}" />-->
+'''

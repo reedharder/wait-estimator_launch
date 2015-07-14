@@ -62,7 +62,7 @@ def mat_sim(urgents, cut_off, carve_out, days, freqs, durs,  nums, num_classes, 
     #initialize daily supplies
     daily_supplys=[0]*days
     
-    #if carveout, recalulate physmins and carve out time with 10% carveout
+    #if carveout, recalulate physmins and carve out time with 24% carveout
     ##print(phys_mins)
     increment_per_doc = {doc:.24*mins for doc, mins in phys_mins.items() } #get number of mins to transfer to carveout for each doc
     ##print(increment_per_doc)    

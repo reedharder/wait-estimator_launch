@@ -34,13 +34,12 @@ input[type=text]
 			<p>Provide a break down of patient profiles in your practice by number - our software will populate the data fields based on a national sample if such data is unavailable at your practice:</p>
 			<br>
 			<!-- Provider Addition Widget -->
-			<!--{% if phys_list %}
-			{% for phys in phys_list %}-->
+			
 			{% if phys_list %}
 			{% for panel in panel_list %}
 			<div class="panel">
-				<!--<label>{{phys}} &nbsp;&nbsp;&nbsp;&nbsp;</label> Panel Size: <input type="text" class="panelsize" placeholder="Enter Panel Size" value="{% if phys == "Doctor 1" %}1800{% elif phys == "Doctor 2" %}1800{% elif phys == "Doctor 3" %}1800{% else %}1800{% endif %}" />-->
-			  <label>{{panel.1}} &nbsp;&nbsp;&nbsp;&nbsp;</label> Panel Size: <input type="text" class="panelsize" placeholder="Enter Panel Size" value="{{panel.2}}" />
+
+			  <label>{{panel.0}} &nbsp;&nbsp;&nbsp;&nbsp;</label> Panel Size: <input type="text" class="panelsize" placeholder="Enter Panel Size" value="{{panel.1}}" />
 
 				<br><br>
 				<span><b>Panel breakdown by percentage:</b></span>
@@ -58,8 +57,8 @@ input[type=text]
 					</tr>
 					<tr>
 						<td>Gender</td>
-						<td><input type="text" class="gender" >{{panel.3}}</td>
-						<td><input type="text" class="gender">{{panel.4}}</td>
+						<td><input type="text" class="gender" value="{{panel.2}}"></td>
+						<td><input type="text" class="gender" value="{{panel.3}}"></td>
 						<td></td>
 						<td></td>
 						<td></td>
@@ -78,22 +77,22 @@ input[type=text]
 					</tr>
 					<tr>
 						<td>Age Group M</td>
-						<td><input type="text" class="age" >{{panel.5}}</td>
-						<td><input type="text" class="age" >{{panel.6}}</td>
-						<td><input type="text" class="age" >{{panel.7}}</td>
-						<td><input type="text" class="age" >{{panel.8}}</td>
-						<td><input type="text" class="age" >{{panel.9}}</td>
-						<td><input type="text" class="age" >{{panel.10}}</td>
+						<td><input type="text" class="age" value="{{panel.4}}" ></td>
+						<td><input type="text" class="age" value="{{panel.5}}"></td>
+						<td><input type="text" class="age" value="{{panel.6}}"></td>
+						<td><input type="text" class="age" value="{{panel.7}}"></td>
+						<td><input type="text" class="age" value="{{panel.8}}"></td>
+						<td><input type="text" class="age" value="{{panel.9}}"></td>
 						<td><input type="checkbox" class="agebox" name="{{forloop.counter0}}" >&nbsp;Use National Sample</td>
 					</tr>
 					<tr>
 						<td>Age Group F</td>
-						<td><input type="text" class="ageF">{{panel.11}}</td>
-						<td><input type="text" class="ageF" >{{panel.12}}</td>
-						<td><input type="text" class="ageF" >{{panel.13}}</td>
-						<td><input type="text" class="ageF">{{panel.14}}</td>
-						<td><input type="text" class="ageF" >{{panel.15}}</td>
-						<td><input type="text" class="ageF" >{{panel.16}}</td>
+						<td><input type="text" class="ageF" value="{{panel.10}}"></td>
+						<td><input type="text" class="ageF" value="{{panel.11}}"></td>
+						<td><input type="text" class="ageF" value="{{panel.12}}"></td>
+						<td><input type="text" class="ageF" value="{{panel.13}}"></td>
+						<td><input type="text" class="ageF" value="{{panel.14}}"></td>
+						<td><input type="text" class="ageF" value="{{panel.15}}"></td>
 						<td><input type="checkbox" class="ageboxF" name="{{forloop.counter0}}" >&nbsp;Use National Sample</td>
 					</tr>
 					<tr>

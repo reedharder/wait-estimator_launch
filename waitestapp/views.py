@@ -431,18 +431,18 @@ def waitapp_utilization(request):#get doctors in list
         
         for record in capacity_table:
             if record['Position'] == 'Physician':
-                phys_capacity[record['Provider Name']] = int(record['Hours Per Week'])*int(record['Weeks Per Year'])
-                phys_demand[record['Provider Name']][4] = int(record['Hours Per Week'])*int(record['Weeks Per Year'])
+                phys_capacity[record['Provider Name']] = float(record['Hours Per Week'])*float(record['Weeks Per Year'])
+                phys_demand[record['Provider Name']][4] = float(record['Hours Per Week'])*float(record['Weeks Per Year'])
                 phys_demand[record['Provider Name']][5] = record['Team'] #team name
                 #imbalance
                 phys_demand[record['Provider Name']][7] = phys_demand[record['Provider Name']][4] - phys_demand[record['Provider Name']][3]
             try:
                 team_capacity[record['Team']][0] += [record['Position'] + ' ' + record['Provider Name']]
-                team_capacity[record['Team']][1] += int(record['Hours Per Week'])*int(record['Weeks Per Year'])
+                team_capacity[record['Team']][1] += float(record['Hours Per Week'])*float(record['Weeks Per Year'])
             except KeyError:
                 team_capacity[record['Team']] = ['','']
                 team_capacity[record['Team']][0] = [record['Position']  + ' ' + record['Provider Name']]
-                team_capacity[record['Team']][1] = int(record['Hours Per Week'])*int(record['Weeks Per Year'])
+                team_capacity[record['Team']][1] = float(record['Hours Per Week'])*float(record['Weeks Per Year'])
         for phys in phys_demand: # get list of team members for each physician
             if phys_demand[phys][5] =='No Team':
                  phys_demand[phys][5] = ''
