@@ -478,6 +478,13 @@ female_p = [0.13509784244856998,
  0.00067737079779227295,
  0.00035122930255895634]
 
+def get_chron_rats(cats, rats):
+    rat_sums = [0,0,0,0]
+    for cat, rat in zip(cats,rats):
+        chron_cat=int(cat.split(",")[2])
+        rat_sums[chron_cat]+=rat
+    return rat_sums
+        
 #proportions of eac catgory (sex,age, num chronic)
 full_p =[0.078005040994292674,
  0.073268244633079349,

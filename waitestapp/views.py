@@ -1961,29 +1961,7 @@ def adjust_ratios(full_p = initial_data.full_p, full_cats=initial_data.full_cats
         male_p = [p*mal_tot for p in male_p]
         female_p = [p*fem_tot for p in female_p]
         full_p = [max(m,f) for m, f in zip(male_p,female_p)]
-    '''
-    
-    if age:
-        #initialize dictionary of category idenifier and values[current proportion, requested proportion, multiplicative factor]
-        divisions={i+1:[0,perc*.01,0] for i,perc in enumerate(age)}
-        new_p = adjust_category(1, divisions, full_cats, full_p)
-        if new_p: #if no errors, replace proportions with adjusted proportions
-            full_p=new_p
-    
-    if chronic:
-        #initialize dictionary of category idenifier and values[current proportion, requested proportion, multiplicative factor]
-        divisions={i:[0,perc*.01,0] for i,perc in enumerate(chronic)}
-        new_p = adjust_category(2, divisions, full_cats, full_p)
-        if new_p: #if no errors, replace proportions with adjusted proportions
-            full_p=new_p  
-            
-            if sex:
-     #initialize dictionary of category idenifier and values[current proportion, requested proportion, multiplicative factor]
-        divisions={i+1:[0,perc*.01,0] for i,perc in enumerate(sex)}
-        new_p = adjust_category(0, divisions, full_cats, full_p)
-        if new_p: #if no errors, replace proportions with adjusted proportions
-            full_p=new_p
-        '''
+
     return full_p
     
             
